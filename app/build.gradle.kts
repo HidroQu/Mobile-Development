@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.fundamentalandroid.hydroqu"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.fundamentalandroid.hydroqu"

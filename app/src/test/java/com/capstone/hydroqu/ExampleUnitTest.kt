@@ -1,4 +1,4 @@
-package com.fundamentalandroid.hydroqu
+package com.capstone.hydroqu
 
 import org.junit.Test
 
