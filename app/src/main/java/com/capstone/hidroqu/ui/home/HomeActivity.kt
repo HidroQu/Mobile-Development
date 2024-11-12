@@ -6,8 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Card
@@ -27,13 +27,14 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.capstone.hidroqu.ui.theme.HydroQuTheme
+import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.capstone.hidroqu.R
 
 class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            HydroQuTheme {
+            HidroQuTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -49,9 +50,10 @@ class HomeActivity : ComponentActivity() {
 fun HomeHidroQu(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .padding(20.dp) // Padding global untuk seluruh layar
+            .padding(20.dp)
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface), // Warna latar belakang aplikasi
+            .background(MaterialTheme.colorScheme.surface)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         TopHome()
@@ -183,12 +185,9 @@ fun AlarmCardHome(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(dummyListAlarmHome) {
-                CardAlarm(it)
-            }
+        // Menambahkan list artikel menggunakan Column biasa
+        dummyListAlarmHome.forEach { alarm ->
+            CardAlarm(alarm)
         }
     }
 }
@@ -255,18 +254,15 @@ fun ArticleSection(modifier: Modifier = Modifier) {
             )
         }
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(dummyListArticles) {
-                ArticleCard(it)
-            }
+        // Menambahkan list artikel menggunakan Column biasa
+        dummyListArticles.forEach { article ->
+            CardArticle(article)
         }
     }
 }
 
 @Composable
-fun ArticleCard(article: ListArticleHome, modifier: Modifier = Modifier) {
+fun CardArticle(article: ListArticleHome, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .fillMaxWidth(),
@@ -302,7 +298,7 @@ fun ArticleCard(article: ListArticleHome, modifier: Modifier = Modifier) {
 @Preview(device = Devices.DEFAULT, showBackground = true)
 @Composable
 fun HomeHidroQuPreview() {
-    HydroQuTheme {
+    HidroQuTheme {
         HomeHidroQu()
     }
 }

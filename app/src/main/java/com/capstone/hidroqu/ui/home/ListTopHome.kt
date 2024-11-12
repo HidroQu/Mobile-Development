@@ -1,6 +1,6 @@
 package com.capstone.hidroqu.ui.home
 
-import com.fundamentalandroid.hydroqu.R
+import com.capstone.hidroqu.R
 
 data class ListTopHome(
     val imgTopHome: Int,
