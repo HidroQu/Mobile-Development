@@ -1,4 +1,4 @@
-package com.capstone.hydroqu.ui.theme
+package com.capstone.hidroqu.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

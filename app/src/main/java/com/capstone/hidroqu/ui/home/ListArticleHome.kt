@@ -1,4 +1,4 @@
-package com.capstone.hydroqu.ui.home
+package com.capstone.hidroqu.ui.home
 
 data class ListArticleHome(
     val title: String, val summary: String

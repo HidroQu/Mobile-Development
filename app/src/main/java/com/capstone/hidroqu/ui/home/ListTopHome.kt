@@ -1,4 +1,4 @@
-package com.capstone.hydroqu.ui.home
+package com.capstone.hidroqu.ui.home
 
 import com.fundamentalandroid.hydroqu.R
 

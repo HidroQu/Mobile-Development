@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.fundamentalandroid.hydroqu"
+    namespace = "com.capstone.hidroqu"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.fundamentalandroid.hydroqu"
+        applicationId = "com.capstone.hidroqu"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
