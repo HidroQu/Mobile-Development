@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">HydroQu</string>
+    <string name="txt_dummy_pototanam">Cek kesehatan tanamanmu!</string>
+    <string name="txt_dummy_scantanam">Itu tanaman apa? Scan aja~</string>
+    <string name="txt_pototanam">PotoTanam</string>
+    <string name="txt_scantanam">ScanTanam</string>
+    <string name="article_title_1">Judul</string>
+    <string name="article_title_2">Judul</string>
+    <string name="article_content_1">Isi</string>
+    <string name="article_content_2">Isi</string>
 </resources>
