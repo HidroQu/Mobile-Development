@@ -5,12 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -52,7 +55,6 @@ fun HomeHidroQu(modifier: Modifier = Modifier) {
         modifier = modifier
             .padding(20.dp)
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -75,22 +77,23 @@ fun TopHome(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Halo Tifah 👋",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                text = "Halo Tifah 👋",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Icon(
                 Icons.Outlined.Notifications,
-                contentDescription = null,
+                contentDescription = "notification",
                 modifier = Modifier.size(31.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Text(
-            "Tanamanmu kangen disapa nih!",
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onSurface,
+            text = "Tanamanmu kangen disapa nih!",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.outline,
         )
     }
 }
@@ -105,17 +108,23 @@ fun CameraSection(modifier: Modifier = Modifier) {
     ) {
         CameraCard(
             modifier = Modifier.weight(0.5f),
+            icon = R.drawable.camera,
             imageRes = R.drawable.poto_tanam,
             title = stringResource(R.string.txt_pototanam),
             description = stringResource(R.string.txt_dummy_pototanam),
-            backgroundColor = MaterialTheme.colorScheme.primaryContainer
+            backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+            borderColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f),
+            colorText = MaterialTheme.colorScheme.onTertiaryContainer
         )
         CameraCard(
             modifier = Modifier.weight(0.5f),
+            icon = R.drawable.flip,
             imageRes = R.drawable.scan_tanam,
             title = stringResource(R.string.txt_scantanam),
             description = stringResource(R.string.txt_dummy_scantanam),
-            backgroundColor = MaterialTheme.colorScheme.primaryContainer
+            backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+            borderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+            colorText = MaterialTheme.colorScheme.onSecondaryContainer
         )
     }
 }
@@ -123,14 +132,23 @@ fun CameraSection(modifier: Modifier = Modifier) {
 @Composable
 fun CameraCard(
     imageRes: Int,
+    icon: Int,
     title: String,
     description: String,
     backgroundColor: Color,
+    borderColor: Color,
+    colorText: Color,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
+            .height(95.dp)
             .background(backgroundColor, shape = MaterialTheme.shapes.medium)
+            .border(
+                width = 1.dp,
+                color = borderColor, // Warna outline
+                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
+            )
             .padding(16.dp), // Padding internal kartu
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -140,27 +158,32 @@ fun CameraCard(
             contentDescription = null,
 //            modifier = Modifier.size(48.dp)
         )
-        Column {
+        Column (
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ){
             Row (
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Icon(
-                    painterResource(R.drawable.camera),
+                    painterResource(icon),
                     contentDescription = "Camera",
-                    modifier = modifier.size(24.dp)
+                    modifier = Modifier.width(14.dp)
                 )
                 Text(
                     text = title,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 13.sp
+                    ),
+                    color = colorText
                 )
             }
             Text(
                 text = description,
-                fontSize = 10.sp,
-                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 11.sp
+                ),
+                color = colorText
             )
         }
     }
@@ -175,19 +198,21 @@ fun AlarmCardHome(modifier: Modifier = Modifier) {
         Column {
             Text(
                 text = "Alarm Panen",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
                 text = "Jangan lewatkan momen panenmu!",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.outline
             )
         }
-        // Menambahkan list artikel menggunakan Column biasa
-        dummyListAlarmHome.forEach { alarm ->
-            CardAlarm(alarm)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp) // Jarak antar elemen dalam daftar
+        ) {
+            dummyListAlarmHome.forEach { alarm ->
+                CardAlarm(alarm)
+            }
         }
     }
 }
@@ -197,7 +222,12 @@ fun CardAlarm(listAlarmHome: ListAlarmHome, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.surfaceDim, // Warna outline
+                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
+            )
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -210,14 +240,13 @@ fun CardAlarm(listAlarmHome: ListAlarmHome, modifier: Modifier = Modifier) {
         Column {
             Text(
                 text = stringResource(id = listAlarmHome.txtAlarmHome),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
                 text = stringResource(id = listAlarmHome.descAlarmHome),
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }
@@ -228,35 +257,37 @@ fun ArticleSection(modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column {
-            Row (
-                modifier = modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
                 Text(
                     text = "Artikel",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = "Lihat semua",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "Temukan wawasan & tips terbaik untuk menanam",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
             Text(
-                text = "Temukan wawasan & tips terbaik untuk menanam",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.W400,
+                text = "Lihat semua",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontSize = 12.sp
+                ),
                 color = MaterialTheme.colorScheme.primary
             )
         }
 
-        // Menambahkan list artikel menggunakan Column biasa
-        dummyListArticles.forEach { article ->
-            CardArticle(article)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp) // Jarak antar artikel
+        ) {
+            dummyListArticles.forEach { article ->
+                CardArticle(article)
+            }
         }
     }
 }
@@ -265,7 +296,13 @@ fun ArticleSection(modifier: Modifier = Modifier) {
 fun CardArticle(article: ListArticleHome, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.surfaceDim, // Warna outline
+                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
+            ),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.onPrimary),
         shape = MaterialTheme.shapes.medium
     ) {
         Image(
@@ -282,14 +319,13 @@ fun CardArticle(article: ListArticleHome, modifier: Modifier = Modifier) {
         ){
             Text(
                 text = article.title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
                 text = article.summary,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.outline
             )
         }
     }
