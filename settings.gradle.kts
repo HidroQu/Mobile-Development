@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "HydroQu"
+rootProject.name = "HidroQu"
 include(":app")
