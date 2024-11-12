@@ -13,14 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.capstone.hidroqu.ui.theme.HydroQuTheme
+import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HydroQuTheme {
+            HidroQuTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
                         name = "Android",
@@ -37,14 +37,14 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
         text = "Hello $name!",
         modifier = modifier
-            .background(MaterialTheme.colorScheme.secondary)
+            .background(MaterialTheme.colorScheme.primary)
     )
     }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    HydroQuTheme {
+    HidroQuTheme {
         Greeting("Android")
     }
 }

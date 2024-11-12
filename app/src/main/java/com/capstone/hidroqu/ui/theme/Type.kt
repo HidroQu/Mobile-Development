@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.fundamentalandroid.hydroqu.R
+import com.capstone.hidroqu.R
 
 private val Urbanist = FontFamily(
     Font(R.font.urbanist_extralight, FontWeight.Thin),

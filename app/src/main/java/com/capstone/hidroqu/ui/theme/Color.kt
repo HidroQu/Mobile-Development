@@ -1,7 +1,6 @@
 package com.capstone.hidroqu.ui.theme
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 
 val primaryLight = Color(0xFF086B5A)
 val onPrimaryLight = Color(0xFFFFFFFF)
@@ -19,6 +18,7 @@ val errorLight = Color(0xFF904A49)
 val onErrorLight = Color(0xFFFFFFFF)
 val errorContainerLight = Color(0xFFFFDAD8)
 val onErrorContainerLight = Color(0xFF3B080B)
+val backgroundLight = Color(0xFFF5FBF7)
 val onBackgroundLight = Color(0xFF171D1B)
 val surfaceLight = Color(0xFFF5FAFB)
 val onSurfaceLight = Color(0xFF171D1E)
@@ -37,9 +37,7 @@ val surfaceContainerLowLight = Color(0xFFEFF5F6)
 val surfaceContainerLight = Color(0xFFE9EFF0)
 val surfaceContainerHighLight = Color(0xFFE3E9EA)
 val surfaceContainerHighestLight = Color(0xFFDEE3E5)
-val backgroundLight = lerp(surfaceLight, primaryLight, 0.08f)
 
-// Dark theme colors
 val primaryDark = Color(0xFF85D6C1)
 val onPrimaryDark = Color(0xFF00382E)
 val primaryContainerDark = Color(0xFF005143)
