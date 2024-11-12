@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.fundamentalandroid.hydroqu"
+    namespace = "com.capstone.hidroqu"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.fundamentalandroid.hydroqu"
+        applicationId = "com.capstone.hidroqu"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -66,6 +66,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Google Fonts untuk Jetpack Compose
-    implementation(libs.androidx.ui.text.google.fonts)
 }
