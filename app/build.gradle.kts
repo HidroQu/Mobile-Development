@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.fundamentalandroid.hydroqu"
+    namespace = "com.capstone.hidroqu"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.fundamentalandroid.hydroqu"
+        applicationId = "com.capstone.hidroqu"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -50,7 +50,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -66,4 +65,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
 }

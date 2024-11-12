@@ -1,4 +1,4 @@
-package com.capstone.hydroqu
+package com.capstone.hidroqu
 
 import org.junit.Test
 
