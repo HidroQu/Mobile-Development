@@ -3,6 +3,6 @@
     <style name="Theme.MySplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenIconBackgroundColor">@color/bglight</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
-        <item name="postSplashScreenTheme">@style/Theme.HydroQu</item>
+        <item name="postSplashScreenTheme">@style/Theme.HidroQu</item>
     </style>
 </resources>
