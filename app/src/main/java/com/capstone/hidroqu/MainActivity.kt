@@ -1,7 +1,8 @@
 package com.capstone.hidroqu
 
 import android.os.Bundle
-import android.provider.ContactsContract.Profile
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -51,10 +52,24 @@ import com.capstone.hidroqu.ui.myplant.MyPlantActivity
 import com.capstone.hidroqu.ui.profile.ProfileActivity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val splashScreen = installSplashScreen()
+
+        splashScreen.setKeepOnScreenCondition {
+            true
+        }
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            splashScreen.setKeepOnScreenCondition {
+                false
+            }
+        }, 2000)
         enableEdgeToEdge()
         setContent {
             HidroQuTheme {
