@@ -1,6 +1,7 @@
 package com.capstone.hidroqu
 
 import android.os.Bundle
+import android.provider.ContactsContract.Profile
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -42,11 +43,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.capstone.hidroqu.ui.article.ArticleActivity
 import com.capstone.hidroqu.ui.comunity.ComunityActivity
+import com.capstone.hidroqu.ui.detailarticle.DetailArticleActivity
 import com.capstone.hidroqu.ui.home.HomeActivity
 import com.capstone.hidroqu.ui.myplant.MyPlantActivity
 import com.capstone.hidroqu.ui.profile.ProfileActivity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +68,18 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainApp() {
     val navController = rememberNavController()
+    val systemUiController = rememberSystemUiController()
+
+    // Mengubah warna status bar
+    systemUiController.setSystemBarsColor(
+        color = MaterialTheme.colorScheme.primaryContainer, // Warna latar belakang status bar
+    )
+
+    // Mengubah warna status bar
+    systemUiController.setNavigationBarColor(
+        color = MaterialTheme.colorScheme.onPrimary, // Warna latar belakang status bar
+    )
+
     Scaffold(
 //        topBar = {
 //            TopAppBar(title = { Text(stringResource(R.string.app_name)) })
@@ -78,10 +94,17 @@ fun MainApp() {
             startDestination = "Home",
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable("Home") { HomeActivity() }
+            composable("Home") { HomeActivity(navController) }
             composable("Tanmanku") { MyPlantActivity() }
             composable("Komunitas") { ComunityActivity() }
             composable("Profil") { ProfileActivity() }
+            composable("Artikel") { ArticleActivity(navController) }
+            composable("DetailArticle/{articleId}") { backStackEntry ->
+                val articleId = backStackEntry.arguments?.getString("articleId")?.toIntOrNull()
+                if (articleId != null) {
+                    DetailArticleActivity(navController, articleId) // Kirim artikelId
+                }
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package com.capstone.hidroqu.ui.home
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.component.CardAlarm
@@ -29,7 +31,7 @@ import com.capstone.hidroqu.component.CardArticle
 import com.capstone.hidroqu.component.CardCamera
 
 @Composable
-fun HomeActivity(modifier: Modifier = Modifier) {
+fun HomeActivity(navController: NavHostController, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -40,7 +42,7 @@ fun HomeActivity(modifier: Modifier = Modifier) {
         TopHome()
         CameraSection()
         AlarmSection()
-        ArticleSection()
+        ArticleSection(navController)
     }
 }
 
@@ -136,7 +138,7 @@ fun AlarmSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ArticleSection(modifier: Modifier = Modifier) {
+fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -161,7 +163,18 @@ fun ArticleSection(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontSize = 12.sp
                 ),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable {
+                    navController.navigate("Artikel") {
+                        popUpTo("Home") {
+                            // Menyimpan state HomeActivity
+                            saveState = true
+                        }
+                        // Menggunakan launchSingleTop agar halaman Artikel tidak ditambahkan lagi ke stack
+                        launchSingleTop = true
+                        restoreState = true
+                    }// Arahkan ke halaman artikel
+                }
             )
         }
 
@@ -169,7 +182,18 @@ fun ArticleSection(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(16.dp) // Jarak antar artikel
         ) {
             dummyListArticles.forEach { article ->
-                CardArticle(article)
+                CardArticle(
+                    article = article,
+                    onClick = {
+                        navController.navigate("DetailArticle/${article.id}") {
+                            popUpTo("Home") { // Bersihkan halaman Home dari stack
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
         }
     }
@@ -180,6 +204,7 @@ fun ArticleSection(modifier: Modifier = Modifier) {
 @Composable
 fun HomeActivityPreview() {
     HidroQuTheme {
-        HomeActivity()
+        val navController = rememberNavController()
+        HomeActivity(navController)
     }
 }
