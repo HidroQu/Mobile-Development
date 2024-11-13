@@ -67,5 +67,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //splashscreen
-    implementation(libs.androidx.core.splashscreen)
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }
