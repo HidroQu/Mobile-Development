@@ -8,4 +8,9 @@
     <string name="article_title_2">Judul</string>
     <string name="article_content_1">Isi</string>
     <string name="article_content_2">Isi</string>
+    <string name="title_activity_article">ArticleActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_my_plant">MyPlantActivity</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_comunity">ComunityActivity</string>
 </resources>

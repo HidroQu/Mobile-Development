@@ -3,17 +3,11 @@ package com.capstone.hidroqu.ui.home
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,46 +15,31 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.R
-
-class HomeActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            HidroQuTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    HomeHidroQu()
-                }
-            }
-        }
-    }
-}
+import com.capstone.hidroqu.component.CardAlarm
+import com.capstone.hidroqu.component.CardArticle
+import com.capstone.hidroqu.component.CardCamera
 
 @Composable
-fun HomeHidroQu(modifier: Modifier = Modifier) {
+fun HomeActivity(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
+            .verticalScroll(rememberScrollState())
             .padding(20.dp)
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         TopHome()
         CameraSection()
-        AlarmCardHome()
+        AlarmSection()
         ArticleSection()
     }
 }
@@ -106,7 +85,7 @@ fun CameraSection(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CameraCard(
+        CardCamera(
             modifier = Modifier.weight(0.5f),
             icon = R.drawable.camera,
             imageRes = R.drawable.poto_tanam,
@@ -116,7 +95,7 @@ fun CameraSection(modifier: Modifier = Modifier) {
             borderColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f),
             colorText = MaterialTheme.colorScheme.onTertiaryContainer
         )
-        CameraCard(
+        CardCamera(
             modifier = Modifier.weight(0.5f),
             icon = R.drawable.flip,
             imageRes = R.drawable.scan_tanam,
@@ -130,68 +109,7 @@ fun CameraSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CameraCard(
-    imageRes: Int,
-    icon: Int,
-    title: String,
-    description: String,
-    backgroundColor: Color,
-    borderColor: Color,
-    colorText: Color,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .height(95.dp)
-            .background(backgroundColor, shape = MaterialTheme.shapes.medium)
-            .border(
-                width = 1.dp,
-                color = borderColor, // Warna outline
-                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
-            )
-            .padding(16.dp), // Padding internal kartu
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = null,
-//            modifier = Modifier.size(48.dp)
-        )
-        Column (
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ){
-            Row (
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Icon(
-                    painterResource(icon),
-                    contentDescription = "Camera",
-                    modifier = Modifier.width(14.dp)
-                )
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontSize = 13.sp
-                    ),
-                    color = colorText
-                )
-            }
-            Text(
-                text = description,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 11.sp
-                ),
-                color = colorText
-            )
-        }
-    }
-}
-
-
-@Composable
-fun AlarmCardHome(modifier: Modifier = Modifier) {
+fun AlarmSection(modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -213,41 +131,6 @@ fun AlarmCardHome(modifier: Modifier = Modifier) {
             dummyListAlarmHome.forEach { alarm ->
                 CardAlarm(alarm)
             }
-        }
-    }
-}
-
-@Composable
-fun CardAlarm(listAlarmHome: ListAlarmHome, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.surfaceDim, // Warna outline
-                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
-            )
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(id = listAlarmHome.imgAlarmHome),
-            contentDescription = "Gambar Tanaman",
-            modifier = Modifier.size(40.dp)
-        )
-        Column {
-            Text(
-                text = stringResource(id = listAlarmHome.txtAlarmHome),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            Text(
-                text = stringResource(id = listAlarmHome.descAlarmHome),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
         }
     }
 }
@@ -292,49 +175,11 @@ fun ArticleSection(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun CardArticle(article: ListArticleHome, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.surfaceDim, // Warna outline
-                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
-            ),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.onPrimary),
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Image(
-            painter = painterResource(R.drawable.ic_launcher_background),
-            contentDescription = "Artikel",
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth(),
-            contentScale = ContentScale.Crop
-        )
-        Column (
-            modifier = modifier
-                .padding(16.dp)
-        ){
-            Text(
-                text = article.title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-            Text(
-                text = article.summary,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
-    }
-}
 
 @Preview(device = Devices.DEFAULT, showBackground = true)
 @Composable
-fun HomeHidroQuPreview() {
+fun HomeActivityPreview() {
     HidroQuTheme {
-        HomeHidroQu()
+        HomeActivity()
     }
 }
