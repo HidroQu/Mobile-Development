@@ -40,43 +40,16 @@ import com.capstone.hidroqu.ui.home.getArticleById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun DetailArticleActivity(navController: NavHostController, articleId: Int, modifier: Modifier = Modifier) {
+fun DetailArticleActivity(articleId: Int, modifier: Modifier = Modifier) {
     val article = getArticleById(articleId)
 
     // Menampilkan konten hanya jika artikel ditemukan
     if (article != null) {
         Column {
-            TopBarDetailArticle(navController)
             DetailArticleContent(article)
         }
     } else {
         Text("Artikel tidak ditemukan", style = MaterialTheme.typography.bodyLarge)
-    }
-}
-
-@Composable
-fun TopBarDetailArticle(navController: NavHostController, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.onPrimary)
-            .padding(horizontal = 8.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row (
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-            }
-            Text(
-                text = "Tips panen cepat dengan",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        }
     }
 }
 
@@ -137,7 +110,6 @@ fun DetailArticleContent(article: ListArticleHome, modifier: Modifier = Modifier
 @Composable
 fun DetailArticleActivityPreview() {
     HidroQuTheme {
-        val navController = rememberNavController()
-        DetailArticleActivity(navController, 1)
+        DetailArticleActivity(1)
     }
 }
