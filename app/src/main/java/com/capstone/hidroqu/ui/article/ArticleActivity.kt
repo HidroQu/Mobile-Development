@@ -2,7 +2,6 @@ package com.capstone.hidroqu.ui.article
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,22 +10,46 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.capstone.hidroqu.ui.home.AlarmSection
-import com.capstone.hidroqu.ui.home.ArticleSection
-import com.capstone.hidroqu.ui.home.CameraSection
-import com.capstone.hidroqu.ui.home.TopHome
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.capstone.hidroqu.component.CardArticle
+import com.capstone.hidroqu.ui.home.dummyListArticles
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun ArticleActivity(modifier: Modifier = Modifier) {
+fun ArticleActivity(navController: NavHostController, searchQuery: String, modifier: Modifier = Modifier) {
+    Column {
+        Article(navController, searchQuery)  // Pass searchQuery to filter
+    }
+}
+
+@Composable
+fun Article(navController: NavHostController, searchQuery: String, modifier: Modifier = Modifier) {
+    val filteredArticles = dummyListArticles.filter {
+        it.title.contains(searchQuery, ignoreCase = true) ||
+                it.summary.contains(searchQuery, ignoreCase = true)
+    }
+
     Column(
-        modifier = modifier
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
             .verticalScroll(rememberScrollState())
             .padding(20.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        ArticleSection()
+        filteredArticles.forEach { article ->
+            CardArticle(
+                article = article,
+                onClick = {
+                    navController.navigate("DetailArticle/${article.id}") {
+                        popUpTo("Artikel") {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -34,6 +57,7 @@ fun ArticleActivity(modifier: Modifier = Modifier) {
 @Composable
 fun ArticleActivityPreview() {
     HidroQuTheme {
-        ArticleActivity()
+        val navController = rememberNavController()
+        ArticleActivity(navController, "")
     }
 }

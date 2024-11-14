@@ -2,6 +2,7 @@ package com.capstone.hidroqu.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,7 +20,7 @@ import com.capstone.hidroqu.R
 import com.capstone.hidroqu.ui.home.ListArticleHome
 
 @Composable
-fun CardArticle(article: ListArticleHome, modifier: Modifier = Modifier) {
+fun CardArticle(article: ListArticleHome, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -27,7 +28,8 @@ fun CardArticle(article: ListArticleHome, modifier: Modifier = Modifier) {
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.surfaceDim, // Warna outline
                 shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
-            ),
+            )
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.onPrimary),
         shape = MaterialTheme.shapes.medium
     ) {
