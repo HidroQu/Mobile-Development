@@ -40,7 +40,7 @@ import com.capstone.hidroqu.ui.home.HomeActivity
 import com.capstone.hidroqu.ui.myplant.MyPlantActivity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.capstone.hidroqu.ui.register.RegisterAvtivity
+import com.capstone.hidroqu.ui.profile.ProfileActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,19 +85,9 @@ fun MainApp() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("Home") { HomeActivity() }
-            composable("Tanmanku") { MyPlantActivity() }
+            composable("Tanamanku") { MyPlantActivity() }
             composable("Komunitas") { ComunityActivity() }
-            composable("Profil") { RegisterAvtivity(
-                name = "", // Passing initial values
-                email = "",
-                password = "",
-                checkValid = mutableListOf(),
-                onNameChanged = {},
-                onEmailChanged = {},
-                onPasswordChanged = {},
-                onLoginClicked = {},
-                onRegisterClicked = {},
-                onBackClick = {} ) } }
+            composable("Profil") { ProfileActivity() } }
         }
     }
 
@@ -105,7 +95,7 @@ fun MainApp() {
 fun BottomNavigationBar(navController: NavHostController) {
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home", "Tanamanku", "Komunitas", "Profil")
-    val routes = listOf("Home", "Tanmanku", "Komunitas", "Profil")
+    val routes = listOf("Home", "Tanamanku", "Komunitas", "Profil")
     val selectedIcons = listOf(Icons.Filled.Home, Icons.Filled.Favorite, Icons.Filled.Person, Icons.Filled.Person)
     val unselectedIcons = listOf(Icons.Outlined.Home, Icons.Outlined.FavoriteBorder, Icons.Outlined.Person, Icons.Outlined.Person)
     NavigationBar(
