@@ -1,90 +1,114 @@
 package com.capstone.hidroqu.ui.editprofile
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import com.capstone.hidroqu.R
+import com.capstone.hidroqu.component.TextFieldForm
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileActivity() {
-    var username by remember { mutableStateOf(TextFieldValue("@User12312312")) }
-    var name by remember { mutableStateOf(TextFieldValue("tifah")) }
-    var bio by remember { mutableStateOf(TextFieldValue("Android Developer Advocate @google, sketch comedienne, opera singer. BLM.")) }
+fun EditProfileActivity(
+    name: String,
+    bio: String,
+    onNameChanged: (String) -> Unit,
+    onBioChanged: (String) -> Unit
+) {
+    var nameValue by remember { mutableStateOf(name) }
+    var bioValue by remember { mutableStateOf(bio) }
+    var profileImage by remember { mutableStateOf<Bitmap?>(null) }
+
+    var isNameValid by remember { mutableStateOf(true) }
+    var isBioValid by remember { mutableStateOf(true) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val imageBitmap = result.data?.extras?.get("data") as? Bitmap
+            if (imageBitmap != null) {
+                profileImage = imageBitmap
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        horizontalAlignment = Alignment.Start
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
-            contentAlignment = Alignment.Center,
+        // Profile Header
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
-            Icon(
-                imageVector = Icons.Default.Person, // Menggunakan ikon Material3
-                contentDescription = "Profile Icon",
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(60.dp)
-            )
+            // Profile Picture
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clickable {
+                        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                        launcher.launch(intent)
+                    }
+                    .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                profileImage?.let {
+                    Image(
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier.size(120.dp)
+                    )
+                } ?: Icon(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = "Default Profile Icon",
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(60.dp)
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Username Field
-        Text("Username", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
+        TextFieldForm(
             modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            value = nameValue,
+            onValueChange = {
+                nameValue = it
+                onNameChanged(it)
+                isNameValid = it.isNotBlank()
+            },
+            label = "Nama Lengkap",
+            isError = !isNameValid,
+            errorMessage = if (!isNameValid) "Nama tidak boleh kosong" else null
         )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Name Field
-        Text("Nama anda", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
+        TextFieldForm(
             modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Bio Field
-        Text("Bio", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
-        OutlinedTextField(
-            value = bio,
-            onValueChange = { bio = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            value = bioValue,
+            onValueChange = {
+                bioValue = it
+                onBioChanged(it)
+                isBioValid = it.isNotBlank()
+            },
+            label = "Bio",
+            isError = !isBioValid,
+            errorMessage = if (!isBioValid) "Bio Tidak boleh kosong" else null
         )
     }
 }
@@ -93,6 +117,11 @@ fun EditProfileActivity() {
 @Composable
 fun PreviewEditProfileScreen() {
     HidroQuTheme {
-        EditProfileActivity()
+        EditProfileActivity(
+            name = "",
+            bio = "",
+            onNameChanged = {},
+            onBioChanged = {}
+        )
     }
 }

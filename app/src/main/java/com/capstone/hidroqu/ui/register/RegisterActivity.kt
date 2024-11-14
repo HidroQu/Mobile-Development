@@ -29,7 +29,7 @@ private fun isEmailValid(email: String): Boolean {
  * Komponen utama layar registrasi
  */
 @Composable
-fun RegisterAvtivity(
+fun RegisterActivity(
     name: String,
     email: String,
     password: String,
@@ -236,7 +236,7 @@ private fun RegisterForm(
 @Composable
 fun RegisterScreenPreview() {
     HidroQuTheme {
-        RegisterAvtivity(
+        RegisterActivity(
             name = "",
             email = "",
             password = "",

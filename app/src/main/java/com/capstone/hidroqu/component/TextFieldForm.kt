@@ -48,11 +48,11 @@ fun TextFieldForm(
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                unfocusedTextColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedTextColor = MaterialTheme.colorScheme.outline,
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                 focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.outlineVariant,
+                unfocusedLabelColor = MaterialTheme.colorScheme.outline,
                 errorBorderColor = MaterialTheme.colorScheme.error,
                 errorLabelColor = MaterialTheme.colorScheme.error,
                 errorTextColor = MaterialTheme.colorScheme.error
