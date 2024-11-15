@@ -206,7 +206,6 @@ fun MainApp() {
                                 Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                             }
                         },
-
                         colors = TopAppBarDefaults.smallTopAppBarColors(
                             containerColor = MaterialTheme.colorScheme.onPrimary
                         )
@@ -233,9 +232,9 @@ fun MainApp() {
             }
         },
         bottomBar = {
+            BottomNavigationBar(navController)
             when (currentDestination?.route){
                 "HistoryTanamanku/{historyId}" -> {
-
                 }
                 "DetailTanamanku/{detailId}" -> {
                     NavigationBar(
@@ -253,7 +252,6 @@ fun MainApp() {
                     }
                 }
                 else -> {
-                    BottomNavigationBar(navController)
                 }
             }
         }
