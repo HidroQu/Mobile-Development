@@ -6,6 +6,7 @@ import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -61,6 +64,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.capstone.hidroqu.ui.profile.ProfileActivity
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
+import com.capstone.hidroqu.ui.detailmyplant.getHealthHistoryById
+import com.capstone.hidroqu.ui.detailmyplant.getPlantById
 import com.capstone.hidroqu.ui.editprofile.EditProfileActivity
 import com.capstone.hidroqu.ui.historymyplant.HistoryMyPlantActivity
 import com.capstone.hidroqu.ui.home.getArticleById
@@ -190,13 +195,67 @@ fun MainApp() {
                         )
                     )
                 }
+                "DetailTanamanku/{detailId}" -> {
+                    val detailId = currentBackStackEntry.value?.arguments?.getString("detailId")
+                        ?.toIntOrNull()
+                    val detail = detailId?.let { getPlantById(it) }
+                    TopAppBar(
+                        title = { Text(detail?.name ?: "Tanamanku") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
 
+                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+                "HistoryTanamanku/{historyId}" -> {
+                    val historyId = currentBackStackEntry.value?.arguments?.getString("historyId")
+                        ?.toIntOrNull()
+                    val history = historyId?.let { getHealthHistoryById(it) }
+                    TopAppBar(
+                        title = { Text(history?.dateHistory ?: "History tanaman") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
                 else -> {
                 }
             }
         },
         bottomBar = {
-            BottomNavigationBar(navController)
+            when (currentDestination?.route){
+                "HistoryTanamanku/{historyId}" -> {
+
+                }
+                "DetailTanamanku/{detailId}" -> {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ) {
+                        Button(
+                            onClick = {  },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                        ) {
+                            Text(text = "Edit", style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+                }
+                else -> {
+                    BottomNavigationBar(navController)
+                }
+            }
         }
     ) { paddingValues ->
         if (isSearchVisible) {
@@ -271,8 +330,13 @@ fun MainApp() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("Home") { HomeActivity(navController) }
-            composable("Tanamanku") { MyPlantActivity() }
-            composable("DetailTanamanku") { DetailMyPlantActivity(navController) }
+            composable("Tanamanku") { MyPlantActivity(navController) }
+            composable("DetailTanamanku/{detailId}") { backStackEntry ->
+                val detailId = backStackEntry.arguments?.getString("detailId")?.toIntOrNull()
+                if (detailId != null) {
+                    DetailMyPlantActivity(detailId, navController)
+                }
+            }
             composable("HistoryTanamanku/{historyId}") { backStackEntry ->
                 val historyId = backStackEntry.arguments?.getString("historyId")?.toIntOrNull()
                 if (historyId != null) {
@@ -356,7 +420,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         Icons.Outlined.Person
     )
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.onPrimary,
+        containerColor = MaterialTheme.colorScheme.onPrimary
     ) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(

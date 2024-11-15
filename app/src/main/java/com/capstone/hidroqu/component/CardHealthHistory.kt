@@ -3,6 +3,7 @@ package com.capstone.hidroqu.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,12 +34,14 @@ import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.ui.detailmyplant.ListHealthHistory
 import com.capstone.hidroqu.ui.detailmyplant.dummyListHealthHistory
 import com.capstone.hidroqu.ui.home.dummyListArticles
+import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
 fun CardHealthHistory(listHealthHistory: ListHealthHistory, onClick: () -> Unit, modifier: Modifier = Modifier) {
     // Health History Section
         Row(
             modifier = Modifier
+                .clickable { onClick() }
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
                 .border(
@@ -46,7 +49,7 @@ fun CardHealthHistory(listHealthHistory: ListHealthHistory, onClick: () -> Unit,
                     color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
                     shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
                 )
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -73,20 +76,20 @@ fun CardHealthHistory(listHealthHistory: ListHealthHistory, onClick: () -> Unit,
                     Text(
                         text = listHealthHistory.issue,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text = listHealthHistory.date,
+                        text = listHealthHistory.dateHistory,
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.outline
                     )
                 }
             }
-            IconButton(onClick = { /* Navigate to health details */ }) {
+            IconButton(onClick = { onClick() }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = "See Health Details",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.outline
                 )
             }
         }
@@ -96,19 +99,21 @@ fun CardHealthHistory(listHealthHistory: ListHealthHistory, onClick: () -> Unit,
     @Preview(showBackground = false)
     @Composable
     private fun CardHealthHistoryPreview() {
-        val navController = rememberNavController()
-        dummyListHealthHistory.forEach { healthhistory ->
-            CardHealthHistory(
-                listHealthHistory = healthhistory,
-                onClick = {
-                    navController.navigate("DetailArticle/${healthhistory.id}") {
-                        popUpTo("Home") { // Bersihkan halaman Home dari stack
-                            saveState = true
+        HidroQuTheme {
+            val navController = rememberNavController()
+            dummyListHealthHistory.forEach { healthhistory ->
+                CardHealthHistory(
+                    listHealthHistory = healthhistory,
+                    onClick = {
+                        navController.navigate("DetailArticle/${healthhistory.plantId}") {
+                            popUpTo("Home") { // Bersihkan halaman Home dari stack
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
-                }
-            )
+                )
+            }
         }
     }
