@@ -60,7 +60,9 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.capstone.hidroqu.ui.profile.ProfileActivity
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
 import com.capstone.hidroqu.ui.editprofile.EditProfileActivity
+import com.capstone.hidroqu.ui.historymyplant.HistoryMyPlantActivity
 import com.capstone.hidroqu.ui.home.getArticleById
 
 
@@ -261,14 +263,20 @@ fun MainApp() {
             }
         }
 
-
-            NavHost(
+        NavHost(
             navController = navController,
             startDestination = "Home",
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("Home") { HomeActivity(navController) }
             composable("Tanamanku") { MyPlantActivity() }
+            composable("DetailTanamanku") { DetailMyPlantActivity(navController) }
+            composable("HistoryTanamanku/{historyId}") { backStackEntry ->
+                val historyId = backStackEntry.arguments?.getString("historyId")?.toIntOrNull()
+                if (historyId != null) {
+                    HistoryMyPlantActivity(historyId)
+                }
+            }
             composable("Komunitas") { ComunityActivity() }
             composable("Profil") { ProfileActivity(navController) }
             composable("EditProfil") {
