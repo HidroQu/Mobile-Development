@@ -21,9 +21,6 @@ import androidx.compose.ui.unit.dp
 import com.capstone.hidroqu.component.TextFieldForm
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
-/**
- * Validasi format email menggunakan Android Patterns
- */
 fun isEmailValid(email: String): Boolean {
     return Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
