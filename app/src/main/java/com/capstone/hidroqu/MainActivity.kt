@@ -61,6 +61,8 @@ import com.capstone.hidroqu.ui.profile.ProfileActivity
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.capstone.hidroqu.ui.editprofile.EditProfileActivity
 import com.capstone.hidroqu.ui.home.getArticleById
+import com.capstone.hidroqu.ui.login.LoginActivity
+import com.capstone.hidroqu.ui.register.RegisterActivity
 
 
 class MainActivity : ComponentActivity() {
@@ -230,10 +232,62 @@ fun MainApp() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("Home") { HomeActivity(navController) }
-            composable("Tanamanku") { MyPlantActivity() }
+            composable("Tanamanku") {
+                LoginActivity(
+                    email = "",
+                    password = "",
+                    onEmailChanged = {},
+                    onPasswordChanged = {},
+                    onLoginClicked = {},
+                    onRegisterClicked = {
+                        navController.navigate("Daftar") {
+                            popUpTo("Masuk") { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
             composable("Komunitas") { ComunityActivity() }
             composable("Profil") { ProfileActivity(navController) }
             composable("EditProfil") { EditProfileActivity() }
+            composable("Daftar") {
+                RegisterActivity(
+                    name = "",
+                    email = "",
+                    password = "",
+                    checkValid = mutableListOf(),
+                    onNameChanged = {},
+                    onEmailChanged = {},
+                    onPasswordChanged = {},
+                    onLoginClicked = {
+                        navController.navigate("Masuk") {
+                            popUpTo("Daftar") { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    onRegisterClicked = {
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+            composable("Masuk") {
+                LoginActivity(
+                    email = "",
+                    password = "",
+                    onEmailChanged = {},
+                    onPasswordChanged = {},
+                    onLoginClicked = {},
+                    onRegisterClicked = {
+                        navController.navigate("Daftar") {
+                            popUpTo("Masuk") { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+
             composable("Artikel") { ArticleActivity(navController, searchQuery) }
             composable("DetailArticle/{articleId}") { backStackEntry ->
                 val articleId = backStackEntry.arguments?.getString("articleId")?.toIntOrNull()
@@ -245,71 +299,71 @@ fun MainApp() {
     }
 }
 
-    @Composable
-    fun BottomNavigationBar(navController: NavHostController) {
-        var selectedItem by remember { mutableIntStateOf(0) }
-        val items = listOf("Home", "Tanamanku", "Komunitas", "Profil")
-        val routes = listOf("Home", "Tanamanku", "Komunitas", "Profil")
-        val selectedIcons = listOf(
-            Icons.Filled.Home,
-            Icons.Filled.Favorite,
-            Icons.Filled.Person,
-            Icons.Filled.Person
-        )
-        val unselectedIcons = listOf(
-            Icons.Outlined.Home,
-            Icons.Outlined.FavoriteBorder,
-            Icons.Outlined.Person,
-            Icons.Outlined.Person
-        )
-        NavigationBar(
-            containerColor = MaterialTheme.colorScheme.onPrimary,
-        ) {
-            items.forEachIndexed { index, item ->
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            if (selectedItem == index) selectedIcons[index] else unselectedIcons[index],
-                            contentDescription = item
-                        )
-                    },
-                    label = {
-                        Text(
-                            item,
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontFamily = MaterialTheme.typography.labelLarge.fontFamily,
-                                fontSize = MaterialTheme.typography.labelLarge.fontSize,
-                                fontWeight = if (selectedItem == index) FontWeight.Bold else FontWeight.Normal,
-                            )
-                        )
-                    },
-                    selected = selectedItem == index,
-                    onClick =
-                    {
-                        selectedItem = index
-                        navController.navigate(routes[index]) {
-                            popUpTo(navController.graph.startDestinationId)
-                            launchSingleTop = true
-                        }
-                    },
-                    modifier = Modifier.padding(top = 12.dp, bottom = 16.dp),
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+@Composable
+fun BottomNavigationBar(navController: NavHostController) {
+    var selectedItem by remember { mutableIntStateOf(0) }
+    val items = listOf("Home", "Tanamanku", "Komunitas", "Profil")
+    val routes = listOf("Home", "Tanamanku", "Komunitas", "Profil")
+    val selectedIcons = listOf(
+        Icons.Filled.Home,
+        Icons.Filled.Favorite,
+        Icons.Filled.Person,
+        Icons.Filled.Person
+    )
+    val unselectedIcons = listOf(
+        Icons.Outlined.Home,
+        Icons.Outlined.FavoriteBorder,
+        Icons.Outlined.Person,
+        Icons.Outlined.Person
+    )
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.onPrimary,
+    ) {
+        items.forEachIndexed { index, item ->
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        if (selectedItem == index) selectedIcons[index] else unselectedIcons[index],
+                        contentDescription = item
                     )
+                },
+                label = {
+                    Text(
+                        item,
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontFamily = MaterialTheme.typography.labelLarge.fontFamily,
+                            fontSize = MaterialTheme.typography.labelLarge.fontSize,
+                            fontWeight = if (selectedItem == index) FontWeight.Bold else FontWeight.Normal,
+                        )
+                    )
+                },
+                selected = selectedItem == index,
+                onClick =
+                {
+                    selectedItem = index
+                    navController.navigate(routes[index]) {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                },
+                modifier = Modifier.padding(top = 12.dp, bottom = 16.dp),
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
                 )
-            }
+            )
         }
     }
+}
 
-    @Preview
-    @Composable
-    private fun MainAppPreview() {
-        HidroQuTheme {
-            MainApp()
-        }
+@Preview
+@Composable
+private fun MainAppPreview() {
+    HidroQuTheme {
+        MainApp()
     }
+}
 

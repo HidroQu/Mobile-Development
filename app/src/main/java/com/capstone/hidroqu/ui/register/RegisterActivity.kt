@@ -1,6 +1,7 @@
 package com.capstone.hidroqu.ui.register
 
 import android.util.Patterns
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,6 +11,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -21,7 +24,7 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 /**
  * Validasi format email menggunakan Android Patterns
  */
-private fun isEmailValid(email: String): Boolean {
+fun isEmailValid(email: String): Boolean {
     return Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
 
@@ -29,7 +32,7 @@ private fun isEmailValid(email: String): Boolean {
  * Komponen utama layar registrasi
  */
 @Composable
-fun RegisterAvtivity(
+fun RegisterActivity(
     name: String,
     email: String,
     password: String,
@@ -42,6 +45,8 @@ fun RegisterAvtivity(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Scaffold(
         topBar = {
             RegisterTopBar(
@@ -54,7 +59,12 @@ fun RegisterAvtivity(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(20.dp),
+                .padding(20.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures {
+                        keyboardController?.hide()
+                    }
+                },
             name = name,
             email = email,
             password = password,
@@ -215,6 +225,7 @@ private fun RegisterForm(
             Text(
                 text = "Daftar",
                 style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onPrimary
             )
         }
@@ -222,9 +233,9 @@ private fun RegisterForm(
         TextButton(onClick = onLoginClicked) {
             Text(
                 text = "Sudah punya akun? Masuk.",
-                style = MaterialTheme.typography.titleMedium.copy(
+                style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 ),
             )
         }
@@ -236,7 +247,7 @@ private fun RegisterForm(
 @Composable
 fun RegisterScreenPreview() {
     HidroQuTheme {
-        RegisterAvtivity(
+        RegisterActivity(
             name = "",
             email = "",
             password = "",
