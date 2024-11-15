@@ -12,16 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -47,11 +44,9 @@ fun LoginActivity(
     var isPasswordValid by remember { mutableStateOf(true) }
     val isFormValid = isEmailValid && isPasswordValid
 
-    // Mendapatkan kontrol keyboard
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background Image covering the whole screen
         Image(
             painter = painterResource(id = R.drawable.hidroponikbg),
             contentDescription = "Hidroponik Background",
@@ -59,12 +54,11 @@ fun LoginActivity(
             contentScale = ContentScale.FillHeight
         )
 
-        // Content (login card) on top of the image
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .clickable {
-                    keyboardController?.hide() // Menutup keyboard ketika area di luar textfield diklik
+                    keyboardController?.hide()
                 },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
@@ -190,7 +184,6 @@ fun LoginButton(
     isFormValid: Boolean,
     onLoginClicked: () -> Unit,
 ) {
-    // Login Button
     Button(
         onClick = onLoginClicked,
         enabled = isFormValid,

@@ -60,6 +60,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.capstone.hidroqu.ui.profile.ProfileActivity
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.capstone.hidroqu.ui.addplant.AddPlantActivity
 import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
 import com.capstone.hidroqu.ui.editprofile.EditProfileActivity
 import com.capstone.hidroqu.ui.historymyplant.HistoryMyPlantActivity
@@ -172,6 +173,22 @@ fun MainApp() {
                     )
                 }
 
+                "Tanamanku" -> {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "Tanamanku",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        colors = TopAppBarDefaults.mediumTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+
                 "EditProfil" -> {
                     TopAppBar(
                         title = { Text("Edit Profil") },
@@ -271,7 +288,21 @@ fun MainApp() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("Home") { HomeActivity(navController) }
-            composable("Tanamanku") { MyPlantActivity() }
+            composable("Tanamanku") { MyPlantActivity(
+                onAddClicked = {
+                    navController.navigate("Pilihjenistanaman") {
+                        popUpTo("Tanamanku") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onDetailClicked = {
+                    navController.navigate("DetailTanamanku") {
+                        popUpTo("Tanamanku") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            ) }
+            composable("Pilihjenistanaman") { AddPlantActivity() }
             composable("DetailTanamanku") { DetailMyPlantActivity(navController) }
             composable("HistoryTanamanku/{historyId}") { backStackEntry ->
                 val historyId = backStackEntry.arguments?.getString("historyId")?.toIntOrNull()

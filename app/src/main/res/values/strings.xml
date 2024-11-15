@@ -14,4 +14,10 @@
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_comunity">ComunityActivity</string>
     <string name="title_activity_register">RegisterActivity</string>
+    <string name="txt_title_tanamanku1">Timun</string>
+    <string name="txt_title_tanamanku2">Tomat</string>
+    <string name="txt_title_tanamanku3">Bayam</string>
+    <string name="txt_desc_tanamanku1">Kemarin nanam pagi, ganti nutrisi 1-2 minggu sekali</string>
+    <string name="txt_desc_tanamanku2">Beri nutrisi 1-2 minggu sekali</string>
+    <string name="txt_desc_tanamanku3">Tanaman pertama saya nih</string>
 </resources>
