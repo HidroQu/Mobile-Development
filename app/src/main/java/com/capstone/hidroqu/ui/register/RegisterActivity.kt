@@ -79,7 +79,7 @@ fun RegisterActivity(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RegisterTopBar(
+fun RegisterTopBar(
     title: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -112,7 +112,7 @@ private fun RegisterTopBar(
  * Form input registrasi
  */
 @Composable
-private fun RegisterForm(
+fun RegisterForm(
     name: String,
     email: String,
     password: String,

@@ -20,7 +20,7 @@ val dummyListPlants = listOf(
         note = "Kemarin nanam pagi, ganti nutrisi 1-2 minggu sekali",
         dateSeeding = "25/08/2024",
         dateHarvest = "25/11/2024",
-        userPlantPhoto = R.drawable.poto_tanam
+        userPlantPhoto = R.drawable.timun
     ),
     ListPlant(
         id = 2,
@@ -29,7 +29,16 @@ val dummyListPlants = listOf(
         note = "Kemarin nanam pagi, ganti nutrisi 1-2 minggu sekali",
         dateSeeding = "25/08/2024",
         dateHarvest = "25/11/2024",
-        userPlantPhoto = R.drawable.poto_tanam
+        userPlantPhoto = R.drawable.tomat
+    ),
+    ListPlant(
+        id = 3,
+        name = "Bayam",
+        latinName = "Tomatus spiritus",
+        note = "Kemarin nanam pagi, ganti nutrisi 1-2 minggu sekali",
+        dateSeeding = "25/08/2024",
+        dateHarvest = "25/11/2024",
+        userPlantPhoto = R.drawable.bayam
     )
 )
 
