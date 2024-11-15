@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
@@ -53,16 +55,29 @@ import com.capstone.hidroqu.component.CardHealthHistory
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier = Modifier) {
-    val plantName = "Timun"
-    val plantLatinName = "Cucumis sativus"
-    val note = "Kemarin nanam pagi, ganti nutrisi 1-2 minggu sekali"
-    val plantingDate = "25/08/2024"
-    val predictedHarvestDate = "25/11/2025"
-    var isNotificationEnabled by remember { mutableStateOf(false) }
+fun DetailMyPlantActivity(detailId: Int, navController: NavHostController, modifier: Modifier = Modifier) {
+    val detail = getPlantById(detailId)
+    val healthHistoryList = getHealthHistoryByPlantId(detailId) // Fetch history for the plant
 
+    if (detail != null) {
+        DetailMyPlantContent(detail, healthHistoryList, navController)
+    } else {
+        Text("Data tidak ditemukan", style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
+
+@Composable
+fun DetailMyPlantContent(
+    plant: ListPlant,
+    healthHistoryList: List<ListHealthHistory>, // Accept health history list
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    var isNotificationEnabled by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
+            .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
@@ -73,8 +88,8 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
             modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surface),
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.onPrimary),
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -92,39 +107,39 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
             Column(
                 modifier = Modifier
                     .widthIn(max = 150.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surface)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.onPrimary)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     text = "Nama tanaman:",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = plantName,
+                    text = plant.name,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surface)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.onPrimary)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     text = "Nama Latin:",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = plantLatinName,
+                    text = plant.latinName,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
@@ -133,20 +148,20 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surface)
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.onPrimary)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = "Catatan",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = note,
+                text = plant.note,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.outline
             )
         }
 
@@ -157,8 +172,8 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
             Column (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                    .background(MaterialTheme.colorScheme.surface)
+                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                    .background(MaterialTheme.colorScheme.onPrimary)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ){
@@ -168,12 +183,12 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
                     Text(
                         text = "Progress tanaman",
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
                         text = "Dalam 60 hari ke depan, tanamamu siap panen",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.outline
                     )
                 }
                 Row(
@@ -193,11 +208,10 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
                         Text(
                             text = "Tanggal menanam",
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                        Spacer(modifier = Modifier.height(4.dp)) // Spacing between label and value
                         Text(
-                            text = plantingDate,
+                            text = plant.dateSeeding,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -215,11 +229,11 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
                         Text(
                             text = "Prediksi panen",
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Spacer(modifier = Modifier.height(4.dp)) // Spacing between label and value
                         Text(
-                            text = predictedHarvestDate,
+                            text = plant.dateHarvest,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -230,7 +244,7 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(bottomEnd = 8.dp, bottomStart = 8.dp))
+                    .clip(RoundedCornerShape(bottomEnd = 12.dp, bottomStart = 12.dp))
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -256,25 +270,25 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surface)
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.onPrimary)
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = "Riwayat kesehatan",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                dummyListHealthHistory.forEach { healthhistory ->
+                healthHistoryList.forEach { healthHistory -> // Loop through the list
                     CardHealthHistory(
-                        listHealthHistory = healthhistory,
+                        listHealthHistory = healthHistory,
                         onClick = {
-                            navController.navigate("HistoryTanamanku/${healthhistory.id}") {
-                                popUpTo("DetailTanamanku") {
+                            navController.navigate("HistoryTanamanku/${healthHistory.healthId}") {
+                                popUpTo("DetailTanamanku{detailId}") {
                                     saveState = true
                                 }
                                 launchSingleTop = true
@@ -285,25 +299,14 @@ fun DetailMyPlantActivity(navController: NavHostController, modifier: Modifier =
                 }
             }
         }
-
-        // Edit Button
-        Button(
-            onClick = { /* Navigate to edit screen */ },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
-        ) {
-            Text(text = "Edit", style = MaterialTheme.typography.labelLarge)
-        }
     }
 }
-
-
 
 @Preview
 @Composable
 private fun DetailMyPlantActivityPreview() {
     HidroQuTheme {
         val navController = rememberNavController()
-        DetailMyPlantActivity(navController)
+        DetailMyPlantActivity(2, navController)
     }
 }
