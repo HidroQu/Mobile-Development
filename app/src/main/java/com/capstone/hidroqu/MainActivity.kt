@@ -233,19 +233,7 @@ fun MainApp() {
         ) {
             composable("Home") { HomeActivity(navController) }
             composable("Tanamanku") {
-                LoginActivity(
-                    email = "",
-                    password = "",
-                    onEmailChanged = {},
-                    onPasswordChanged = {},
-                    onLoginClicked = {},
-                    onRegisterClicked = {
-                        navController.navigate("Daftar") {
-                            popUpTo("Masuk") { inclusive = true }
-                            launchSingleTop = true
-                        }
-                    }
-                )
+                MyPlantActivity()
             }
             composable("Komunitas") { ComunityActivity() }
             composable("Profil") { ProfileActivity(navController) }
