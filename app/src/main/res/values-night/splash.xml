@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme.MySplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenIconBackgroundColor">@color/bgdark</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/hidroqu_logo</item>
         <item name="postSplashScreenTheme">@style/Theme.HidroQu</item>
     </style>
 </resources>
