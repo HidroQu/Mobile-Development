@@ -63,6 +63,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.capstone.hidroqu.ui.profile.ProfileActivity
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.capstone.hidroqu.ui.chooseplant.ChoosePlantActivity
 import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
 import com.capstone.hidroqu.ui.detailmyplant.getHealthHistoryById
 import com.capstone.hidroqu.ui.detailmyplant.getPlantById
@@ -71,6 +72,8 @@ import com.capstone.hidroqu.ui.historymyplant.HistoryMyPlantActivity
 import com.capstone.hidroqu.ui.home.getArticleById
 import com.capstone.hidroqu.ui.login.LoginActivity
 import com.capstone.hidroqu.ui.register.RegisterActivity
+import com.capstone.hidroqu.ui.resultpototanam.ResultPotoTanamActivity
+import com.capstone.hidroqu.ui.resultscantanam.ResultScanTanamActivity
 
 
 class MainActivity : ComponentActivity() {
@@ -116,7 +119,6 @@ fun MainApp() {
         searchQuery = ""
         title = "Artikel"
     }
-
     systemUiController.setSystemBarsColor(
         color = MaterialTheme.colorScheme.primaryContainer,
     )
@@ -227,6 +229,45 @@ fun MainApp() {
                         )
                     )
                 }
+                "PilihTanaman" -> {
+                    TopAppBar(
+                        title = { Text("Pilih tanamanmu") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+                "ResultPotoTanam" -> {
+                    TopAppBar(
+                        title = { Text("Penyakit terdeteksi") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+                "ResultScanTanam"-> {
+                    TopAppBar(
+                        title = { Text("Detail tanaman") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
                 else -> {
                 }
             }
@@ -234,8 +275,6 @@ fun MainApp() {
         bottomBar = {
             BottomNavigationBar(navController)
             when (currentDestination?.route){
-                "HistoryTanamanku/{historyId}" -> {
-                }
                 "DetailTanamanku/{detailId}" -> {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -248,6 +287,55 @@ fun MainApp() {
                             colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
                         ) {
                             Text(text = "Edit", style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+                }
+                "ResultScanTanam" -> {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ) {
+                        Button(
+                            onClick = {
+
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                        ) {
+                            Text(text = "Simpan ke koleksi tanaman anda", style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+                }
+                "ResultPotoTanam" -> {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ) {
+                        Button(
+                            onClick = {
+                                navController.navigate("PilihTanaman")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                        ) {
+                            Text(text = "Simpan dan Pilih Tanaman", style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+                }
+                "PilihTanaman"-> {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ) {
+                        Button(
+                            onClick = { },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                        ) {
+                            Text(text = "Simpan riwayat penyakit", style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
@@ -396,6 +484,9 @@ fun MainApp() {
                     DetailArticleActivity(articleId)
                 }
             }
+            composable("ResultPotoTanam") { ResultPotoTanamActivity(navController) }
+            composable("ResultScanTanam") { ResultScanTanamActivity() }
+            composable("PilihTanaman") { ChoosePlantActivity(navController) }
         }
     }
 }

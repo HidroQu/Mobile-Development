@@ -40,7 +40,7 @@ fun HomeActivity(navController: NavHostController, modifier: Modifier = Modifier
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         TopHome()
-        CameraSection()
+        CameraSection(navController)
         AlarmSection()
         ArticleSection(navController)
     }
@@ -79,7 +79,7 @@ fun TopHome(modifier: Modifier = Modifier) {
     }
 }
 @Composable
-fun CameraSection(modifier: Modifier = Modifier) {
+fun CameraSection(navController: NavHostController, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -95,7 +95,11 @@ fun CameraSection(modifier: Modifier = Modifier) {
             description = stringResource(R.string.txt_dummy_pototanam),
             backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
             borderColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f),
-            colorText = MaterialTheme.colorScheme.onTertiaryContainer
+            colorText = MaterialTheme.colorScheme.onTertiaryContainer,
+            onClick = {
+                // Navigasi ke halaman hasil (Result) setelah mengklik card kedua
+                navController.navigate("ResultPotoTanam")
+            }
         )
         CardCamera(
             modifier = Modifier.weight(0.5f),
@@ -105,7 +109,11 @@ fun CameraSection(modifier: Modifier = Modifier) {
             description = stringResource(R.string.txt_dummy_scantanam),
             backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
             borderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-            colorText = MaterialTheme.colorScheme.onSecondaryContainer
+            colorText = MaterialTheme.colorScheme.onSecondaryContainer,
+            onClick = {
+                // Navigasi ke halaman hasil (Result) setelah mengklik card kedua
+                navController.navigate("ResultScanTanam")
+            }
         )
     }
 }
