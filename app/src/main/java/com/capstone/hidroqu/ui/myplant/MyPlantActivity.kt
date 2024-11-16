@@ -39,20 +39,17 @@ fun MyPlantActivity(
         },
         floatingActionButtonPosition = FabPosition.End
     ) { paddingValues ->
-        Column (
+        Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp)
                 .fillMaxSize()
-        ){
+        ) {
             if (dummyListPlants.isEmpty()) {
-                NoPlantList(modifier = Modifier
-                    .padding(paddingValues)
-                )
+                NoPlantList(modifier = Modifier.padding(paddingValues))
             } else {
                 MyPlantList(
-                    modifier = Modifier
-                        .padding(paddingValues),
+                    modifier = Modifier.padding(paddingValues),
                     onDetailClicked = onDetailClicked
                 )
             }

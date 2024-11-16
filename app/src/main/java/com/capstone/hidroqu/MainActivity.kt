@@ -61,8 +61,10 @@ import com.capstone.hidroqu.ui.myplant.MyPlantActivity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavType
 import com.capstone.hidroqu.ui.profile.ProfileActivity
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.capstone.hidroqu.ui.addplant.AddPlantActivity
 import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
 import com.capstone.hidroqu.ui.detailmyplant.getHealthHistoryById
@@ -345,26 +347,35 @@ fun MainApp() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable("Home") { HomeActivity(navController) }
-            composable("DetailTanamanku/{detailId}") { backStackEntry ->
-                val detailId = backStackEntry.arguments?.getString("detailId")?.toIntOrNull()
-                if (detailId != null) {
-                    DetailMyPlantActivity(detailId, navController)
+            composable(
+                route = "DetailTanamanku/{plantId}",
+                arguments = listOf(
+                    navArgument("plantId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) { backStackEntry ->
+                val plantId = backStackEntry.arguments?.getInt("plantId")
+                if (plantId != null) {
+                    DetailMyPlantActivity(
+                        detailId = plantId,
+                        navController = navController
+                    )
                 }
             }
-            composable("Tanamanku") { MyPlantActivity(
-                onAddClicked = {
-                    navController.navigate("Pilihjenistanaman") {
-                        popUpTo("Tanamanku") { inclusive = true }
-                        launchSingleTop = true
+            composable("Tanamanku") {
+                MyPlantActivity(
+                    onAddClicked = {
+                        navController.navigate("Pilihjenistanaman") {
+                            popUpTo("Tanamanku") { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    onDetailClicked = { plantId ->
+                        navController.navigate("DetailTanamanku/$plantId")
                     }
-                },
-                onDetailClicked = {
-                    navController.navigate("DetailTanamanku/{detailId}") {
-                        popUpTo("Tanamanku") { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
-            ) }
+                )
+            }
             composable("Pilihjenistanaman") { AddPlantActivity() }
             composable("HistoryTanamanku/{historyId}") { backStackEntry ->
                 val historyId = backStackEntry.arguments?.getString("historyId")?.toIntOrNull()
