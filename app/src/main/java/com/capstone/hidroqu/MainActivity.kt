@@ -357,6 +357,12 @@ fun MainApp() {
                         }
                     }
                 }
+                "FormTanaman/{plantId}" -> {
+                    selectedPlant?.let { plant ->
+                        navController.navigate("FormTanaman/${plant.plantId}")
+                    }
+                }
+
                 "ResultScanTanam" -> {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -503,7 +509,9 @@ fun MainApp() {
                 MyPlantActivity(
                     onAddClicked = {
                         navController.navigate("PilihJenisTanaman") {
-                            popUpTo("Tanamanku") { inclusive = true }
+                            popUpTo("Tanamanku"){
+                                saveState = true
+                            }
                             launchSingleTop = true
                         }
                     },
@@ -513,18 +521,13 @@ fun MainApp() {
                 )
             }
             composable("PilihJenisTanaman") {
-                var selectedPlant by remember { mutableStateOf<ListMyAddPlant?>(null) }
-
                 AddPlantActivity(
                     selectedPlantAdd = selectedPlant,
                     onPlantSelected = { plant ->
                         selectedPlant = plant
-                        navController.navigate("FormTanaman/${plant.plantId}")
                     }
                 )
             }
-
-
 
             composable("FormTanaman/{plantId}") { backStackEntry ->
                 val plantId = backStackEntry.arguments?.getString("plantId")?.toIntOrNull()
@@ -540,7 +543,6 @@ fun MainApp() {
                     Text("ID Tanaman tidak valid")
                 }
             }
-
 
 
 

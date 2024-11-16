@@ -26,8 +26,8 @@ fun CardArticle(article: ListArticleHome, onClick: () -> Unit, modifier: Modifie
             .fillMaxWidth()
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.surfaceDim, // Warna outline
-                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
+                color = MaterialTheme.colorScheme.surfaceDim,
+                shape = MaterialTheme.shapes.medium
             )
             .clickable { onClick() },
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.onPrimary),

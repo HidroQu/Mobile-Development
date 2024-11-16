@@ -15,8 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.capstone.hidroqu.ui.addplant.ListMyAddPlant
 import com.capstone.hidroqu.ui.addplant.dummyListAMyPlantTanamanku
-import com.capstone.hidroqu.ui.detailmyplant.ListPlant
-import com.capstone.hidroqu.ui.detailmyplant.dummyListPlants
 
 @Composable
 fun CardAddPlant(
@@ -24,45 +22,50 @@ fun CardAddPlant(
     isSelected: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = if (isSelected) {
-        MaterialTheme.colorScheme.secondaryContainer
-    } else {
-        MaterialTheme.colorScheme.onPrimary
-    }
-
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(backgroundColor, shape = MaterialTheme.shapes.medium)
+            .padding(8.dp)
             .border(
                 width = 2.dp,
-                color = MaterialTheme.colorScheme.surfaceDim,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim,
                 shape = MaterialTheme.shapes.medium
             )
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .background(
+                color = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.medium
+            ),
     ) {
-        Image(
-            modifier = Modifier.size(40.dp),
-            painter = painterResource(id = ListPlant.userPlantPhoto),
-            contentDescription = "Gambar Tanaman",
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = ListPlant.name,
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = ListPlant.userPlantPhoto),
+                contentDescription = "Gambar Tanaman",
+                modifier = Modifier.size(60.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = ListPlant.name,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
 
+
+
 @Preview
 @Composable
-fun CardAddPlantPreview() {
+fun CardAddPlantUnselectedPreview() {
     CardAddPlant(
         ListPlant = dummyListAMyPlantTanamanku[1],
-        isSelected = true
+        isSelected = false
     )
 }
