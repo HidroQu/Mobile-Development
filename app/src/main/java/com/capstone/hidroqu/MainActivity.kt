@@ -66,17 +66,22 @@ import com.capstone.hidroqu.ui.profile.ProfileActivity
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.capstone.hidroqu.ui.addplant.AddPlantActivity
+import com.capstone.hidroqu.ui.addplant.ListMyAddPlant
+import com.capstone.hidroqu.ui.addplant.getAddPlantById
 import com.capstone.hidroqu.ui.chooseplant.ChoosePlantActivity
 import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
+import com.capstone.hidroqu.ui.detailmyplant.ListPlant
 import com.capstone.hidroqu.ui.detailmyplant.getHealthHistoryById
 import com.capstone.hidroqu.ui.detailmyplant.getPlantById
 import com.capstone.hidroqu.ui.editprofile.EditProfileActivity
+import com.capstone.hidroqu.ui.formaddplant.FormAddPlantActivity
 import com.capstone.hidroqu.ui.historymyplant.HistoryMyPlantActivity
 import com.capstone.hidroqu.ui.home.getArticleById
 import com.capstone.hidroqu.ui.login.LoginActivity
 import com.capstone.hidroqu.ui.register.RegisterActivity
 import com.capstone.hidroqu.ui.resultpototanam.ResultPotoTanamActivity
 import com.capstone.hidroqu.ui.resultscantanam.ResultScanTanamActivity
+
 
 
 class MainActivity : ComponentActivity() {
@@ -113,6 +118,7 @@ fun MainApp() {
     var isSearchVisible by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("Artikel") }
+    var selectedPlant by remember { mutableStateOf<ListMyAddPlant?>(null) }
     var items = remember {
         mutableStateListOf(
             "history"
@@ -232,6 +238,19 @@ fun MainApp() {
                         )
                     )
                 }
+                "PilihJenisTanaman" -> {
+                    TopAppBar(
+                        title = { Text("Pilih tanaman anda") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
                 "HistoryTanamanku/{historyId}" -> {
                     val historyId = currentBackStackEntry.value?.arguments?.getString("historyId")
                         ?.toIntOrNull()
@@ -306,6 +325,35 @@ fun MainApp() {
                             colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
                         ) {
                             Text(text = "Edit", style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+                }
+                "PilihJenisTanaman" -> {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ) {
+                        NavigationBar(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                        ) {
+                            Button(
+                                onClick = {
+                                    selectedPlant?.let { plant ->
+                                        navController.navigate("FormTanaman/{plantId}")
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(20.dp),
+                                enabled = selectedPlant != null,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selectedPlant != null)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            ) {
+                                Text(text = "Lanjut", style = MaterialTheme.typography.labelLarge)
+                            }
                         }
                     }
                 }
@@ -454,7 +502,7 @@ fun MainApp() {
             composable("Tanamanku") {
                 MyPlantActivity(
                     onAddClicked = {
-                        navController.navigate("Pilihjenistanaman") {
+                        navController.navigate("PilihJenisTanaman") {
                             popUpTo("Tanamanku") { inclusive = true }
                             launchSingleTop = true
                         }
@@ -464,7 +512,38 @@ fun MainApp() {
                     }
                 )
             }
-            composable("Pilihjenistanaman") { AddPlantActivity() }
+            composable("PilihJenisTanaman") {
+                var selectedPlant by remember { mutableStateOf<ListMyAddPlant?>(null) }
+
+                AddPlantActivity(
+                    selectedPlantAdd = selectedPlant,
+                    onPlantSelected = { plant ->
+                        selectedPlant = plant
+                        navController.navigate("FormTanaman/${plant.plantId}")
+                    }
+                )
+            }
+
+
+
+            composable("FormTanaman/{plantId}") { backStackEntry ->
+                val plantId = backStackEntry.arguments?.getString("plantId")?.toIntOrNull()
+
+                if (plantId != null) {
+                    val plantDetail = getAddPlantById(plantId)
+                    if (plantDetail != null) {
+                        FormAddPlantActivity(plantAdd = plantDetail)
+                    } else {
+                        Text("Tanaman tidak ditemukan")
+                    }
+                } else {
+                    Text("ID Tanaman tidak valid")
+                }
+            }
+
+
+
+
             composable("HistoryTanamanku/{historyId}") { backStackEntry ->
                 val historyId = backStackEntry.arguments?.getString("historyId")?.toIntOrNull()
                 if (historyId != null) {
