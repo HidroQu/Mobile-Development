@@ -216,12 +216,12 @@ fun MainApp() {
                         )
                     )
                 }
-                "DetailTanamanku/{detailId}" -> {
-                    val detailId = currentBackStackEntry.value?.arguments?.getString("detailId")
+                "DetailTanamanku/{plantId}" -> {
+                    val plantId = currentBackStackEntry.value?.arguments?.getString("plantId")
                         ?.toIntOrNull()
-                    val detail = detailId?.let { getPlantById(it) }
+                    val plant = plantId?.let { getPlantById(it) }
                     TopAppBar(
-                        title = { Text(detail?.name ?: "Tanamanku") },
+                        title = { Text(plant?.name ?: "Tanamanku") },
                         navigationIcon = {
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
@@ -294,7 +294,7 @@ fun MainApp() {
         bottomBar = {
             BottomNavigationBar(navController)
             when (currentDestination?.route){
-                "DetailTanamanku/{detailId}" -> {
+                "DetailTanamanku/{plantId}" -> {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.onPrimary,
                     ) {
