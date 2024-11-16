@@ -1,5 +1,6 @@
 package com.capstone.hidroqu.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
@@ -29,6 +31,7 @@ import com.capstone.hidroqu.R
 import com.capstone.hidroqu.component.CardAlarm
 import com.capstone.hidroqu.component.CardArticle
 import com.capstone.hidroqu.component.CardCamera
+import com.capstone.hidroqu.ui.camera.CameraPotoTanamActivity
 
 @Composable
 fun HomeActivity(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -80,6 +83,7 @@ fun TopHome(modifier: Modifier = Modifier) {
 }
 @Composable
 fun CameraSection(navController: NavHostController, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -97,8 +101,9 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
             borderColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f),
             colorText = MaterialTheme.colorScheme.onTertiaryContainer,
             onClick = {
-                // Navigasi ke halaman hasil (Result) setelah mengklik card kedua
-                navController.navigate("ResultPotoTanam")
+                // Buka CameraPotoTanamActivity
+                val intent = Intent(context, CameraPotoTanamActivity::class.java)
+                context.startActivity(intent)
             }
         )
         CardCamera(

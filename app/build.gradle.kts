@@ -73,4 +73,14 @@ dependencies {
     //splashscreen
     implementation("androidx.core:core-splashscreen:1.0.1")
 
+    // CameraX Libraries
+    implementation("androidx.camera:camera-core:1.4.0")
+    implementation("androidx.camera:camera-camera2:1.4.0")
+    implementation("androidx.camera:camera-lifecycle:1.4.0")
+    implementation("androidx.camera:camera-view:1.4.0")
+    implementation("androidx.camera:camera-extensions:1.4.0")
+
+    implementation("io.coil-kt:coil-compose:2.3.0")
+
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
 }
