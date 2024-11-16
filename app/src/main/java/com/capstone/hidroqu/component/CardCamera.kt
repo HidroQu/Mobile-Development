@@ -3,6 +3,7 @@ package com.capstone.hidroqu.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,10 +30,12 @@ fun CardCamera(
     backgroundColor: Color,
     borderColor: Color,
     colorText: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = modifier
+            .clickable { onClick() }
             .height(95.dp)
             .background(backgroundColor, shape = MaterialTheme.shapes.medium)
             .border(

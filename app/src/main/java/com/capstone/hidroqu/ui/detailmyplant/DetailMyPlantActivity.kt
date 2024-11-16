@@ -80,7 +80,7 @@ fun DetailMyPlantContent(
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
+            .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Image placeholder for the plant
