@@ -9,29 +9,24 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
-import android.os.Bundle
-import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -47,27 +41,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.ui.camera.ResultTesting
-import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.capstone.hidroqu.ui.resultpototanam.ResultPotoTanamActivity
+import com.capstone.hidroqu.ui.resultscantanam.ResultScanTanamActivity
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import java.io.File
 import java.io.FileOutputStream
+import java.net.URLEncoder
 import java.util.concurrent.Executors
 
-class CameraPotoTanamActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            HidroQuTheme {
-                CameraPermissionScreen()
-            }
-        }
-    }
-}
-
 @Composable
-fun CameraPermissionScreen() {
+fun CameraPermissionScreen(cameraMode: String, navController: NavController) {
     val systemUiController = rememberSystemUiController()
 
     var hasCameraPermission by remember { mutableStateOf(false) }
@@ -99,7 +85,7 @@ fun CameraPermissionScreen() {
     }
 
     if (hasCameraPermission) {
-        CameraScreen()
+        CameraScreen(cameraMode, navController)
     } else {
         Box(
             modifier = Modifier
@@ -119,7 +105,7 @@ fun CameraPermissionScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraScreen() {
+fun CameraScreen(cameraMode: String, navController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -208,7 +194,7 @@ fun CameraScreen() {
             TopAppBar(
                 title = {
                     Text(
-                        "Poto Tanam",
+                        cameraMode,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -248,7 +234,7 @@ fun CameraScreen() {
             BottomBar(
                 onGalleryClick = { galleryLauncher.launch("image/*") },
                 onCaptureClick = {
-                    takePhoto(context, imageCapture, cameraExecutor, flashEnabled, isFrontCamera)
+                    takePhoto(context, imageCapture, cameraExecutor, flashEnabled, isFrontCamera, cameraMode, navController)
                 },
                 onSwitchCameraClick = {
                     isFrontCamera = !isFrontCamera
@@ -402,7 +388,9 @@ fun takePhoto(
     imageCapture: ImageCapture?,
     executor: java.util.concurrent.Executor,
     flashEnabled: Boolean,
-    isFrontCamera: Boolean
+    isFrontCamera: Boolean,
+    cameraMode: String,
+    navController: NavController
 ) {
     val photoFile = File(context.externalCacheDir, "${System.currentTimeMillis()}.jpg")
     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
@@ -417,46 +405,87 @@ fun takePhoto(
 
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                 val savedUri = Uri.fromFile(photoFile)
-                // Jika menggunakan kamera depan, lakukan mirror pada gambar
-                if (isFrontCamera) {
-                    // Lakukan transformasi gambar untuk efek mirror
-                    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
-                    // Menggunakan ExifInterface untuk memeriksa orientasi dan memperbaiki gambar
-                    val exif = ExifInterface(photoFile)
-                    val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
 
-                    // Memutar gambar sesuai dengan orientasi
-                    val rotatedBitmap = when (orientation) {
-                        ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
-                        ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
-                        ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
-                        else -> bitmap // Tidak perlu memutar jika orientasi sudah benar
-                    }
-                    // Lakukan transformasi mirror pada gambar
-                    val mirroredBitmap = Bitmap.createBitmap(
-                        rotatedBitmap, 0, 0, rotatedBitmap.width, rotatedBitmap.height,
-                        Matrix().apply { preScale(-1f, 1f) }, false
-                    )
+                // Pastikan navigasi dilakukan di main thread
+                val handler = Handler(Looper.getMainLooper())
+                handler.post {
+                if (cameraMode == "Poto Tanam") {
+                    // Jika menggunakan kamera depan, lakukan mirror pada gambar
+                    if (isFrontCamera) {
+                        // Lakukan transformasi gambar untuk efek mirror
+                        val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+                        // Menggunakan ExifInterface untuk memeriksa orientasi dan memperbaiki gambar
+                        val exif = ExifInterface(photoFile)
+                        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
 
-                    // Simpan bitmap hasil mirror ke file
-                    val mirroredFile = File(context.externalCacheDir, "${System.currentTimeMillis()}_mirrored.jpg")
-                    FileOutputStream(mirroredFile).use { out ->
-                        mirroredBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    }
+                        // Memutar gambar sesuai dengan orientasi
+                        val rotatedBitmap = when (orientation) {
+                            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
+                            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
+                            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
+                            else -> bitmap // Tidak perlu memutar jika orientasi sudah benar
+                        }
+                        // Lakukan transformasi mirror pada gambar
+                        val mirroredBitmap = Bitmap.createBitmap(
+                            rotatedBitmap, 0, 0, rotatedBitmap.width, rotatedBitmap.height,
+                            Matrix().apply { preScale(-1f, 1f) }, false
+                        )
 
-                    // Kirim hasil gambar yang sudah di-mirror ke ResultTesting
-                    val mirroredUri = Uri.fromFile(mirroredFile)
-                    val intent = Intent(context, ResultTesting::class.java).apply {
-                        putExtra("photo_uri", mirroredUri.toString())
+                        // Simpan bitmap hasil mirror ke file
+                        val mirroredFile = File(context.externalCacheDir, "${System.currentTimeMillis()}_mirrored.jpg")
+                        FileOutputStream(mirroredFile).use { out ->
+                            mirroredBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                        }
+
+                        // Kirim hasil gambar yang sudah di-mirror ke ResultTesting
+                        val mirroredUri = Uri.fromFile(mirroredFile)
+                        val encodedUri = URLEncoder.encode(mirroredUri.toString(), "UTF-8")
+                        navController.navigate("ResultPotoTanam/$encodedUri")
+                    } else {
+                        // Jika kamera belakang, kirim foto tanpa perubahan
+                        val encodedUri = URLEncoder.encode(savedUri.toString(), "UTF-8")
+                        navController.navigate("ResultPotoTanam/$encodedUri")
                     }
-                    context.startActivity(intent)
                 } else {
-                    // Jika kamera belakang, kirim foto tanpa perubahan
-                    val intent = Intent(context, ResultTesting::class.java).apply {
-                        putExtra("photo_uri", savedUri.toString())
+                    // Jika menggunakan kamera depan, lakukan mirror pada gambar
+                    if (isFrontCamera) {
+                        // Lakukan transformasi gambar untuk efek mirror
+                        val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+                        // Menggunakan ExifInterface untuk memeriksa orientasi dan memperbaiki gambar
+                        val exif = ExifInterface(photoFile)
+                        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+
+                        // Memutar gambar sesuai dengan orientasi
+                        val rotatedBitmap = when (orientation) {
+                            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
+                            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
+                            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
+                            else -> bitmap // Tidak perlu memutar jika orientasi sudah benar
+                        }
+                        // Lakukan transformasi mirror pada gambar
+                        val mirroredBitmap = Bitmap.createBitmap(
+                            rotatedBitmap, 0, 0, rotatedBitmap.width, rotatedBitmap.height,
+                            Matrix().apply { preScale(-1f, 1f) }, false
+                        )
+
+                        // Simpan bitmap hasil mirror ke file
+                        val mirroredFile = File(context.externalCacheDir, "${System.currentTimeMillis()}_mirrored.jpg")
+                        FileOutputStream(mirroredFile).use { out ->
+                            mirroredBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                        }
+
+                        // Kirim hasil gambar yang sudah di-mirror ke ResultTesting
+                        val mirroredUri = Uri.fromFile(mirroredFile)
+                        val encodedUri = URLEncoder.encode(mirroredUri.toString(), "UTF-8")
+                        navController.navigate("ResultScanTanam/$encodedUri")
+                    } else {
+                        // Jika kamera belakang, kirim foto tanpa perubahan
+                        val encodedUri = URLEncoder.encode(savedUri.toString(), "UTF-8")
+                        navController.navigate("ResultScanTanam/$encodedUri")
                     }
-                    context.startActivity(intent)
                 }
+                }
+
             }
         }
     )

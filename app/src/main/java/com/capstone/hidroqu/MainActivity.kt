@@ -66,6 +66,7 @@ import com.capstone.hidroqu.ui.profile.ProfileActivity
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.capstone.hidroqu.ui.addplant.AddPlantActivity
+import com.capstone.hidroqu.ui.camera.CameraPermissionScreen
 import com.capstone.hidroqu.ui.chooseplant.ChoosePlantActivity
 import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
 import com.capstone.hidroqu.ui.detailmyplant.getHealthHistoryById
@@ -261,7 +262,7 @@ fun MainApp() {
                         )
                     )
                 }
-                "ResultPotoTanam" -> {
+                "ResultPotoTanam/{photoUri}" -> {
                     TopAppBar(
                         title = { Text("Penyakit terdeteksi") },
                         navigationIcon = {
@@ -274,7 +275,7 @@ fun MainApp() {
                         )
                     )
                 }
-                "ResultScanTanam"-> {
+                "ResultScanTanam/{photoUri}"-> {
                     TopAppBar(
                         title = { Text("Detail tanaman") },
                         navigationIcon = {
@@ -309,7 +310,7 @@ fun MainApp() {
                         }
                     }
                 }
-                "ResultScanTanam" -> {
+                "ResultScanTanam/{photoUri}" -> {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.onPrimary,
                     ) {
@@ -326,7 +327,7 @@ fun MainApp() {
                         }
                     }
                 }
-                "ResultPotoTanam" -> {
+                "ResultPotoTanam/{photoUri}" -> {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.onPrimary,
                     ) {
@@ -526,8 +527,22 @@ fun MainApp() {
                     DetailArticleActivity(articleId)
                 }
             }
-            composable("ResultPotoTanam") { ResultPotoTanamActivity(navController) }
-            composable("ResultScanTanam") { ResultScanTanamActivity() }
+            composable("CameraPotoTanam") { CameraPermissionScreen("Poto Tanam", navController) }
+            composable("CameraScanTanam") { CameraPermissionScreen("Scan Tanam", navController)}
+            composable(
+                "ResultPotoTanam/{photoUri}",
+                arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val photoUri = backStackEntry.arguments?.getString("photoUri")
+                ResultPotoTanamActivity(photoUri = photoUri, navController)
+            }
+            composable(
+                "ResultScanTanam/{photoUri}",
+                arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val photoUri = backStackEntry.arguments?.getString("photoUri")
+                ResultScanTanamActivity(photoUri = photoUri, navController)
+            }
             composable("PilihTanaman") { ChoosePlantActivity(navController) }
         }
     }

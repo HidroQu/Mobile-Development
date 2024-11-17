@@ -31,7 +31,6 @@ import com.capstone.hidroqu.R
 import com.capstone.hidroqu.component.CardAlarm
 import com.capstone.hidroqu.component.CardArticle
 import com.capstone.hidroqu.component.CardCamera
-import com.capstone.hidroqu.ui.camera.CameraPotoTanamActivity
 
 @Composable
 fun HomeActivity(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -102,8 +101,7 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
             colorText = MaterialTheme.colorScheme.onTertiaryContainer,
             onClick = {
                 // Buka CameraPotoTanamActivity
-                val intent = Intent(context, CameraPotoTanamActivity::class.java)
-                context.startActivity(intent)
+                navController.navigate("CameraPotoTanam")
             }
         )
         CardCamera(
@@ -117,7 +115,7 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
             colorText = MaterialTheme.colorScheme.onSecondaryContainer,
             onClick = {
                 // Navigasi ke halaman hasil (Result) setelah mengklik card kedua
-                navController.navigate("ResultScanTanam")
+                navController.navigate("CameraScanTanam")
             }
         )
     }

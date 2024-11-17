@@ -1,5 +1,6 @@
 package com.capstone.hidroqu.ui.resultscantanam
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,14 +14,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun ResultScanTanamActivity(modifier: Modifier = Modifier) {
+fun ResultScanTanamActivity(
+    photoUri: String?,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
+    val imageUri = Uri.parse(photoUri)
+
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -35,13 +47,12 @@ fun ResultScanTanamActivity(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Image Tanaman
-            Image(
-                painter = painterResource(R.drawable.ic_launcher_background),
+            AsyncImage(
+                model = imageUri,
                 contentDescription = "User Photo",
                 modifier = Modifier
                     .height(150.dp)
-                    .widthIn(min = 130.dp)
+                    .widthIn(min = 130.dp, max = 250.dp)
                     .clip(RoundedCornerShape(25.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -158,6 +169,6 @@ fun ResultScanTanamActivity(modifier: Modifier = Modifier) {
 @Composable
 private fun ResultScanTanamActivityPreview() {
     HidroQuTheme {
-        ResultScanTanamActivity()
+        ResultScanTanamActivity("Poto Tanam", navController = rememberNavController())
     }
 }

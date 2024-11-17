@@ -1,5 +1,6 @@
 package com.capstone.hidroqu.ui.resultpototanam
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,11 +22,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
+
 @Composable
 fun ResultPotoTanamActivity(
+    photoUri: String?,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
@@ -37,6 +42,7 @@ fun ResultPotoTanamActivity(
 
     // Display the content with the diagnosis
     ResultPotoTanamActivityContent(
+        photoUri = photoUri,
         issue = issue.value,
         symptoms = symptoms.value,
         cause = cause.value,
@@ -47,12 +53,14 @@ fun ResultPotoTanamActivity(
 
 @Composable
 fun ResultPotoTanamActivityContent(
+    photoUri: String?,
     issue: String,
     symptoms: String,
     cause: String,
     relatedPhotos: List<Int>,
     modifier: Modifier = Modifier
 ) {
+    val imageUri = Uri.parse(photoUri)
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -60,9 +68,9 @@ fun ResultPotoTanamActivityContent(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Image(
-            painter = painterResource(R.drawable.ic_launcher_background),
-            contentDescription = "User Photo",
+        AsyncImage(
+            model = Uri.parse(photoUri),
+            contentDescription = "Hasil Foto",
             modifier = Modifier
                 .height(200.dp)
                 .fillMaxWidth()
@@ -156,6 +164,6 @@ fun ResultPotoTanamActivityContent(
 @Composable
 private fun ResultPotoTanamActivityPreview() {
     HidroQuTheme {
-        ResultPotoTanamActivity(navController = rememberNavController())
+        ResultPotoTanamActivity("Poto Tanam", navController = rememberNavController())
     }
 }
