@@ -1,5 +1,6 @@
 package com.capstone.hidroqu.ui.formaddplant
 
+import android.graphics.Paint.Align
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -16,8 +17,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.capstone.hidroqu.R
@@ -44,6 +47,7 @@ fun FormAddPlantActivity(plantId: Int) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormAddPlantContent(
     plantAdd: ListMyAddPlant,
@@ -51,18 +55,22 @@ fun FormAddPlantContent(
     onDateSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
+    var note by remember { mutableStateOf("") } // State untuk catatan yang diisi oleh user
+
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp),
+            .padding(20.dp)
+            .clickable { focusManager.clearFocus() },
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(id = plantAdd.userPlantPhoto),
@@ -70,9 +78,10 @@ fun FormAddPlantContent(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.onPrimary)
                     .border(
                         width = 2.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant,
+                        color = MaterialTheme.colorScheme.primary,
                         shape = CircleShape
                     ),
             )
@@ -80,8 +89,9 @@ fun FormAddPlantContent(
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = plantAdd.name,
+                textAlign = TextAlign.Center,
                 fontWeight = FontWeight.SemiBold,
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
@@ -91,13 +101,59 @@ fun FormAddPlantContent(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DatePickerField(plantingDate, onDateSelected)
         } // Menampilkan date picker
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // TextField untuk menambahkan catatan
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Tambahkan catatan",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            TextField(
+                value = note,
+                onValueChange = { note = it },
+                placeholder = { Text(text = "Isi catatan") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.onPrimary),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        }
     }
 }
+
+//private val userPlantCollection = mutableListOf<ListMyAddPlant>()
+//
+//fun addPlantToUserCollection(
+//    plant: ListMyAddPlant,
+//    plantingDate: String?,
+//    note: String
+//) {
+//    val newPlant = ListMyAddPlant(
+//        id = generateUniqueId(),
+//        name = plant.name,
+//        userPlantPhoto = plant.userPlantPhoto,
+//        plantingDate = plantingDate ?: "Tidak Diketahui",
+//        note = note
+//    )
+//    userPlantCollection.add(newPlant)
+//}
+
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DatePickerField(plantingDate: String?, onDateSelected: (String) -> Unit) {
-    var showDatePicker by remember { mutableStateOf(false) }
     val dateDialogState = rememberMaterialDialogState()
 
     // Tanggal yang akan ditampilkan
@@ -107,9 +163,12 @@ fun DatePickerField(plantingDate: String?, onDateSelected: (String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { dateDialogState.show() } // On click to show date picker
+            .clickable { dateDialogState.show() }
+            .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant, shape = MaterialTheme.shapes.medium)
             .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.primary)
     ) {
         Row(
             modifier = Modifier
@@ -120,7 +179,7 @@ fun DatePickerField(plantingDate: String?, onDateSelected: (String) -> Unit) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_calendar),
                 contentDescription = "Ikon Kalender",
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(28.dp)
             )
 
@@ -131,10 +190,10 @@ fun DatePickerField(plantingDate: String?, onDateSelected: (String) -> Unit) {
                     .fillMaxSize()
             ) {
                 Text(
-                    text = "Tanggal Tanam",
+                    text = "Tanggal Menanam",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -144,7 +203,7 @@ fun DatePickerField(plantingDate: String?, onDateSelected: (String) -> Unit) {
                     text = dateText,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
@@ -154,13 +213,13 @@ fun DatePickerField(plantingDate: String?, onDateSelected: (String) -> Unit) {
     MaterialDialog(
         dialogState = dateDialogState,
         buttons = {
-            positiveButton(text = "Ok")
-            negativeButton(text = "Cancel")
+            positiveButton(text = "Pilih")
+            negativeButton(text = "Batal")
         }
     ) {
         datepicker(
             initialDate = LocalDate.now(),
-            title = "Pilih Tanggal Tanam"
+            title = "Pilih Tanggal Menanam"
         ) { selectedDate ->
             val formattedDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 DateTimeFormatter.ofPattern("dd MMM yyyy").format(selectedDate)

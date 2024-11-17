@@ -3,6 +3,7 @@ package com.capstone.hidroqu
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -46,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -375,6 +377,41 @@ fun MainApp() {
                 "FormTanaman/{plantId}" -> {
                     selectedPlant?.let { plant ->
                         navController.navigate("FormTanaman/${plant.plantId}")
+                    }
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ) {
+                        Button(
+                            onClick = {
+                                selectedPlant?.let { plant ->
+//                                    // Logika untuk menambahkan input user ke data "Tanamanku"
+//                                    addPlantToUserCollection(plant, plantingDate, note)
+//
+//                                    // Tampilkan Toast jika berhasil
+//                                    Toast.makeText(
+//                                        LocalContext.current,
+//                                        "Tanaman berhasil ditambahkan!",
+//                                        Toast.LENGTH_SHORT
+//                                    ).show()
+
+                                    // Arahkan ke halaman "Tanamanku"
+                                    navController.navigate("Tanamanku")
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            enabled = selectedPlant != null,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (selectedPlant != null)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Text(text = "Lanjut", style = MaterialTheme.typography.labelLarge)
+                        }
+
                     }
                 }
 
