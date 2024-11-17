@@ -63,7 +63,7 @@ fun CardCommunity(
             .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.surfaceDim,
+                color = MaterialTheme.colorScheme.outline,
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),

@@ -26,11 +26,12 @@ import androidx.compose.ui.unit.dp
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.ui.list.ListHealthHistory
 import com.capstone.hidroqu.ui.list.getHealthHistoryById
+import com.capstone.hidroqu.ui.list.getHealthHistoryByPlantAndHealthId
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun HistoryMyPlantActivity(plantId: Int, modifier: Modifier = Modifier) {
-    val history = getHealthHistoryById(plantId)  // Use plantId to retrieve history
+fun HistoryMyPlantActivity(plantId: Int, healthId: Int, modifier: Modifier = Modifier) {
+    val history = getHealthHistoryByPlantAndHealthId(plantId, healthId)
 
     if (history != null) {
         DetailHistoryContent(history)
@@ -38,6 +39,7 @@ fun HistoryMyPlantActivity(plantId: Int, modifier: Modifier = Modifier) {
         Text("History tidak ditemukan", style = MaterialTheme.typography.bodyLarge)
     }
 }
+
 
 @Composable
 fun DetailHistoryContent(history: ListHealthHistory, modifier: Modifier = Modifier) {
@@ -140,6 +142,6 @@ fun DetailHistoryContent(history: ListHealthHistory, modifier: Modifier = Modifi
 @Composable
 private fun HistoryMyPlantActivityPreview() {
     HidroQuTheme {
-        HistoryMyPlantActivity(1)
+        HistoryMyPlantActivity(1, 1)
     }
 }

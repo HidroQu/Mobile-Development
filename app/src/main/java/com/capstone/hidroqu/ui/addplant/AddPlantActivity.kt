@@ -37,7 +37,7 @@ fun AddPlantActivity(
 
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             dummyListMyPlantTanamanku.forEach { plant ->
@@ -45,12 +45,10 @@ fun AddPlantActivity(
                 CardAddPlant(
                     ListPlant = plant,
                     isSelected = isSelected,
-                    modifier = Modifier
-                        .clickable {
-                            selectedPlant = if (isSelected) null else plant
-                            selectedPlant?.let { onPlantSelected(it) }
-                        }
-                        .padding(vertical = 8.dp)
+                    onClick = {
+                        selectedPlant = if (isSelected) null else plant
+                        selectedPlant?.let { onPlantSelected(it) }
+                    }
                 )
             }
         }

@@ -67,3 +67,7 @@ fun getHealthHistoryById(healthId: Int): ListHealthHistory? {
     // Dummy data for example. Replace with your actual data fetching logic.
     return dummyListHealthHistory.find { it.healthId == healthId }
 }
+fun getHealthHistoryByPlantAndHealthId(plantId: Int, healthId: Int): ListHealthHistory? {
+    // Mengambil data berdasarkan kedua ID
+    return dummyListHealthHistory.find { it.plantId == plantId && it.healthId == healthId }
+}

@@ -3,6 +3,7 @@ package com.capstone.hidroqu.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,12 +22,13 @@ import com.capstone.hidroqu.ui.list.dummyListMyPlantTanamanku
 fun CardAddPlant(
     ListPlant: ListMyAddPlant,
     isSelected: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .clickable(onClick = onClick)
             .border(
                 width = 2.dp,
                 color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim,
@@ -60,13 +62,13 @@ fun CardAddPlant(
     }
 }
 
-
-
 @Preview
 @Composable
 fun CardAddPlantUnselectedPreview() {
     CardAddPlant(
         ListPlant = dummyListMyPlantTanamanku[1],
-        isSelected = false
+        isSelected = false,
+        onClick = {
+        }
     )
 }

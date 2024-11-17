@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -75,6 +76,7 @@ import com.capstone.hidroqu.ui.editprofile.EditProfileActivity
 import com.capstone.hidroqu.ui.formaddplant.FormAddPlantActivity
 import com.capstone.hidroqu.ui.historymyplant.HistoryMyPlantActivity
 import com.capstone.hidroqu.ui.home.getArticleById
+import com.capstone.hidroqu.ui.list.getHealthHistoryByPlantAndHealthId
 import com.capstone.hidroqu.ui.login.LoginActivity
 import com.capstone.hidroqu.ui.register.RegisterActivity
 import com.capstone.hidroqu.ui.resultpototanam.ResultPotoTanamActivity
@@ -264,22 +266,30 @@ fun MainApp() {
                     )
                 }
 
-                "HistoryTanamanku/{historyId}" -> {
-                    val historyId = currentBackStackEntry.value?.arguments?.getString("historyId")
-                        ?.toIntOrNull()
-                    val history = historyId?.let { getHealthHistoryById(it) }
-                    TopAppBar(
-                        title = { Text(history?.dateHistory ?: "History tanaman") },
-                        navigationIcon = {
-                            IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                            }
-                        },
-                        colors = TopAppBarDefaults.smallTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimary
+                "HistoryTanamanku/{plantId}/{healthId}" -> {
+                    // Ambil plantId dan healthId dari argumen dengan kunci yang benar
+                    val plantId = currentBackStackEntry.value?.arguments?.getString("plantId")?.toIntOrNull()
+                    val healthId = currentBackStackEntry.value?.arguments?.getString("healthId")?.toIntOrNull()
+
+                    // Dapatkan riwayat kesehatan berdasarkan plantId dan healthId
+                    if (plantId != null && healthId != null) {
+                        val history = getHealthHistoryByPlantAndHealthId(plantId, healthId)
+
+                        // Menampilkan TopAppBar dengan judul yang sesuai
+                        TopAppBar(
+                            title = { Text(history?.dateHistory ?: "History tanaman") },
+                            navigationIcon = {
+                                IconButton(onClick = { navController.popBackStack() }) {
+                                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                                }
+                            },
+                            colors = TopAppBarDefaults.smallTopAppBarColors(
+                                containerColor = MaterialTheme.colorScheme.onPrimary
+                            )
                         )
-                    )
+                    }
                 }
+
                 "PilihTanaman" -> {
                     TopAppBar(
                         title = { Text("Pilih tanamanmu") },
@@ -351,7 +361,11 @@ fun MainApp() {
                             Button(
                                 onClick = {
                                     selectedPlant?.let { plant ->
-                                        navController.navigate("FormTanaman/{plantId}")
+                                        navController.navigate("FormTanaman/{plantId}"){
+                                            // Menjaga status halaman sebelumnya di stack navigasi
+                                            popUpTo("PilihJenisTanaman")
+                                            launchSingleTop = true
+                                        }
                                     }
                                 },
                                 modifier = Modifier
@@ -371,8 +385,10 @@ fun MainApp() {
                     }
                 }
                 "FormTanaman/{plantId}" -> {
-                    selectedPlant?.let { plant ->
-                        navController.navigate("FormTanaman/${plant.plantId}")
+                    LaunchedEffect(selectedPlant) {
+                        selectedPlant?.let { plant ->
+                            navController.navigate("FormTanaman/${plant.plantId}")
+                        }
                     }
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -586,12 +602,16 @@ fun MainApp() {
                 }
             }
 
-            composable("HistoryTanamanku/{historyId}") { backStackEntry ->
-                val historyId = backStackEntry.arguments?.getString("historyId")?.toIntOrNull()
-                if (historyId != null) {
-                    HistoryMyPlantActivity(historyId)
+            composable("HistoryTanamanku/{plantId}/{healthId}") { backStackEntry ->
+                val plantId = backStackEntry.arguments?.getString("plantId")?.toIntOrNull()
+                val healthId = backStackEntry.arguments?.getString("healthId")?.toIntOrNull()
+
+                if (plantId != null && healthId != null) {
+                    // Menampilkan aktivitas atau layar dengan data yang sesuai
+                    HistoryMyPlantActivity(plantId, healthId)
                 }
             }
+
             composable("Komunitas") { CommunityActivity(
                     onAddClicked = {
 

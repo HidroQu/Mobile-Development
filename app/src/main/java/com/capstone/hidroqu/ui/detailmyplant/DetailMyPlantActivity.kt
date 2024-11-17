@@ -275,8 +275,8 @@ fun DetailMyPlantContent(
                     CardHealthHistory(
                         listHealthHistory = healthHistory,
                         onClick = {
-                            navController.navigate("HistoryTanamanku/${healthHistory.healthId}") {
-                                popUpTo("DetailTanamanku{detailId}") {
+                            navController.navigate("HistoryTanamanku/${healthHistory.plantId}/${healthHistory.healthId}") {
+                                popUpTo("DetailTanamanku/{detailId}") {
                                     saveState = true
                                 }
                                 launchSingleTop = true
@@ -284,6 +284,7 @@ fun DetailMyPlantContent(
                             }
                         }
                     )
+
                 }
             }
         }
