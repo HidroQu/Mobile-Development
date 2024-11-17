@@ -409,7 +409,7 @@ fun MainApp() {
                                     MaterialTheme.colorScheme.surfaceVariant
                             )
                         ) {
-                            Text(text = "Lanjut", style = MaterialTheme.typography.labelLarge)
+                            Text(text = "Simpan", style = MaterialTheme.typography.labelLarge)
                         }
 
                     }
