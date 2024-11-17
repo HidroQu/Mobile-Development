@@ -73,4 +73,9 @@ dependencies {
     //splashscreen
     implementation("androidx.core:core-splashscreen:1.0.1")
 
+    //datepicker
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
+
+    // Desugaring (correct syntax in Kotlin DSL)
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.9")
 }

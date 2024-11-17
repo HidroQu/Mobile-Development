@@ -251,6 +251,21 @@ fun MainApp() {
                         )
                     )
                 }
+
+                "FormTanaman/{plantId}" -> {
+                    TopAppBar(
+                        title = { Text("Pilih tanaman anda") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+
                 "HistoryTanamanku/{historyId}" -> {
                     val historyId = currentBackStackEntry.value?.arguments?.getString("historyId")
                         ?.toIntOrNull()
@@ -533,18 +548,11 @@ fun MainApp() {
                 val plantId = backStackEntry.arguments?.getString("plantId")?.toIntOrNull()
 
                 if (plantId != null) {
-                    val plantDetail = getAddPlantById(plantId)
-                    if (plantDetail != null) {
-                        FormAddPlantActivity(plantAdd = plantDetail)
-                    } else {
-                        Text("Tanaman tidak ditemukan")
-                    }
+                    FormAddPlantActivity(plantId = plantId)
                 } else {
                     Text("ID Tanaman tidak valid")
                 }
             }
-
-
 
             composable("HistoryTanamanku/{historyId}") { backStackEntry ->
                 val historyId = backStackEntry.arguments?.getString("historyId")?.toIntOrNull()
