@@ -13,8 +13,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.capstone.hidroqu.ui.addplant.ListMyAddPlant
-import com.capstone.hidroqu.ui.addplant.dummyListAMyPlantTanamanku
+import com.capstone.hidroqu.ui.list.ListMyAddPlant
+import com.capstone.hidroqu.ui.list.dummyListAMyPlantTanamanku
+import com.capstone.hidroqu.ui.list.dummyListMyPlantTanamanku
 
 @Composable
 fun CardAddPlant(
@@ -65,7 +66,7 @@ fun CardAddPlant(
 @Composable
 fun CardAddPlantUnselectedPreview() {
     CardAddPlant(
-        ListPlant = dummyListAMyPlantTanamanku[1],
+        ListPlant = dummyListMyPlantTanamanku[1],
         isSelected = false
     )
 }

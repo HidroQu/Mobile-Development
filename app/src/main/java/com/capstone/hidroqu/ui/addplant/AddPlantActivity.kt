@@ -12,6 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.capstone.hidroqu.component.CardAddPlant
+import com.capstone.hidroqu.ui.list.ListMyAddPlant
+import com.capstone.hidroqu.ui.list.dummyListAMyPlantTanamanku
+import com.capstone.hidroqu.ui.list.dummyListMyPlantTanamanku
 
 @Composable
 fun AddPlantActivity(
@@ -37,7 +40,7 @@ fun AddPlantActivity(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            dummyListAMyPlantTanamanku.forEach { plant ->
+            dummyListMyPlantTanamanku.forEach { plant ->
                 val isSelected = selectedPlant == plant
                 CardAddPlant(
                     ListPlant = plant,
@@ -59,7 +62,7 @@ fun AddPlantActivity(
 @Preview(showBackground = true)
 @Composable
 fun AddPlantActivityPreview() {
-    val dummyPlant = dummyListAMyPlantTanamanku.firstOrNull()
+    val dummyPlant = dummyListMyPlantTanamanku.firstOrNull()
     AddPlantActivity(
         selectedPlantAdd = dummyPlant,
         onPlantSelected = {}

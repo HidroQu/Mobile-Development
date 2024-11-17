@@ -3,11 +3,9 @@ package com.capstone.hidroqu
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -47,7 +45,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,7 +53,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.ui.article.ArticleActivity
-import com.capstone.hidroqu.ui.comunity.ComunityActivity
 import com.capstone.hidroqu.ui.detailarticle.DetailArticleActivity
 import com.capstone.hidroqu.ui.home.HomeActivity
 import com.capstone.hidroqu.ui.myplant.MyPlantActivity
@@ -69,13 +65,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.capstone.hidroqu.ui.addplant.AddPlantActivity
 import com.capstone.hidroqu.ui.camera.CameraPermissionScreen
-import com.capstone.hidroqu.ui.addplant.ListMyAddPlant
-import com.capstone.hidroqu.ui.addplant.getAddPlantById
+import com.capstone.hidroqu.ui.list.ListMyAddPlant
 import com.capstone.hidroqu.ui.chooseplant.ChoosePlantActivity
+import com.capstone.hidroqu.ui.community.CommunityActivity
 import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
-import com.capstone.hidroqu.ui.detailmyplant.ListPlant
-import com.capstone.hidroqu.ui.detailmyplant.getHealthHistoryById
-import com.capstone.hidroqu.ui.detailmyplant.getPlantById
+import com.capstone.hidroqu.ui.list.getHealthHistoryById
+import com.capstone.hidroqu.ui.list.getPlantById
 import com.capstone.hidroqu.ui.editprofile.EditProfileActivity
 import com.capstone.hidroqu.ui.formaddplant.FormAddPlantActivity
 import com.capstone.hidroqu.ui.historymyplant.HistoryMyPlantActivity
@@ -597,7 +592,15 @@ fun MainApp() {
                     HistoryMyPlantActivity(historyId)
                 }
             }
-            composable("Komunitas") { ComunityActivity() }
+            composable("Komunitas") { CommunityActivity(
+                    onAddClicked = {
+
+                    },
+                    onDetailClicked = {
+
+                    }
+                )
+            }
             composable("Profil") { ProfileActivity(navController) }
             composable("EditProfil") {
                 EditProfileActivity(

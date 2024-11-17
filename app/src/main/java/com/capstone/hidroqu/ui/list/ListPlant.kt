@@ -1,4 +1,4 @@
-package com.capstone.hidroqu.ui.detailmyplant
+package com.capstone.hidroqu.ui.list
 
 import com.capstone.hidroqu.R
 

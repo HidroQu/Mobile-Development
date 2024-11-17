@@ -1,6 +1,5 @@
 package com.capstone.hidroqu.ui.formaddplant
 
-import android.graphics.Paint.Align
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -24,8 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.capstone.hidroqu.R
-import com.capstone.hidroqu.ui.addplant.ListMyAddPlant
-import com.capstone.hidroqu.ui.addplant.getAddPlantById
+import com.capstone.hidroqu.ui.list.ListMyAddPlant
+import com.capstone.hidroqu.ui.list.getAddPlantById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker

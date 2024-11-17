@@ -1,4 +1,4 @@
-package com.capstone.hidroqu.ui.addplant
+package com.capstone.hidroqu.ui.list
 
 import com.capstone.hidroqu.R
 
@@ -8,7 +8,7 @@ data class ListMyAddPlant(
     val userPlantPhoto: Int
 )
 
-val dummyListAMyPlantTanamanku = listOf(
+val dummyListMyPlantTanamanku = listOf(
     ListMyAddPlant(
         plantId = 1,
         name = "Tomat",
@@ -33,5 +33,5 @@ val dummyListAMyPlantTanamanku = listOf(
 )
 
 fun getAddPlantById(plantId: Int): ListMyAddPlant? {
-    return dummyListAMyPlantTanamanku.find { it.plantId == plantId }
+    return dummyListMyPlantTanamanku.find { it.plantId == plantId }
 }
