@@ -60,7 +60,6 @@ fun ProfileActivity(navController: NavHostController) {
                             saveState = true
                         }
                         launchSingleTop = true
-                        restoreState = true
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

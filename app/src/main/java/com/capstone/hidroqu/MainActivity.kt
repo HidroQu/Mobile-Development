@@ -3,6 +3,7 @@ package com.capstone.hidroqu
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -46,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,17 +69,22 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.capstone.hidroqu.ui.addplant.AddPlantActivity
 import com.capstone.hidroqu.ui.camera.CameraPermissionScreen
+import com.capstone.hidroqu.ui.addplant.ListMyAddPlant
+import com.capstone.hidroqu.ui.addplant.getAddPlantById
 import com.capstone.hidroqu.ui.chooseplant.ChoosePlantActivity
 import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
+import com.capstone.hidroqu.ui.detailmyplant.ListPlant
 import com.capstone.hidroqu.ui.detailmyplant.getHealthHistoryById
 import com.capstone.hidroqu.ui.detailmyplant.getPlantById
 import com.capstone.hidroqu.ui.editprofile.EditProfileActivity
+import com.capstone.hidroqu.ui.formaddplant.FormAddPlantActivity
 import com.capstone.hidroqu.ui.historymyplant.HistoryMyPlantActivity
 import com.capstone.hidroqu.ui.home.getArticleById
 import com.capstone.hidroqu.ui.login.LoginActivity
 import com.capstone.hidroqu.ui.register.RegisterActivity
 import com.capstone.hidroqu.ui.resultpototanam.ResultPotoTanamActivity
 import com.capstone.hidroqu.ui.resultscantanam.ResultScanTanamActivity
+
 
 
 class MainActivity : ComponentActivity() {
@@ -114,6 +121,7 @@ fun MainApp() {
     var isSearchVisible by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("Artikel") }
+    var selectedPlant by remember { mutableStateOf<ListMyAddPlant?>(null) }
     var items = remember {
         mutableStateListOf(
             "history"
@@ -233,6 +241,34 @@ fun MainApp() {
                         )
                     )
                 }
+                "PilihJenisTanaman" -> {
+                    TopAppBar(
+                        title = { Text("Pilih tanaman anda") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+
+                "FormTanaman/{plantId}" -> {
+                    TopAppBar(
+                        title = { Text("Pilih tanaman anda") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        },
+                        colors = TopAppBarDefaults.smallTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+                }
+
                 "HistoryTanamanku/{historyId}" -> {
                     val historyId = currentBackStackEntry.value?.arguments?.getString("historyId")
                         ?.toIntOrNull()
@@ -308,6 +344,75 @@ fun MainApp() {
                         ) {
                             Text(text = "Edit", style = MaterialTheme.typography.labelLarge)
                         }
+                    }
+                }
+                "PilihJenisTanaman" -> {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ) {
+                        NavigationBar(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                        ) {
+                            Button(
+                                onClick = {
+                                    selectedPlant?.let { plant ->
+                                        navController.navigate("FormTanaman/{plantId}")
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(20.dp),
+                                enabled = selectedPlant != null,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selectedPlant != null)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            ) {
+                                Text(text = "Lanjut", style = MaterialTheme.typography.labelLarge)
+                            }
+                        }
+                    }
+                }
+                "FormTanaman/{plantId}" -> {
+                    selectedPlant?.let { plant ->
+                        navController.navigate("FormTanaman/${plant.plantId}")
+                    }
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                    ) {
+                        Button(
+                            onClick = {
+                                selectedPlant?.let { plant ->
+//                                    // Logika untuk menambahkan input user ke data "Tanamanku"
+//                                    addPlantToUserCollection(plant, plantingDate, note)
+//
+//                                    // Tampilkan Toast jika berhasil
+//                                    Toast.makeText(
+//                                        LocalContext.current,
+//                                        "Tanaman berhasil ditambahkan!",
+//                                        Toast.LENGTH_SHORT
+//                                    ).show()
+
+                                    // Arahkan ke halaman "Tanamanku"
+                                    navController.navigate("Tanamanku")
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            enabled = selectedPlant != null,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (selectedPlant != null)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Text(text = "Simpan", style = MaterialTheme.typography.labelLarge)
+                        }
+
                     }
                 }
                 "ResultScanTanam/{photoUri}" -> {
@@ -455,8 +560,10 @@ fun MainApp() {
             composable("Tanamanku") {
                 MyPlantActivity(
                     onAddClicked = {
-                        navController.navigate("Pilihjenistanaman") {
-                            popUpTo("Tanamanku") { inclusive = true }
+                        navController.navigate("PilihJenisTanaman") {
+                            popUpTo("Tanamanku"){
+                                saveState = true
+                            }
                             launchSingleTop = true
                         }
                     },
@@ -465,7 +572,25 @@ fun MainApp() {
                     }
                 )
             }
-            composable("Pilihjenistanaman") { AddPlantActivity() }
+            composable("PilihJenisTanaman") {
+                AddPlantActivity(
+                    selectedPlantAdd = selectedPlant,
+                    onPlantSelected = { plant ->
+                        selectedPlant = plant
+                    }
+                )
+            }
+
+            composable("FormTanaman/{plantId}") { backStackEntry ->
+                val plantId = backStackEntry.arguments?.getString("plantId")?.toIntOrNull()
+
+                if (plantId != null) {
+                    FormAddPlantActivity(plantId = plantId)
+                } else {
+                    Text("ID Tanaman tidak valid")
+                }
+            }
+
             composable("HistoryTanamanku/{historyId}") { backStackEntry ->
                 val historyId = backStackEntry.arguments?.getString("historyId")?.toIntOrNull()
                 if (historyId != null) {

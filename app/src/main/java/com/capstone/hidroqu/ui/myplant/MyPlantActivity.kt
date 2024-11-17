@@ -25,7 +25,6 @@ import com.capstone.hidroqu.R
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.component.CardMyPlant
 import androidx.compose.ui.graphics.ColorFilter
-import com.capstone.hidroqu.ui.detailmyplant.ListPlant
 import com.capstone.hidroqu.ui.detailmyplant.dummyListPlants
 
 @Composable

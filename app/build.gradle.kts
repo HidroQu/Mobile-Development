@@ -83,4 +83,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.3.0")
 
     implementation("androidx.exifinterface:exifinterface:1.3.7")
+    //datepicker
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
+
+    // Desugaring (correct syntax in Kotlin DSL)
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.9")
 }
