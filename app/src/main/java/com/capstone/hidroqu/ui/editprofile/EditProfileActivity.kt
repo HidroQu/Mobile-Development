@@ -21,17 +21,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.component.TextFieldForm
+import com.capstone.hidroqu.ui.list.ListUserData
+import com.capstone.hidroqu.ui.list.dummyListUserData
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
 fun EditProfileActivity(
-    name: String,
-    bio: String,
+    userData: ListUserData,  // Menambahkan parameter userData
     onNameChanged: (String) -> Unit,
     onBioChanged: (String) -> Unit
 ) {
-    var nameValue by remember { mutableStateOf(name) }
-    var bioValue by remember { mutableStateOf(bio) }
+    var nameValue by remember { mutableStateOf(userData.name) }  // Menggunakan nama dari userData
+    var bioValue by remember { mutableStateOf(userData.bio) }    // Menggunakan bio dari userData
     var profileImage by remember { mutableStateOf<Bitmap?>(null) }
 
     var isNameValid by remember { mutableStateOf(true) }
@@ -86,6 +87,8 @@ fun EditProfileActivity(
                 )
             }
         }
+
+        // TextField for Name
         TextFieldForm(
             modifier = Modifier.fillMaxWidth(),
             value = nameValue,
@@ -98,6 +101,8 @@ fun EditProfileActivity(
             isError = !isNameValid,
             errorMessage = if (!isNameValid) "Nama tidak boleh kosong" else null
         )
+
+        // TextField for Bio
         TextFieldForm(
             modifier = Modifier.fillMaxWidth(),
             value = bioValue,
@@ -118,10 +123,10 @@ fun EditProfileActivity(
 fun PreviewEditProfileScreen() {
     HidroQuTheme {
         EditProfileActivity(
-            name = "",
-            bio = "",
+            userData = dummyListUserData.first(),  // Menggunakan data pertama dari dummyListUserData
             onNameChanged = {},
             onBioChanged = {}
         )
     }
 }
+

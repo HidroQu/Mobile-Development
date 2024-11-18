@@ -16,6 +16,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -60,48 +62,63 @@ fun FormAddPlantContent(
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp)
-            .clickable { focusManager.clearFocus() },
+            .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Image(
                 painter = painterResource(id = plantAdd.userPlantPhoto),
                 contentDescription = "Gambar Tanaman",
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.onPrimary)
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = CircleShape
-                    ),
+                    .height(150.dp)
+                    .widthIn(min = 130.dp, max = 200.dp)
+                    .clip(RoundedCornerShape(25.dp)),
+                contentScale = ContentScale.Crop
             )
 
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = plantAdd.name,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.SemiBold,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ){
+                    Text(
+                        text = "Nama Tanaman: ",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = plantAdd.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Tanggal Menanam: ",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = plantingDate ?: "Belum Ditentukan",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DatePickerField(plantingDate, onDateSelected)
         } // Menampilkan date picker
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // TextField untuk menambahkan catatan
         Column(
@@ -124,9 +141,12 @@ fun FormAddPlantContent(
                     .background(MaterialTheme.colorScheme.onPrimary),
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    focusedIndicatorColor = Color.Transparent,  // Remove the bottom focus indicator
+                    unfocusedIndicatorColor = Color.Transparent // Remove the bottom unfocused indicator
                 )
             )
+
         }
     }
 }

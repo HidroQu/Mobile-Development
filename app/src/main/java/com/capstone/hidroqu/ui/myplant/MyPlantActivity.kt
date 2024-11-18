@@ -113,7 +113,7 @@ fun NoPlantList(
 @Composable
 fun MyPlantList(modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         dummyListPlants.forEach { plant ->
             CardMyPlant(

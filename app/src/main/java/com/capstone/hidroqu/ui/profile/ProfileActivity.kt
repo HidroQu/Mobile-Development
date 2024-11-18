@@ -14,10 +14,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.R
+import com.capstone.hidroqu.ui.list.ListUserData
+import com.capstone.hidroqu.ui.list.dummyListUserData
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun ProfileActivity(navController: NavHostController) {
+fun ProfileActivity(navController: NavHostController, userData: ListUserData) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,7 +42,7 @@ fun ProfileActivity(navController: NavHostController) {
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    painter = painterResource(id = userData.img), // Use the dynamic image
                     contentDescription = "Profile Icon",
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(60.dp)
@@ -48,8 +51,8 @@ fun ProfileActivity(navController: NavHostController) {
 
             // Profile Name and Description
             ProfileInfo(
-                name = "Tiffah",
-                description = "Android Developer Advocate @google, sketch comedienne, opera singer. BLM."
+                name = userData.name,  // Use dynamic name
+                description = userData.bio // Use dynamic bio
             )
 
             // Edit Profile Button (Outlined)
@@ -77,6 +80,7 @@ fun ProfileActivity(navController: NavHostController) {
         }
     }
 }
+
 
 @Composable
 fun ProfileInfo(name: String, description: String) {
@@ -131,6 +135,8 @@ fun AppearanceOption(text: String, selected: Boolean) {
 fun PreviewProfileScreen() {
     HidroQuTheme {
         val navController = rememberNavController()
-        ProfileActivity(navController)
+        val userData = dummyListUserData.first() // Ambil data pertama dari dummy list
+        ProfileActivity(navController, userData)
     }
 }
+

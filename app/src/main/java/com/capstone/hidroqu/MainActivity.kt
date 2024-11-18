@@ -74,8 +74,10 @@ import com.capstone.hidroqu.ui.list.getHealthHistoryById
 import com.capstone.hidroqu.ui.list.getPlantById
 import com.capstone.hidroqu.ui.editprofile.EditProfileActivity
 import com.capstone.hidroqu.ui.formaddplant.FormAddPlantActivity
+import com.capstone.hidroqu.ui.formcommunity.FormAddCommunityActivity
 import com.capstone.hidroqu.ui.historymyplant.HistoryMyPlantActivity
 import com.capstone.hidroqu.ui.home.getArticleById
+import com.capstone.hidroqu.ui.list.dummyListUserData
 import com.capstone.hidroqu.ui.list.getHealthHistoryByPlantAndHealthId
 import com.capstone.hidroqu.ui.login.LoginActivity
 import com.capstone.hidroqu.ui.register.RegisterActivity
@@ -614,18 +616,27 @@ fun MainApp() {
 
             composable("Komunitas") { CommunityActivity(
                     onAddClicked = {
-
+                        navController.navigate("TambahPostKomunitas") {
+                            popUpTo("Komunitas")
+                            launchSingleTop = true
+                        }
                     },
                     onDetailClicked = {
 
                     }
                 )
             }
-            composable("Profil") { ProfileActivity(navController) }
+            composable("TambahPostKomunitas") { FormAddCommunityActivity()}
+
+            composable("Profil") {
+                ProfileActivity(
+                    navController,
+                    dummyListUserData.first()
+                )
+            }
             composable("EditProfil") {
                 EditProfileActivity(
-                    name = "",
-                    bio = "",
+                    userData = dummyListUserData.first(),
                     onNameChanged = {},
                     onBioChanged = {}
                 )

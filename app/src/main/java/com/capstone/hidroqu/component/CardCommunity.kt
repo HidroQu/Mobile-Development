@@ -67,7 +67,7 @@ fun CardCommunity(
                 shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ){
         Row(
             modifier = modifier

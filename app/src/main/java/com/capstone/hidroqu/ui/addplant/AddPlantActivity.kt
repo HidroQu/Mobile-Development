@@ -25,9 +25,9 @@ fun AddPlantActivity(
 
     Column(
         modifier = Modifier
+            .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .padding(20.dp)
-            .verticalScroll(rememberScrollState())
     ) {
         Text(
             text = "Silahkan pilih tanaman Anda",
