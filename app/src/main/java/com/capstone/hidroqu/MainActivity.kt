@@ -69,6 +69,7 @@ import com.capstone.hidroqu.ui.camera.CameraPermissionScreen
 import com.capstone.hidroqu.ui.list.ListMyAddPlant
 import com.capstone.hidroqu.ui.chooseplant.ChoosePlantActivity
 import com.capstone.hidroqu.ui.community.CommunityActivity
+import com.capstone.hidroqu.ui.detailcommunity.DetailPostCommunityActivity
 import com.capstone.hidroqu.ui.detailmyplant.DetailMyPlantActivity
 import com.capstone.hidroqu.ui.list.getHealthHistoryById
 import com.capstone.hidroqu.ui.list.getPlantById
@@ -621,10 +622,25 @@ fun MainApp() {
                             launchSingleTop = true
                         }
                     },
-                    onDetailClicked = {
-
+                    onDetailClicked = { postId ->
+                        navController.navigate("DetailKomunitas/$postId")
                     }
                 )
+            }
+            composable(
+                route = "DetailKomunitas/{postId}",
+                arguments = listOf(
+                    navArgument("postId") {
+                        type = NavType.IntType
+                    }
+                )
+            ) { backStackEntry ->
+                val postId = backStackEntry.arguments?.getInt("postId")
+                if (postId != null) {
+                    DetailPostCommunityActivity(
+                        communityId = postId
+                    )
+                }
             }
             composable("TambahPostKomunitas") { FormAddCommunityActivity()}
 
