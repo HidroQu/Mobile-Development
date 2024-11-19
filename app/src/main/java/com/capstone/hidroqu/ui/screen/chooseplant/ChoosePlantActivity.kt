@@ -17,13 +17,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.utils.ListPlant
 import com.capstone.hidroqu.utils.dummyListPlants
 
 @Composable
 fun ChoosePlantActivity(
-    navController: NavController
+    navHostController: NavHostController
 ) {
     val plants = dummyListPlants  // Mengambil data tanaman dari dummyListPlants
     var selectedPlant by remember { mutableStateOf<ListPlant?>(null) }  // State untuk menyimpan tanaman yang dipilih
@@ -70,11 +71,11 @@ fun ChoosePlantActivity(
                 selectedPlant?.let { plant ->
                     // Menyimpan plantId dan navigasi ke Home
                     Toast.makeText(
-                        navController.context,
+                        navHostController.context,
                         "Data disimpan untuk tanaman: ${plant.name}",
                         Toast.LENGTH_SHORT
                     ).show()
-                    navController.navigate("Home")  // Navigasi kembali ke Home setelah menyimpan
+                    navHostController.navigate("Home")  // Navigasi kembali ke Home setelah menyimpan
                 }
             },
             modifier = Modifier.padding(top = 16.dp)
@@ -87,5 +88,5 @@ fun ChoosePlantActivity(
 @Preview(showBackground = true)
 @Composable
 fun ChoosePlantActivityPreview() {
-    ChoosePlantActivity(navController = rememberNavController())
+    ChoosePlantActivity(navHostController = rememberNavController())
 }

@@ -10,6 +10,15 @@ sealed class Screen(val route: String) {
     object CameraPotoTanam : Screen("camerapototanam")
     object CameraScanTanam : Screen("camerascantanam")
 
+    //result
+    object ResultPotoTanam : Screen("ResultPotoTanam/{photoUri}") {
+        fun createRoute(photoUri: String) = "ResultPotoTanam/$photoUri"
+    }
+    object ResultScanTanam : Screen("ResultScanTanam/{photoUri}") {
+        fun createRoute(photoUri: String) = "ResultScanTanam/$photoUri"
+    }
+    object ChoosePlant : Screen("chooseplant")
+
     //main
     object Home : Screen("home")
     object MyPlant : Screen("myplant")
@@ -27,14 +36,19 @@ sealed class Screen(val route: String) {
         fun createRoute(plantId: Int) = "DetailMyPlant/$plantId"
     }
 
+    //riwayat
+    object HistoryMyPlant : Screen("HistoryMyPlant/{plantId}/{healthId}") {
+        fun createRoute(plantId: Int, healthId: Int) = "HistoryMyPlant/$plantId/$healthId"
+    }
+
     object AddPlant : Screen("addplant")
     object FormAddPlant : Screen("FormTanaman/{plantId}") {
         fun createRoute(plantId: Int) = "FormTanaman/$plantId"
     }
 
     //komunitas
-    object DetailCommunity : Screen("DetailCommunity/{postId}") {
-        fun createRoute(postId: Int) = "DetailCommunity/$postId"
+    object DetailCommunity : Screen("DetailCommunity/{idPost}") {
+        fun createRoute(idPost: Int) = "DetailCommunity/$idPost"
     }
 
     object AddPostCommunity : Screen("addpostcommunity")

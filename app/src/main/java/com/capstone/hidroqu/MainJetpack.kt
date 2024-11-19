@@ -21,6 +21,9 @@ import androidx.navigation.navArgument
 import com.capstone.hidroqu.navigation.BottomBar
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.ui.screen.addplant.AddPlantActivity
+import com.capstone.hidroqu.ui.screen.article.ArticleActivity
+import com.capstone.hidroqu.ui.screen.camera.CameraPermissionScreen
+import com.capstone.hidroqu.ui.screen.chooseplant.ChoosePlantActivity
 import com.capstone.hidroqu.ui.screen.community.CommunityActivity
 import com.capstone.hidroqu.ui.screen.detailarticle.DetailArticleScreen
 import com.capstone.hidroqu.ui.screen.detailcommunity.DetailPostCommunityActivity
@@ -28,11 +31,14 @@ import com.capstone.hidroqu.ui.screen.detailmyplant.DetailMyPlantActivity
 import com.capstone.hidroqu.ui.screen.editprofile.EditProfileActivity
 import com.capstone.hidroqu.ui.screen.formaddplant.FormAddPlantActivity
 import com.capstone.hidroqu.ui.screen.formcommunity.FormAddCommunityActivity
+import com.capstone.hidroqu.ui.screen.historymyplant.HistoryMyPlantActivity
 import com.capstone.hidroqu.ui.screen.home.HomeActivity
 import com.capstone.hidroqu.ui.screen.login.LoginActivity
 import com.capstone.hidroqu.ui.screen.myplant.MyPlantActivity
 import com.capstone.hidroqu.ui.screen.profile.ProfileActivity
 import com.capstone.hidroqu.ui.screen.register.RegisterActivity
+import com.capstone.hidroqu.ui.screen.resultpototanam.ResultPotoTanamActivity
+import com.capstone.hidroqu.ui.screen.resultscantanam.ResultScanTanamActivity
 import com.capstone.hidroqu.utils.dummyListUserData
 
 @Composable
@@ -47,11 +53,6 @@ fun MainJetpack(
             if (currentRoute == Screen.Home.route || currentRoute == Screen.MyPlant.route || currentRoute == Screen.Community.route || currentRoute == Screen.Profile.route) {
                     BottomBar(navHostController = navController)
             }
-            else if (currentRoute == Screen.AddPlant.route || currentRoute == Screen.FormAddPlant.route || currentRoute == Screen.Community.route || currentRoute == Screen.Profile.route){
-                    BottomBar(navHostController = navController)
-            } else{
-
-            }
         }
     ) { innerPadding ->
         NavHost(
@@ -59,92 +60,53 @@ fun MainJetpack(
             startDestination = Screen.Login.route,
             modifier = Modifier.padding(innerPadding)
         ) {
+            //auth
             composable(Screen.Login.route) {
                 LoginActivity(navHostController = navController)
             }
             composable(Screen.Register.route) {
                 RegisterActivity(navHostController = navController)
             }
+            //home
             composable(Screen.Home.route) {
                 HomeActivity(navHostController = navController)
             }
-            composable(Screen.MyPlant.route) {
-                // Panggil MyPlantActivity di sini
-                MyPlantActivity(
-                    navHostController = navController,
-                    onAddClicked = {
-                        navController.navigate(Screen.AddPlant.route) // Navigasi ke halaman penambahan tanaman
-                    },
-                    onDetailClicked = { plantId ->
-                        navController.navigate(Screen.DetailMyPlant.createRoute(plantId)) // Navigasi ke detail tanaman
-                    }
-                )
+            ////camera
+
+            composable(Screen.CameraScanTanam.route) {
+                CameraPermissionScreen("Scan Tanam", navController)
             }
-            composable(Screen.AddPlant.route) {
-                AddPlantActivity(
-                    navHostController = navController,
-                )
+            composable(Screen.CameraPotoTanam.route) {
+                CameraPermissionScreen("Poto Tanam", navController)
             }
+            /////detail kamera
 
             composable(
-                route = Screen.FormAddPlant.route,
-                arguments = listOf(navArgument("plantId") { type = NavType.IntType })
+                route = Screen.ResultPotoTanam.route,
+                arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
             ) { backStackEntry ->
-                val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
-                FormAddPlantActivity(navHostController = navController)
+                val photoUri = backStackEntry.arguments?.getString("photoUri")
+                ResultPotoTanamActivity(photoUri = photoUri, navHostController = navController)
             }
 
 
+
             composable(
-                route = Screen.DetailMyPlant.route,
-                arguments = listOf(navArgument("plantId") { type = NavType.IntType })
+                route = Screen.ResultScanTanam.route,
+                arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
             ) { backStackEntry ->
-                val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
-                DetailMyPlantActivity(
-                    detailId = plantId,
-                    navHostController = navController
-                )
-            }
-            composable(Screen.Community.route) {
-                CommunityActivity(
-                    navHostController = navController,
-                    onAddClicked = {
-                        navController.navigate(Screen.AddPostCommunity.route)
-                    },
-                    onDetailClicked = { postId ->
-                        navController.navigate(Screen.DetailCommunity.createRoute(postId))
-                    }
-                )
-            }
-            composable(Screen.AddPostCommunity.route) {
-                // Tambahkan implementasi halaman untuk Add Post
-//                FormAddCommunityActivity(navController = navController)
-            }
-            composable(
-                route = Screen.DetailCommunity.route,
-                arguments = listOf(navArgument("postId") { type = NavType.IntType })
-            ) { val id = it.arguments?.getString("postId") ?: ""
-                val communityId = id.toIntOrNull() ?: 0
-                DetailPostCommunityActivity(
-                    navHostController = navController,
-                    communityId = communityId
-                )
-            }
-            composable(Screen.Profile.route){
-                ProfileActivity(navHostController = navController, dummyListUserData.first())
-            }
-            composable(Screen.EditProfile.route) {
-                EditProfileActivity(
-                    userData = dummyListUserData.first(), // Mengirim data pengguna
-                    onNameChanged = { newName ->
-                        // Logika untuk mengupdate nama jika perlu
-                    },
-                    onBioChanged = { newBio ->
-                        // Logika untuk mengupdate bio jika perlu
-                    }
-                )
+                val photoUri = backStackEntry.arguments?.getString("photoUri")
+                ResultScanTanamActivity(photoUri = photoUri, navHostController = navController)
             }
 
+            composable(Screen.ChoosePlant.route) {
+                ChoosePlantActivity(navHostController = navController)
+            }
+
+            ///artikel
+            composable(Screen.Article.route) {
+                ArticleActivity(navHostController = navController)
+            }
             composable(
                 route = Screen.DetailArticle.route,
                 arguments = listOf(navArgument("articleId") { type = NavType.StringType })
@@ -157,7 +119,99 @@ fun MainJetpack(
                     articleId = articleId // Pass the `articleId` here
                 )
             }
+            //tanamanku
+            composable(Screen.MyPlant.route) {
+                // Panggil MyPlantActivity di sini
+                MyPlantActivity(
+                    navHostController = navController,
+                    onAddClicked = {
+                        navController.navigate(Screen.AddPlant.route)
+                    },
+                    onDetailClicked = { plantId ->
+                        navController.navigate(Screen.DetailMyPlant.createRoute(plantId)) // Navigasi ke detail tanaman
+                    }
+                )
+            }
+            ////add plant
+            composable(Screen.AddPlant.route) {
+                AddPlantActivity(
+                    navHostController = navController,
+                )
+            }
+            ////form add plant
+            composable(
+                route = Screen.FormAddPlant.route,
+                arguments = listOf(navArgument("plantId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
+                FormAddPlantActivity(navHostController = navController)
+            }
+            /////detailmyplant
+            composable(
+                route = Screen.DetailMyPlant.route,
+                arguments = listOf(navArgument("plantId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
+                DetailMyPlantActivity(
+                    detailId = plantId,
+                    navHostController = navController
+                )
+            }
 
+            ////history riwayat sakit
+            composable(
+                route = Screen.HistoryMyPlant.route,
+                arguments = listOf(
+                    navArgument("plantId") { type = NavType.IntType },
+                    navArgument("healthId") { type = NavType.IntType }
+                )
+            ) { backStackEntry ->
+                val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0  // Default to 0 if null
+                val healthId = backStackEntry.arguments?.getInt("healthId") ?: 0  // Default to 0 if null
+
+                HistoryMyPlantActivity(navHostController = navController, plantId = plantId, healthId = healthId)
+            }
+            //komunitas
+            composable(Screen.Community.route) {
+                CommunityActivity(
+                    navHostController = navController,
+                    onAddClicked = {
+                        navController.navigate(Screen.AddPostCommunity.route)
+                    }
+                )
+            }
+            ////add post komunitas
+            composable(Screen.AddPostCommunity.route) {
+                FormAddCommunityActivity(navHostController = navController)
+            }
+            ////detail komunitas
+            composable(
+                route = Screen.DetailCommunity.route,
+                arguments = listOf(navArgument("idPost") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val idPost = backStackEntry.arguments?.getInt("idPost") ?: 0
+                DetailPostCommunityActivity(
+                    navHostController = navController,
+                    idPost = idPost
+                )
+            }
+
+            //profil
+            composable(Screen.Profile.route){
+                ProfileActivity(navHostController = navController, dummyListUserData.first())
+            }
+            ////edit profil
+            composable(Screen.EditProfile.route) {
+                EditProfileActivity(
+                    userData = dummyListUserData.first(), // Mengirim data pengguna
+                    onNameChanged = { newName ->
+                        // Logika untuk mengupdate nama jika perlu
+                    },
+                    onBioChanged = { newBio ->
+                        // Logika untuk mengupdate bio jika perlu
+                    }
+                )
+            }
         }
     }
 }

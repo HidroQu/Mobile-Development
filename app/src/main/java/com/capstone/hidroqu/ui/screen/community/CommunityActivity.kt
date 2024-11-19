@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.ui.component.CardCommunity
 import com.capstone.hidroqu.utils.dummyListPlants
 import com.capstone.hidroqu.utils.dummyListCommunity
@@ -36,7 +37,6 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 fun CommunityActivity(
     navHostController: NavHostController,
     onAddClicked: () -> Unit,
-    onDetailClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -54,7 +54,11 @@ fun CommunityActivity(
             if (dummyListCommunity.isEmpty()) {
                 NoPostList()
             } else {
-                PostList(onDetailClicked = onDetailClicked)
+                PostList(onDetailClicked = { idPost ->
+                    navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)){
+                        popUpTo(Screen.Community.route)
+                    }
+                })
             }
         }
     }
@@ -134,9 +138,6 @@ fun CommunityActivityPreview() {
         CommunityActivity(navController,
             onAddClicked = {
             },
-            onDetailClicked = {
-
-            }
         )
     }
 }

@@ -35,9 +35,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.R
+import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.component.CardHealthHistory
 import com.capstone.hidroqu.utils.ListHealthHistory
@@ -63,7 +65,7 @@ fun DetailMyPlantActivity(detailId: Int, navHostController: NavHostController, m
             content = { paddingValues ->
                 Column(
                     modifier = Modifier
-                        .padding(paddingValues) // Tambahkan padding dari Scaffold
+                        .padding(paddingValues)
                         .fillMaxSize()
                 ) {
                     DetailMyPlantContent(
@@ -298,19 +300,21 @@ fun DetailMyPlantContent(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                healthHistoryList.forEach { healthHistory -> // Loop through the list
-                    CardHealthHistory(
-                        listHealthHistory = healthHistory,
-                        onClick = {
-                            navHostController.navigate("HistoryTanamanku/${healthHistory.plantId}/${healthHistory.healthId}") {
-                                popUpTo("DetailTanamanku/{detailId}") {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
+                healthHistoryList.forEach { healthHistory ->
+                    healthHistoryList.forEach { healthHistory ->
+                        CardHealthHistory(
+                            listHealthHistory = healthHistory,
+                            onClick = {
+                                navHostController.navigate(
+                                    Screen.HistoryMyPlant.createRoute(
+                                        plantId = plant.id,
+                                        healthId = healthHistory.healthId
+                                    )
+                                )
                             }
-                        }
-                    )
+                        )
+
+                    }
 
                 }
             }

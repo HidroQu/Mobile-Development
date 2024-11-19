@@ -28,6 +28,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.utils.ListUserData
@@ -95,7 +97,9 @@ fun ImageWithZoom(imageUri: Uri) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormAddCommunityActivity() {
+fun FormAddCommunityActivity(
+    navHostController: NavController
+) {
     val user = dummyListUserData[0]
     var postText by remember { mutableStateOf("") } // State for the post text
     var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) } // State for the selected images
@@ -287,6 +291,7 @@ fun UserItem(user: ListUserData) {
 @Composable
 private fun FormAddCommunityActivityPreview() {
     HidroQuTheme {
-        FormAddCommunityActivity()
+        val navHostController = rememberNavController()
+        FormAddCommunityActivity(navHostController = navHostController)
     }
 }

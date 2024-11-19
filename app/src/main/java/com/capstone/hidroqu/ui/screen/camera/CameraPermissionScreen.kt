@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.ui.screen.camera.ResultTesting
 import com.capstone.hidroqu.ui.screen.resultpototanam.ResultPotoTanamActivity
@@ -53,7 +54,7 @@ import java.net.URLEncoder
 import java.util.concurrent.Executors
 
 @Composable
-fun CameraPermissionScreen(cameraMode: String, navController: NavController) {
+fun CameraPermissionScreen(cameraMode: String, navHostController: NavHostController) {
     val systemUiController = rememberSystemUiController()
 
     var hasCameraPermission by remember { mutableStateOf(false) }
@@ -85,7 +86,7 @@ fun CameraPermissionScreen(cameraMode: String, navController: NavController) {
     }
 
     if (hasCameraPermission) {
-        CameraScreen(cameraMode, navController)
+        CameraScreen(cameraMode, navHostController)
     } else {
         Box(
             modifier = Modifier

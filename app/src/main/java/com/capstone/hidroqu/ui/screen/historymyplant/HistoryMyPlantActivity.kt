@@ -23,13 +23,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.utils.ListHealthHistory
 import com.capstone.hidroqu.utils.getHealthHistoryByPlantAndHealthId
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun HistoryMyPlantActivity(plantId: Int, healthId: Int, modifier: Modifier = Modifier) {
+fun HistoryMyPlantActivity(
+    navHostController: NavHostController,
+    plantId: Int,
+    healthId: Int,
+    modifier: Modifier = Modifier
+) {
+    // Fetching the health history for the given plantId and healthId
     val history = getHealthHistoryByPlantAndHealthId(plantId, healthId)
 
     if (history != null) {
@@ -39,18 +48,18 @@ fun HistoryMyPlantActivity(plantId: Int, healthId: Int, modifier: Modifier = Mod
     }
 }
 
-
 @Composable
 fun DetailHistoryContent(history: ListHealthHistory, modifier: Modifier = Modifier) {
-    Column (
+    Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.background)
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
+    ) {
+        // Displaying related photo, diagnosis, symptoms, and cause
         Image(
-            painter = painterResource(R.drawable.ic_launcher_background),
+            painter = painterResource(R.drawable.ic_launcher_background),  // Replace with actual image
             contentDescription = "User Photo",
             modifier = Modifier
                 .height(200.dp)
@@ -58,6 +67,8 @@ fun DetailHistoryContent(history: ListHealthHistory, modifier: Modifier = Modifi
                 .clip(RoundedCornerShape(25.dp)),
             contentScale = ContentScale.Crop
         )
+
+        // Diagnosis Details
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
@@ -68,17 +79,17 @@ fun DetailHistoryContent(history: ListHealthHistory, modifier: Modifier = Modifi
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text (
+                Text(
                     text = "Hasil diagnosis",
                     style = MaterialTheme.typography.labelLarge
                 )
-                Text (
+                Text(
                     text = history.issue,
                     style = MaterialTheme.typography.bodyMedium
                 )
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
+
+                // Displaying related photos in a LazyRow
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(history.relatedPhotos) { photo ->
                         Image(
                             painter = painterResource(photo),
@@ -87,48 +98,44 @@ fun DetailHistoryContent(history: ListHealthHistory, modifier: Modifier = Modifi
                                 .widthIn(min = 150.dp)
                                 .height(95.dp)
                                 .clip(RoundedCornerShape(25.dp))
-                                .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(25.dp)), // Menambahkan border tipis
+                                .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(25.dp)),
                             contentScale = ContentScale.Crop
                         )
                     }
                 }
-
             }
-            Column (
-                modifier = modifier
-                    .fillMaxWidth(),
+
+            // Symptoms and Cause Details
+            Column(
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
-            ){
+            ) {
                 Text(
                     text = "Gejala serangan",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    style = MaterialTheme.typography.labelLarge
                 )
                 Text(
                     text = history.symptoms,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = modifier
+                    modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(16.dp)
                 )
             }
-            Column (
-                modifier = modifier
-                    .fillMaxWidth(),
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
-            ){
+            ) {
                 Text(
                     text = "Penyebab",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    style = MaterialTheme.typography.labelLarge
                 )
                 Text(
                     text = history.cause,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = modifier
+                    modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(16.dp)
@@ -137,10 +144,12 @@ fun DetailHistoryContent(history: ListHealthHistory, modifier: Modifier = Modifi
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 private fun HistoryMyPlantActivityPreview() {
+    val navHostController = rememberNavController()
     HidroQuTheme {
-        HistoryMyPlantActivity(1, 1)
+        HistoryMyPlantActivity(navHostController, 1, 1)
     }
 }

@@ -43,14 +43,14 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 @Composable
 fun DetailPostCommunityActivity(
     navHostController: NavHostController,
-    communityId: Int,  // Use communityId here, not postId
+    idPost: Int,
     modifier: Modifier = Modifier
 ) {
-    val listComment = getDetailPostById(communityId)  // Use communityId for fetching details
-    val post = getPostById(communityId)  // Same here, use communityId
+    val listComment = getDetailPostById(idPost)
+    val post = getPostById(idPost)
 
     if (post != null) {
-        DetailPostCommunityContent(post, listComment)  // Pass correct data to content function
+        DetailPostCommunityContent(post, listComment)
     } else {
         Text("Postingan tidak ditemukan", style = MaterialTheme.typography.bodyLarge)
     }
