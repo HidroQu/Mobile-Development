@@ -32,14 +32,14 @@ import com.capstone.hidroqu.utils.dummyListPlants
 
 @Composable
 fun MyPlantActivity(
-    navController: NavHostController,
+    navHostController: NavHostController,
     onAddClicked: () -> Unit,
     onDetailClicked: (Int) -> Unit,
 ) {
     Scaffold(
         floatingActionButton = {
             AddButton(onClick = {
-                navController.navigate(Screen.AddPlant.route) // Pindah ke halaman AddPlant
+                navHostController.navigate(Screen.AddPlant.route) // Pindah ke halaman AddPlant
             })
         }
     ) { paddingValues ->
@@ -55,7 +55,7 @@ fun MyPlantActivity(
                 MyPlantList(
                     modifier = Modifier.padding(paddingValues),
                     onDetailClicked = { plantId ->
-                        navController.navigate(Screen.DetailMyPlant.createRoute(plantId)){
+                        navHostController.navigate(Screen.DetailMyPlant.createRoute(plantId)){
                             popUpTo(Screen.MyPlant.route)
                         }
                     }
@@ -143,8 +143,8 @@ fun MyPlantList(modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
 @Composable
 fun MyPlantActivityPreview() {
     HidroQuTheme {
-        val navController = rememberNavController()
-        MyPlantActivity(navController,
+        val navHostController = rememberNavController()
+        MyPlantActivity(navHostController,
             onAddClicked = {
             },
             onDetailClicked = {

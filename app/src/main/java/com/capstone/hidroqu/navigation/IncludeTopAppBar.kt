@@ -19,14 +19,14 @@ import androidx.navigation.NavHostController
 @ExperimentalMaterial3Api
 @ExperimentalLayoutApi
 @Composable
-fun SimpleLightTopAppBar(title: String, navController: NavHostController) {
+fun SimpleLightTopAppBar(title: String, navHostController: NavHostController) {
     TopAppBar(
         title = {
             Text(title, style = MaterialTheme.typography.titleMedium)
         },
         navigationIcon = {
             IconButton(onClick = {
-                navController.popBackStack()
+                navHostController.popBackStack()
             }) {
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Back")
             }

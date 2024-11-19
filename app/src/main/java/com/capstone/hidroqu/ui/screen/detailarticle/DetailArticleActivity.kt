@@ -35,7 +35,7 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DetailArticleScreen(
-    navController: NavHostController,
+    navHostController: NavHostController,
     articleId: Int
 ) {
 
@@ -46,7 +46,7 @@ fun DetailArticleScreen(
             topBar = {
                 SimpleLightTopAppBar(
                     title = article.title ?: "Detail Artikel", // Menampilkan judul artikel
-                    navController = navController
+                    navHostController = navHostController
                 )
             },
             content = { paddingValues ->
@@ -123,7 +123,7 @@ fun DetailArticleContent(article: ListArticleHome, modifier: Modifier = Modifier
 @Composable
 fun DetailArticleActivityPreview() {
     HidroQuTheme {
-        val navController = rememberNavController() // Create a NavHostController
-        DetailArticleScreen(navController = navController, articleId = 1) // Pass navController to the screen
+        val navHostController = rememberNavController() // Create a NavHostController
+        DetailArticleScreen(navHostController = navHostController, articleId = 1) // Pass navController to the screen
     }
 }

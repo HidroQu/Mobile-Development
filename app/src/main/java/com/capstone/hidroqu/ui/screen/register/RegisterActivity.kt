@@ -40,7 +40,7 @@ fun RegisterActivity(
 
     Scaffold(
         topBar = {
-            SimpleLightTopAppBar(title = "Daftar", navController = navHostController,)
+            SimpleLightTopAppBar(title = "Daftar", navHostController = navHostController,)
         },
         modifier = modifier
     ) { paddingValues ->

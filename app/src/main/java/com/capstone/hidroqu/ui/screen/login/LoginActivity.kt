@@ -30,7 +30,7 @@ import com.capstone.hidroqu.ui.component.TextFieldForm
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun LoginActivity(
-    navHostController: NavHostController,  // Accept navHostController here
+    navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     var emailValue by remember { mutableStateOf("") }
@@ -91,18 +91,18 @@ fun LoginActivity(
 
                     // Login Button
                     LoginButton(
-                        navController = navHostController,  // Use navHostController here
+                        navHostController = navHostController,
                         isFormValid = isFormValid
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Register Button
-                    RegisterButton(navController = navHostController)
+                    RegisterButton(navHostController = navHostController)
 
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Google Login Button
-                    GoogleButton(navController = navHostController)
+                    GoogleButton(navHostController = navHostController)
                 }
             }
         }
@@ -144,14 +144,14 @@ fun LoginForm(
 
 @Composable
 fun LoginButton(
-    navController: NavHostController,
+    navHostController: NavHostController,
     isFormValid: Boolean,
     onLogin: (() -> Unit)? = null
 ) {
     Button(
         onClick = {
             if (isFormValid) {
-                navController.navigate(Screen.Home.route) {
+                navHostController.navigate(Screen.Home.route) {
                     popUpTo(Screen.Login.route) {inclusive = true}
                 }
             }
@@ -178,10 +178,10 @@ fun LoginButton(
 
 @Composable
 fun RegisterButton(
-    navController: NavHostController
+    navHostController: NavHostController
 ) {
     TextButton(
-        onClick = { navController.navigate(Screen.Register.route) }
+        onClick = { navHostController.navigate(Screen.Register.route) }
     ) {
         Text(
             text = "Belum punya akun? Daftar.",
@@ -199,10 +199,10 @@ fun RegisterButton(
 
 @Composable
 fun GoogleButton(
-    navController: NavHostController,
+    navHostController: NavHostController,
 ) {
     TextButton(
-        onClick = { navController.navigate(Screen.Home.route) {
+        onClick = { navHostController.navigate(Screen.Home.route) {
             popUpTo(Screen.Login.route)
         } },
         modifier = Modifier

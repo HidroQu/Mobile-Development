@@ -25,11 +25,15 @@ import com.capstone.hidroqu.ui.screen.community.CommunityActivity
 import com.capstone.hidroqu.ui.screen.detailarticle.DetailArticleScreen
 import com.capstone.hidroqu.ui.screen.detailcommunity.DetailPostCommunityActivity
 import com.capstone.hidroqu.ui.screen.detailmyplant.DetailMyPlantActivity
+import com.capstone.hidroqu.ui.screen.editprofile.EditProfileActivity
+import com.capstone.hidroqu.ui.screen.formaddplant.FormAddPlantActivity
 import com.capstone.hidroqu.ui.screen.formcommunity.FormAddCommunityActivity
 import com.capstone.hidroqu.ui.screen.home.HomeActivity
 import com.capstone.hidroqu.ui.screen.login.LoginActivity
 import com.capstone.hidroqu.ui.screen.myplant.MyPlantActivity
+import com.capstone.hidroqu.ui.screen.profile.ProfileActivity
 import com.capstone.hidroqu.ui.screen.register.RegisterActivity
+import com.capstone.hidroqu.utils.dummyListUserData
 
 @Composable
 fun MainJetpack(
@@ -67,7 +71,7 @@ fun MainJetpack(
             composable(Screen.MyPlant.route) {
                 // Panggil MyPlantActivity di sini
                 MyPlantActivity(
-                    navController = navController,
+                    navHostController = navController,
                     onAddClicked = {
                         navController.navigate(Screen.AddPlant.route) // Navigasi ke halaman penambahan tanaman
                     },
@@ -77,8 +81,20 @@ fun MainJetpack(
                 )
             }
             composable(Screen.AddPlant.route) {
-//                AddPlantActivity(navController = navController)
+                AddPlantActivity(
+                    navHostController = navController,
+                )
             }
+
+            composable(
+                route = Screen.FormAddPlant.route,
+                arguments = listOf(navArgument("plantId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
+                FormAddPlantActivity(navHostController = navController)
+            }
+
+
             composable(
                 route = Screen.DetailMyPlant.route,
                 arguments = listOf(navArgument("plantId") { type = NavType.IntType })
@@ -86,17 +102,17 @@ fun MainJetpack(
                 val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
                 DetailMyPlantActivity(
                     detailId = plantId,
-                    navController = navController
+                    navHostController = navController
                 )
             }
             composable(Screen.Community.route) {
                 CommunityActivity(
                     navHostController = navController,
                     onAddClicked = {
-                        navController.navigate(Screen.AddPostCommunity.route) // Navigasi ke halaman tambah postingan
+                        navController.navigate(Screen.AddPostCommunity.route)
                     },
                     onDetailClicked = { postId ->
-                        navController.navigate(Screen.DetailCommunity.createRoute(postId)) // Navigasi ke halaman detail komunitas
+                        navController.navigate(Screen.DetailCommunity.createRoute(postId))
                     }
                 )
             }
@@ -107,12 +123,26 @@ fun MainJetpack(
             composable(
                 route = Screen.DetailCommunity.route,
                 arguments = listOf(navArgument("postId") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-//                DetailPostCommunityActivity(
-//                    postId = postId,
-//                    navController = navController
-//                )
+            ) { val id = it.arguments?.getString("postId") ?: ""
+                val communityId = id.toIntOrNull() ?: 0
+                DetailPostCommunityActivity(
+                    navHostController = navController,
+                    communityId = communityId
+                )
+            }
+            composable(Screen.Profile.route){
+                ProfileActivity(navHostController = navController, dummyListUserData.first())
+            }
+            composable(Screen.EditProfile.route) {
+                EditProfileActivity(
+                    userData = dummyListUserData.first(), // Mengirim data pengguna
+                    onNameChanged = { newName ->
+                        // Logika untuk mengupdate nama jika perlu
+                    },
+                    onBioChanged = { newBio ->
+                        // Logika untuk mengupdate bio jika perlu
+                    }
+                )
             }
 
             composable(
@@ -120,11 +150,14 @@ fun MainJetpack(
                 arguments = listOf(navArgument("articleId") { type = NavType.StringType })
             ) {
                 val id = it.arguments?.getString("articleId") ?: ""
+                val articleId = id.toIntOrNull() ?: 0 // Use `toIntOrNull()` to avoid errors if `id` is empty or invalid.
+
                 DetailArticleScreen(
-                    navController = navController,
-                    articleId = id.toInt()
+                    navHostController = navController,
+                    articleId = articleId // Pass the `articleId` here
                 )
             }
+
         }
     }
 }

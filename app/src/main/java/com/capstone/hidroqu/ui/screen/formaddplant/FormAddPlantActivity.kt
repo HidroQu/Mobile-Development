@@ -22,7 +22,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.R
+import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.utils.ListMyAddPlant
 import com.capstone.hidroqu.utils.getAddPlantById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -33,16 +36,62 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun FormAddPlantActivity(plantId: Int) {
+fun FormAddPlantActivity(
+    navHostController: NavHostController
+) {
+    val plantId = navHostController.currentBackStackEntry?.arguments?.getInt("plantId") ?: 0
     val plantAdd = getAddPlantById(plantId)
-    var plantingDate by remember { mutableStateOf<String?>(null) } // State untuk tanggal tanam dalam String
 
-    if (plantAdd != null) {
-        FormAddPlantContent(plantAdd, plantingDate, onDateSelected = { selectedDate ->
-            plantingDate = selectedDate
-        })
-    } else {
-        Text(text = "Tanaman tidak ditemukan.")
+    var plantingDate by remember { mutableStateOf<String?>(null) }
+    var note by remember { mutableStateOf("") } // Catatan pengguna
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+            ) {
+                Button(
+                    onClick = {
+                        plantAdd?.let { plant ->
+                            navHostController.navigate(Screen.MyPlant.route) {
+                                popUpTo(Screen.Home.route) { inclusive = false }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    enabled = plantAdd != null,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (plantAdd != null)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Text(text = "Simpan", style = MaterialTheme.typography.labelLarge)
+                }
+            }
+        }
+    ) { paddingValues ->
+        if (plantAdd != null) {
+            FormAddPlantContent(
+                plantAdd = plantAdd,
+                plantingDate = plantingDate,
+                onDateSelected = { selectedDate ->
+                    plantingDate = selectedDate
+                },
+                modifier = Modifier.padding(paddingValues),
+                note = note,
+                onNoteChanged = { newNote -> note = newNote }
+            )
+        } else {
+            Text(
+                text = "Tanaman tidak ditemukan.",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(20.dp)
+            )
+        }
     }
 }
 
@@ -52,13 +101,12 @@ fun FormAddPlantContent(
     plantAdd: ListMyAddPlant,
     plantingDate: String?,
     onDateSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    note: String,
+    onNoteChanged: (String) -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
-    var note by remember { mutableStateOf("") } // State untuk catatan yang diisi oleh user
-
     Column(
-        modifier = Modifier
+        modifier = modifier
             .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.background)
             .padding(20.dp),
@@ -80,48 +128,26 @@ fun FormAddPlantContent(
             )
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ){
-                    Text(
-                        text = "Nama Tanaman: ",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        text = plantAdd.name,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = "Tanggal Menanam: ",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        text = plantingDate ?: "Belum Ditentukan",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
+                Text(
+                    text = "Nama Tanaman: ${plantAdd.name}",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = "Tanggal Menanam: ${plantingDate ?: "Belum Ditentukan"}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
-
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DatePickerField(plantingDate, onDateSelected)
-        } // Menampilkan date picker
+        }
 
-        // TextField untuk menambahkan catatan
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
                 text = "Tambahkan catatan",
                 style = MaterialTheme.typography.bodyLarge,
@@ -130,7 +156,7 @@ fun FormAddPlantContent(
             )
             TextField(
                 value = note,
-                onValueChange = { note = it },
+                onValueChange = { onNoteChanged(it) },
                 placeholder = { Text(text = "Isi catatan") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -140,33 +166,13 @@ fun FormAddPlantContent(
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = MaterialTheme.colorScheme.onPrimary,
                     unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                    focusedIndicatorColor = Color.Transparent,  // Remove the bottom focus indicator
-                    unfocusedIndicatorColor = Color.Transparent // Remove the bottom unfocused indicator
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
             )
-
         }
     }
 }
-
-//private val userPlantCollection = mutableListOf<ListMyAddPlant>()
-//
-//fun addPlantToUserCollection(
-//    plant: ListMyAddPlant,
-//    plantingDate: String?,
-//    note: String
-//) {
-//    val newPlant = ListMyAddPlant(
-//        id = generateUniqueId(),
-//        name = plant.name,
-//        userPlantPhoto = plant.userPlantPhoto,
-//        plantingDate = plantingDate ?: "Tidak Diketahui",
-//        note = note
-//    )
-//    userPlantCollection.add(newPlant)
-//}
-
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -238,11 +244,7 @@ fun DatePickerField(plantingDate: String?, onDateSelected: (String) -> Unit) {
             initialDate = LocalDate.now(),
             title = "Pilih Tanggal Menanam"
         ) { selectedDate ->
-            val formattedDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                DateTimeFormatter.ofPattern("dd MMM yyyy").format(selectedDate)
-            } else {
-                TODO("VERSION.SDK_INT < O")
-            }
+            val formattedDate = DateTimeFormatter.ofPattern("dd MMM yyyy").format(selectedDate)
             onDateSelected(formattedDate)
         }
     }
@@ -251,7 +253,8 @@ fun DatePickerField(plantingDate: String?, onDateSelected: (String) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewFormAddPlantActivity() {
+    val navHostController = rememberNavController()
     HidroQuTheme {
-        FormAddPlantActivity(plantId = 3)
+        FormAddPlantActivity(navHostController)
     }
 }

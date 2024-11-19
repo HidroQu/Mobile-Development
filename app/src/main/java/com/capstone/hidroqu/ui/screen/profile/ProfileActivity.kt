@@ -13,12 +13,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.utils.ListUserData
 import com.capstone.hidroqu.utils.dummyListUserData
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun ProfileActivity(navController: NavHostController, userData: ListUserData) {
+fun ProfileActivity(navHostController: NavHostController, userData: ListUserData) {
 
     Column(
         modifier = Modifier
@@ -56,26 +57,17 @@ fun ProfileActivity(navController: NavHostController, userData: ListUserData) {
 
             // Edit Profile Button (Outlined)
             OutlinedButton(
-                onClick = {
-                    navController.navigate("EditProfil") {
-                        popUpTo("Profil") {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                    }
-                },
+                onClick = { navHostController.navigate(Screen.EditProfile.route) },
                 modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary) // Sets border to primary color
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
             ) {
                 Text(
                     text = "Edit Profile",
-                    color = MaterialTheme.colorScheme.primary, // Text color set to primary color
+                    color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelLarge
                 )
             }
 
-            // Appearance Settings
-            AppearanceSettings()
         }
     }
 }
@@ -87,12 +79,12 @@ fun ProfileInfo(name: String, description: String) {
         Text(
             text = name,
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface // Name text color set to onSurface
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface // Description text color set to onSurface
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

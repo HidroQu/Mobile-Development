@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.ui.component.CardPostComment
 import com.capstone.hidroqu.utils.ListCommunity
 import com.capstone.hidroqu.utils.ListDetailPostCommunity
@@ -40,18 +42,20 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
 fun DetailPostCommunityActivity(
-    communityId: Int,
+    navHostController: NavHostController,
+    communityId: Int,  // Use communityId here, not postId
     modifier: Modifier = Modifier
 ) {
-    val listComment = getDetailPostById(communityId)
-    val post = getPostById(communityId)
+    val listComment = getDetailPostById(communityId)  // Use communityId for fetching details
+    val post = getPostById(communityId)  // Same here, use communityId
 
     if (post != null) {
-        DetailPostCommunityContent(post, listComment)
+        DetailPostCommunityContent(post, listComment)  // Pass correct data to content function
     } else {
-        Text("History tidak ditemukan", style = MaterialTheme.typography.bodyLarge)
+        Text("Postingan tidak ditemukan", style = MaterialTheme.typography.bodyLarge)
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -189,7 +193,8 @@ fun DetailPostCommunityContent(
 @Preview
 @Composable
 private fun DetailPostCommunityPreview() {
+    val navHostController = rememberNavController()
     HidroQuTheme {
-        DetailPostCommunityActivity(1)
+        DetailPostCommunityActivity(navHostController , 1)
     }
 }

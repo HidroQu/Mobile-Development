@@ -48,7 +48,7 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun DetailMyPlantActivity(detailId: Int, navController: NavHostController, modifier: Modifier = Modifier) {
+fun DetailMyPlantActivity(detailId: Int, navHostController: NavHostController, modifier: Modifier = Modifier) {
     val detail = getPlantById(detailId)
     val healthHistoryList = getHealthHistoryByPlantId(detailId)
 
@@ -57,7 +57,7 @@ fun DetailMyPlantActivity(detailId: Int, navController: NavHostController, modif
             topBar = {
                 SimpleLightTopAppBar(
                     title = detail.name,
-                    navController = navController
+                    navHostController = navHostController
                 )
             },
             content = { paddingValues ->
@@ -69,7 +69,7 @@ fun DetailMyPlantActivity(detailId: Int, navController: NavHostController, modif
                     DetailMyPlantContent(
                         plant = detail,
                         healthHistoryList = healthHistoryList,
-                        navController = navController,
+                        navHostController = navHostController,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -86,7 +86,7 @@ fun DetailMyPlantActivity(detailId: Int, navController: NavHostController, modif
 fun DetailMyPlantContent(
     plant: ListPlant,
     healthHistoryList: List<ListHealthHistory>, // Accept health history list
-    navController: NavHostController,
+    navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     var isNotificationEnabled by remember { mutableStateOf(false) }
@@ -302,7 +302,7 @@ fun DetailMyPlantContent(
                     CardHealthHistory(
                         listHealthHistory = healthHistory,
                         onClick = {
-                            navController.navigate("HistoryTanamanku/${healthHistory.plantId}/${healthHistory.healthId}") {
+                            navHostController.navigate("HistoryTanamanku/${healthHistory.plantId}/${healthHistory.healthId}") {
                                 popUpTo("DetailTanamanku/{detailId}") {
                                     saveState = true
                                 }
@@ -322,7 +322,7 @@ fun DetailMyPlantContent(
 @Composable
 private fun DetailMyPlantActivityPreview() {
     HidroQuTheme {
-        val navController = rememberNavController()
-        DetailMyPlantActivity(2, navController)
+        val navHostController = rememberNavController()
+        DetailMyPlantActivity(2, navHostController)
     }
 }
