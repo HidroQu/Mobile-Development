@@ -1,16 +1,10 @@
 package com.capstone.hidroqu
 
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -20,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.capstone.hidroqu.navigation.BottomBar
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.ui.screen.forgotpassword.ForgotPasswordActivity
 import com.capstone.hidroqu.ui.screen.addplant.AddPlantActivity
 import com.capstone.hidroqu.ui.screen.article.ArticleActivity
 import com.capstone.hidroqu.ui.screen.camera.CameraPermissionScreen
@@ -66,6 +61,9 @@ fun MainJetpack(
             }
             composable(Screen.Register.route) {
                 RegisterActivity(navHostController = navController)
+            }
+            composable(Screen.ForgotPassword.route) {
+                ForgotPasswordActivity(navHostController = navController)
             }
             //home
             composable(Screen.Home.route) {

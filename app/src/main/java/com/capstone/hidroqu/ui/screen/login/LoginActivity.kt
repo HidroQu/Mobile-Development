@@ -35,9 +35,15 @@ fun LoginActivity(
 ) {
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
-    val isEmailValid by derivedStateOf { Patterns.EMAIL_ADDRESS.matcher(emailValue).matches() }
-    val isPasswordValid by derivedStateOf { passwordValue.isNotBlank() }
-    val isFormValid by derivedStateOf { isEmailValid && isPasswordValid }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
+    // Fungsi validasi
+    fun validateForm(): Boolean {
+        emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()) "Format email tidak valid" else null
+        passwordError = if (passwordValue.isBlank()) "Password tidak boleh kosong" else null
+        return emailError == null && passwordError == null
+    }
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -82,27 +88,43 @@ fun LoginActivity(
                     LoginForm(
                         email = emailValue,
                         password = passwordValue,
-                        onEmailChanged = { emailValue = it },
-                        onPasswordChanged = { passwordValue = it },
-                        isEmailValid = isEmailValid,
-                        isPasswordValid = isPasswordValid
+                        onEmailChanged = {
+                            emailValue = it
+                            emailError = null // Reset error saat input berubah
+                        },
+                        onPasswordChanged = {
+                            passwordValue = it
+                            passwordError = null // Reset error saat input berubah
+                        },
+                        emailError = emailError,
+                        passwordError = passwordError
                     )
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Login Button
                     LoginButton(
                         navHostController = navHostController,
-                        isFormValid = isFormValid
+                        onLogin = {
+                            if (validateForm()) {
+                                navHostController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.Login.route) { inclusive = true }
+                                }
+                            }
+                        }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+
+                    // Google Login Button
+                    GoogleButton(navHostController = navHostController)
 
                     // Register Button
                     RegisterButton(navHostController = navHostController)
 
+                    ForgotPasswordButton(navHostController = navHostController)
+
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Google Login Button
-                    GoogleButton(navHostController = navHostController)
+
                 }
             }
         }
@@ -116,8 +138,8 @@ fun LoginForm(
     password: String,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
-    isEmailValid: Boolean,
-    isPasswordValid: Boolean
+    emailError: String?,
+    passwordError: String?
 ) {
     TextFieldForm(
         modifier = Modifier.fillMaxWidth(),
@@ -125,8 +147,8 @@ fun LoginForm(
         onValueChange = onEmailChanged,
         label = "Email",
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        isError = !isEmailValid,
-        errorMessage = if (!isEmailValid) "Format email tidak valid" else null
+        isError = emailError != null,
+        errorMessage = emailError
     )
     Spacer(modifier = Modifier.height(8.dp))
     TextFieldForm(
@@ -136,8 +158,8 @@ fun LoginForm(
         label = "Password",
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        isError = !isPasswordValid,
-        errorMessage = if (!isPasswordValid) "Password tidak boleh kosong" else null
+        isError = passwordError != null,
+        errorMessage = passwordError
     )
 }
 
@@ -145,18 +167,10 @@ fun LoginForm(
 @Composable
 fun LoginButton(
     navHostController: NavHostController,
-    isFormValid: Boolean,
-    onLogin: (() -> Unit)? = null
+    onLogin: () -> Unit
 ) {
     Button(
-        onClick = {
-            if (isFormValid) {
-                navHostController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Login.route) {inclusive = true}
-                }
-            }
-        },
-        enabled = isFormValid,
+        onClick = onLogin,
         shape = RoundedCornerShape(100.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -173,7 +187,6 @@ fun LoginButton(
         )
     }
 }
-
 
 
 @Composable
@@ -195,7 +208,24 @@ fun RegisterButton(
     }
 }
 
-
+@Composable
+fun ForgotPasswordButton(
+    navHostController: NavHostController
+) {
+    TextButton(
+        onClick = { navHostController.navigate(Screen.ForgotPassword.route) }
+    ) {
+        Text(
+            text = "Lupa password",
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.primary
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+    }
+}
 
 @Composable
 fun GoogleButton(
@@ -203,7 +233,7 @@ fun GoogleButton(
 ) {
     TextButton(
         onClick = { navHostController.navigate(Screen.Home.route) {
-            popUpTo(Screen.Login.route)
+            popUpTo(Screen.Login.route) { inclusive = true }
         } },
         modifier = Modifier
             .fillMaxWidth()

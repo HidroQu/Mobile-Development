@@ -21,6 +21,8 @@ import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.component.TextFieldForm
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
+
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -31,16 +33,21 @@ fun RegisterActivity(
     var nameValue by remember { mutableStateOf("") }
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
-    val isNameValid by derivedStateOf { nameValue.isNotBlank() }
-    val isEmailValid by derivedStateOf { Patterns.EMAIL_ADDRESS.matcher(emailValue).matches() }
-    val isPasswordValid by derivedStateOf { passwordValue.isNotBlank() }
-    val isFormValid by derivedStateOf { isNameValid && isEmailValid && isPasswordValid }
+    var nameError by remember { mutableStateOf<String?>(null) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
 
-    val keyboardController = LocalSoftwareKeyboardController.current
+    // Fungsi validasi terpisah
+    fun validateForm(): Boolean {
+        nameError = if (nameValue.isBlank()) "Nama tidak boleh kosong" else null
+        emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()) "Format email tidak valid" else null
+        passwordError = if (passwordValue.isBlank()) "Password tidak boleh kosong" else null
+        return nameError == null && emailError == null && passwordError == null
+    }
 
     Scaffold(
         topBar = {
-            SimpleLightTopAppBar(title = "Daftar", navHostController = navHostController,)
+            SimpleLightTopAppBar(title = "Daftar", navHostController = navHostController)
         },
         modifier = modifier
     ) { paddingValues ->
@@ -52,35 +59,47 @@ fun RegisterActivity(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(20.dp)){
+                    .padding(20.dp)
+            ) {
                 RegisterForm(
                     name = nameValue,
                     email = emailValue,
                     password = passwordValue,
-                    onNameChanged = { nameValue = it },
-                    onEmailChanged = { emailValue = it },
-                    onPasswordChanged = { passwordValue = it },
-                    isNameValid = isNameValid,
-                    isEmailValid = isEmailValid,
-                    isPasswordValid = isPasswordValid
+                    onNameChanged = {
+                        nameValue = it
+                        nameError = null // Reset error saat teks berubah
+                    },
+                    onEmailChanged = {
+                        emailValue = it
+                        emailError = null // Reset error saat teks berubah
+                    },
+                    onPasswordChanged = {
+                        passwordValue = it
+                        passwordError = null // Reset error saat teks berubah
+                    },
+                    nameError = nameError,
+                    emailError = emailError,
+                    passwordError = passwordError
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Register Button
                 RegisterButton(
                     navController = navHostController,
-                    isFormValid = isFormValid
+                    onRegister = {
+                        if (validateForm()) {
+                            navHostController.navigate(Screen.Login.route)
+                        }
+                    }
                 )
+
+                ForgotPasswordButton(navHostController = navHostController)
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Login Redirect Button
-                LoginRedirectButton(navController = navHostController,)
+                LoginRedirectButton(navController = navHostController)
             }
         }
     }
 }
-
-
 
 @Composable
 fun RegisterForm(
@@ -90,9 +109,9 @@ fun RegisterForm(
     onNameChanged: (String) -> Unit,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
-    isNameValid: Boolean,
-    isEmailValid: Boolean,
-    isPasswordValid: Boolean
+    nameError: String?,
+    emailError: String?,
+    passwordError: String?
 ) {
     TextFieldForm(
         modifier = Modifier.fillMaxWidth(),
@@ -100,8 +119,8 @@ fun RegisterForm(
         onValueChange = onNameChanged,
         label = "Nama",
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        isError = !isNameValid,
-        errorMessage = if (!isNameValid) "Nama tidak boleh kosong" else null
+        isError = nameError != null,
+        errorMessage = nameError
     )
     Spacer(modifier = Modifier.height(8.dp))
     TextFieldForm(
@@ -110,8 +129,8 @@ fun RegisterForm(
         onValueChange = onEmailChanged,
         label = "Email",
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        isError = !isEmailValid,
-        errorMessage = if (!isEmailValid) "Format email tidak valid" else null
+        isError = emailError != null,
+        errorMessage = emailError
     )
     Spacer(modifier = Modifier.height(8.dp))
     TextFieldForm(
@@ -121,25 +140,36 @@ fun RegisterForm(
         label = "Password",
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        isError = !isPasswordValid,
-        errorMessage = if (!isPasswordValid) "Password tidak boleh kosong" else null
+        isError = passwordError != null,
+        errorMessage = passwordError
     )
 }
 
 @Composable
+fun ForgotPasswordButton(
+    navHostController: NavHostController
+) {
+    TextButton(
+        onClick = { navHostController.navigate(Screen.ForgotPassword.route) }
+    ) {
+        Text(
+            text = "Lupa password",
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.primary
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+@Composable
 fun RegisterButton(
     navController: NavHostController,
-    isFormValid: Boolean,
-    onRegister: (() -> Unit)? = null
+    onRegister: () -> Unit
 ) {
     Button(
-        onClick = {
-            onRegister?.invoke()
-            if (isFormValid) {
-                navController.navigate(Screen.Login.route)
-            }
-        },
-        enabled = isFormValid,
+        onClick = onRegister,
         shape = RoundedCornerShape(100.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -180,5 +210,16 @@ fun LoginRedirectButton(
 @Composable
 fun RegisterActivityPreview() {
     HidroQuTheme {
+        RegisterForm(
+            name = "",
+            email = "",
+            password = "",
+            onNameChanged = {},
+            onEmailChanged = {},
+            onPasswordChanged = {},
+            nameError = null,
+            emailError = null,
+            passwordError = null
+        )
     }
 }
