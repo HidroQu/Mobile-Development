@@ -55,7 +55,6 @@ import java.util.concurrent.Executors
 
 @Composable
 fun CameraPermissionScreen(cameraMode: String, navHostController: NavHostController) {
-    val systemUiController = rememberSystemUiController()
 
     var hasCameraPermission by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -65,15 +64,6 @@ fun CameraPermissionScreen(cameraMode: String, navHostController: NavHostControl
     ) { isGranted ->
         hasCameraPermission = isGranted
     }
-
-    systemUiController.setSystemBarsColor(
-        color = MaterialTheme.colorScheme.primaryContainer,
-    )
-
-    systemUiController.setNavigationBarColor(
-        color = MaterialTheme.colorScheme.onPrimary,
-    )
-
     LaunchedEffect(Unit) {
         when (PackageManager.PERMISSION_GRANTED) {
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
@@ -106,7 +96,7 @@ fun CameraPermissionScreen(cameraMode: String, navHostController: NavHostControl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraScreen(cameraMode: String, navController: NavController) {
+fun CameraScreen(cameraMode: String, navHostController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -201,10 +191,10 @@ fun CameraScreen(cameraMode: String, navController: NavController) {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { (context as ComponentActivity).finish() }) {
+                    IconButton(onClick = { navHostController.popBackStack() }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Kembali",
+                            contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
@@ -235,7 +225,7 @@ fun CameraScreen(cameraMode: String, navController: NavController) {
             BottomBar(
                 onGalleryClick = { galleryLauncher.launch("image/*") },
                 onCaptureClick = {
-                    takePhoto(context, imageCapture, cameraExecutor, flashEnabled, isFrontCamera, cameraMode, navController)
+                    takePhoto(context, imageCapture, cameraExecutor, flashEnabled, isFrontCamera, cameraMode, navHostController)
                 },
                 onSwitchCameraClick = {
                     isFrontCamera = !isFrontCamera

@@ -35,7 +35,9 @@ fun TextFieldForm(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
     errorMessage: String? = null,
-    labelTextStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium // Default gaya label
+    labelTextStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
+    singleLine: Boolean = true,  // Tambahkan parameter untuk singleLine
+    maxLines: Int = 1
 ) {
     Column {
         OutlinedTextField(
@@ -45,7 +47,8 @@ fun TextFieldForm(
                 Text(label, style = labelTextStyle) // Gunakan gaya label yang dapat disesuaikan
             },
             modifier = modifier,
-            singleLine = true,
+            singleLine = singleLine,
+            maxLines = maxLines,
             shape = RoundedCornerShape(8.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 unfocusedTextColor = MaterialTheme.colorScheme.outline,

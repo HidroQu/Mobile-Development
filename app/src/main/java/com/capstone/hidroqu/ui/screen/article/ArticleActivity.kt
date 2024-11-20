@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
@@ -22,11 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.capstone.hidroqu.navigation.TopBarAction
 import com.capstone.hidroqu.ui.component.CardArticle
 import com.capstone.hidroqu.ui.screen.home.dummyListArticles
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleActivity(navHostController: NavHostController, modifier: Modifier = Modifier) {
     var isSearchVisible by remember { mutableStateOf(false) }
@@ -36,23 +37,19 @@ fun ArticleActivity(navHostController: NavHostController, modifier: Modifier = M
         Scaffold(
             topBar = {
                 if (!isSearchVisible) { // TopBar hanya muncul saat search tidak aktif
-                    TopAppBar(
-                        title = { Text("Artikel") },
-                        actions = {
-                            IconButton(onClick = { isSearchVisible = true }) {
-                                Icon(Icons.Default.Search, contentDescription = "Search")
-                            }
+                    TopBarAction(
+                        title = "Artikel",
+                        navHostController = navHostController,
+                        onActionClick = {
+                            isSearchVisible = true
                         },
-                        colors = TopAppBarDefaults.smallTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            titleContentColor = MaterialTheme.colorScheme.onPrimary
-                        )
+                        actionIcon = Icons.Default.Search
                     )
                 }
             }
         ) { paddingValues ->
             if (!isSearchVisible) {
-                Article(navHostController, searchQuery, Modifier.padding(paddingValues))
+                Article(navHostController, searchQuery, modifier = Modifier.padding(paddingValues))
             }
         }
 
@@ -130,7 +127,7 @@ fun Article(navHostController: NavController, searchQuery: String, modifier: Mod
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
+        modifier = modifier
             .verticalScroll(rememberScrollState())
             .padding(20.dp)
     ) {

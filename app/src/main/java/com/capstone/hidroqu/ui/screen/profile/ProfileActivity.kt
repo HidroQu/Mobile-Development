@@ -14,64 +14,77 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.utils.ListUserData
 import com.capstone.hidroqu.utils.dummyListUserData
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun ProfileActivity(navHostController: NavHostController, userData: ListUserData) {
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        horizontalAlignment = Alignment.Start
-    ) {
-        // Profile Header
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-        ) {
-            // Profile Picture
-            Box(
+fun ProfileActivity(
+    navHostController: NavHostController,
+    userData: ListUserData,
+    modifier: Modifier = Modifier
+) {
+    Scaffold(
+        topBar = {
+            // You can customize your top bar here, if needed
+            TopBarDefault("Profil anda")
+        },
+        content = { paddingValues ->
+            // Profile Content
+            Column(
                 modifier = Modifier
-                    .size(120.dp)
-                    .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
-                contentAlignment = Alignment.Center,
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.Start
             ) {
-                Icon(
-                    painter = painterResource(id = userData.img), // Use the dynamic image
-                    contentDescription = "Profile Icon",
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(60.dp)
-                )
+                // Profile Header
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                ) {
+                    // Profile Picture
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = userData.img), // Use the dynamic image
+                            contentDescription = "Profile Icon",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
+
+                    // Profile Name and Description
+                    ProfileInfo(
+                        name = userData.name,
+                        description = userData.bio
+                    )
+
+                    // Edit Profile Button (Outlined)
+                    OutlinedButton(
+                        onClick = { navHostController.navigate(Screen.EditProfile.route) },
+                        modifier = Modifier.fillMaxWidth(),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text(
+                            text = "Edit Profile",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                    AppearanceSettings()
+                }
             }
-
-            // Profile Name and Description
-            ProfileInfo(
-                name = userData.name,  // Use dynamic name
-                description = userData.bio // Use dynamic bio
-            )
-
-            // Edit Profile Button (Outlined)
-            OutlinedButton(
-                onClick = { navHostController.navigate(Screen.EditProfile.route) },
-                modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-            ) {
-                Text(
-                    text = "Edit Profile",
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
-
         }
-    }
+    )
 }
-
 
 @Composable
 fun ProfileInfo(name: String, description: String) {
@@ -130,4 +143,3 @@ fun PreviewProfileScreen() {
         ProfileActivity(navController, userData)
     }
 }
-
