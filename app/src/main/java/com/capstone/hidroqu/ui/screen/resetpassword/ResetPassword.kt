@@ -1,36 +1,42 @@
 package com.capstone.hidroqu.ui.screen.resetpassword
 
 import android.annotation.SuppressLint
-import android.util.Patterns
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.component.TextFieldForm
+import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun ResetPasswordActivity(
     navHostController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = viewModel()
 ) {
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var newPasswordError by remember { mutableStateOf<String?>(null) }
     var confirmPasswordError by remember { mutableStateOf<String?>(null) }
+    var serverResponse by remember { mutableStateOf<String?>(null) }
+    var message by remember { mutableStateOf("") }
 
     // Fungsi validasi terpisah
     fun validateForm(): Boolean {
@@ -69,12 +75,31 @@ fun ResetPasswordActivity(
                     newPasswordError = newPasswordError,
                     newConfirmPasswordError = confirmPasswordError
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(message)
+
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
                     onClick = {
                         if (validateForm()) {
-                            navHostController.navigate(Screen.Login.route)
+                            viewModel.resetPassword(
+                                token = "user-token-placeholder",
+                                email = "user-email-placeholder",
+                                password = newPassword,
+                                onSuccess = {
+                                    serverResponse = it
+                                    navHostController.navigate(Screen.Login.route) {
+                                        popUpTo(Screen.ResetPassword.route) { inclusive = true }
+                                    }
+                                    message = "Tautan berhasil dikirim ke email Anda!!"
+                                },
+                                onError = {
+                                    serverResponse = it
+                                }
+                            )
                         }
                     },
                     shape = RoundedCornerShape(100.dp),
@@ -92,13 +117,23 @@ fun ResetPasswordActivity(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
 
+                serverResponse?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
                 LoginRedirectButton(navController = navHostController)
             }
         }
     }
 }
+
 
 
 @Composable
@@ -156,13 +191,8 @@ fun LoginRedirectButton(
 @Composable
 fun ResetPasswordActivityPreview() {
     HidroQuTheme {
-        ResetPasswordForm(
-            newPassword = "",
-            confirmPassword = "",
-            onNewPasswordChanged = {},
-            onConfirmPasswordChanged = {},
-            newPasswordError = null,
-            newConfirmPasswordError = null
+        ResetPasswordActivity(
+            navHostController = NavHostController(context = LocalContext.current),
         )
     }
 }
