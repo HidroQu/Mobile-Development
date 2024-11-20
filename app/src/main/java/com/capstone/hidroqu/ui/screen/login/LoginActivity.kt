@@ -99,6 +99,7 @@ fun LoginActivity(
                         emailError = emailError,
                         passwordError = passwordError
                     )
+                    ForgotPasswordButton(navHostController = navHostController)
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Login Button
@@ -120,11 +121,7 @@ fun LoginActivity(
                     // Register Button
                     RegisterButton(navHostController = navHostController)
 
-                    ForgotPasswordButton(navHostController = navHostController)
-
                     Spacer(modifier = Modifier.height(32.dp))
-
-
                 }
             }
         }
@@ -155,7 +152,7 @@ fun LoginForm(
         modifier = Modifier.fillMaxWidth(),
         value = password,
         onValueChange = onPasswordChanged,
-        label = "Password",
+        label = "Kata Sandi",
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         isError = passwordError != null,
@@ -222,7 +219,7 @@ fun ForgotPasswordButton(
                 color = MaterialTheme.colorScheme.primary
             ),
             modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.End
         )
     }
 }

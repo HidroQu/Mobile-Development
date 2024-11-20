@@ -1,4 +1,4 @@
-package com.capstone.hidroqu.ui.screen.register
+package com.capstone.hidroqu.ui.screen.forgetpassword
 
 import android.annotation.SuppressLint
 import android.util.Patterns
@@ -8,10 +8,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,28 +24,22 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun RegisterActivity(
+fun ForgotPasswordActivity(
     navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    var nameValue by remember { mutableStateOf("") }
     var emailValue by remember { mutableStateOf("") }
-    var passwordValue by remember { mutableStateOf("") }
-    var nameError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
-    var passwordError by remember { mutableStateOf<String?>(null) }
 
     // Fungsi validasi terpisah
     fun validateForm(): Boolean {
-        nameError = if (nameValue.isBlank()) "Nama tidak boleh kosong" else null
         emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()) "Format email tidak valid" else null
-        passwordError = if (passwordValue.isBlank()) "Password tidak boleh kosong" else null
-        return nameError == null && emailError == null && passwordError == null
+        return emailError == null
     }
 
     Scaffold(
         topBar = {
-            SimpleLightTopAppBar(title = "Daftar", navHostController = navHostController)
+            SimpleLightTopAppBar(title = "Lupa Kata Sandi", navHostController = navHostController)
         },
         modifier = modifier
     ) { paddingValues ->
@@ -61,37 +53,24 @@ fun RegisterActivity(
                     .fillMaxSize()
                     .padding(20.dp)
             ) {
-                RegisterForm(
-                    name = nameValue,
+                ForgotPasswordForm(
                     email = emailValue,
-                    password = passwordValue,
-                    onNameChanged = {
-                        nameValue = it
-                        nameError = null // Reset error saat teks berubah
-                    },
                     onEmailChanged = {
                         emailValue = it
                         emailError = null // Reset error saat teks berubah
                     },
-                    onPasswordChanged = {
-                        passwordValue = it
-                        passwordError = null // Reset error saat teks berubah
-                    },
-                    nameError = nameError,
                     emailError = emailError,
-                    passwordError = passwordError
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
-                RegisterButton(
+                ForgotPasswordButton(
                     navController = navHostController,
-                    onRegister = {
+                    onForget = {
                         if (validateForm()) {
                             navHostController.navigate(Screen.Login.route)
                         }
                     }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
 
                 LoginRedirectButton(navController = navHostController)
             }
@@ -100,27 +79,11 @@ fun RegisterActivity(
 }
 
 @Composable
-fun RegisterForm(
-    name: String,
+fun ForgotPasswordForm(
     email: String,
-    password: String,
-    onNameChanged: (String) -> Unit,
     onEmailChanged: (String) -> Unit,
-    onPasswordChanged: (String) -> Unit,
-    nameError: String?,
     emailError: String?,
-    passwordError: String?
 ) {
-    TextFieldForm(
-        modifier = Modifier.fillMaxWidth(),
-        value = name,
-        onValueChange = onNameChanged,
-        label = "Nama",
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-        isError = nameError != null,
-        errorMessage = nameError
-    )
-    Spacer(modifier = Modifier.height(8.dp))
     TextFieldForm(
         modifier = Modifier.fillMaxWidth(),
         value = email,
@@ -130,26 +93,15 @@ fun RegisterForm(
         isError = emailError != null,
         errorMessage = emailError
     )
-    Spacer(modifier = Modifier.height(8.dp))
-    TextFieldForm(
-        modifier = Modifier.fillMaxWidth(),
-        value = password,
-        onValueChange = onPasswordChanged,
-        label = "Password",
-        visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        isError = passwordError != null,
-        errorMessage = passwordError
-    )
 }
 
 @Composable
-fun RegisterButton(
+fun ForgotPasswordButton(
     navController: NavHostController,
-    onRegister: () -> Unit
+    onForget: () -> Unit
 ) {
     Button(
-        onClick = onRegister,
+        onClick = onForget,
         shape = RoundedCornerShape(100.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -160,7 +112,7 @@ fun RegisterButton(
         )
     ) {
         Text(
-            text = "Daftar",
+            text = "Kirim Tautan Pemulihan",
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onPrimary
         )
@@ -175,7 +127,7 @@ fun LoginRedirectButton(
         onClick = { navController.navigate(Screen.Login.route) }
     ) {
         Text(
-            text = "Sudah punya akun? Masuk.",
+            text = "Kembali ke halaman masuk..",
             style = MaterialTheme.typography.labelMedium.copy(
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.primary
@@ -188,18 +140,12 @@ fun LoginRedirectButton(
 
 @Preview(showBackground = true)
 @Composable
-fun RegisterActivityPreview() {
+fun ForgetPasswordActivityPreview() {
     HidroQuTheme {
-        RegisterForm(
-            name = "",
+        ForgotPasswordForm(
             email = "",
-            password = "",
-            onNameChanged = {},
             onEmailChanged = {},
-            onPasswordChanged = {},
-            nameError = null,
             emailError = null,
-            passwordError = null
         )
     }
 }

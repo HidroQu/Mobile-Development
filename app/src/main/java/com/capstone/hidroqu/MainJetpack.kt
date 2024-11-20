@@ -14,7 +14,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.capstone.hidroqu.navigation.BottomBar
 import com.capstone.hidroqu.navigation.Screen
-import com.capstone.hidroqu.ui.screen.forgotpassword.ForgotPasswordActivity
 import com.capstone.hidroqu.ui.screen.addplant.AddPlantActivity
 import com.capstone.hidroqu.ui.screen.article.ArticleActivity
 import com.capstone.hidroqu.ui.screen.camera.CameraPermissionScreen
@@ -24,6 +23,7 @@ import com.capstone.hidroqu.ui.screen.detailarticle.DetailArticleScreen
 import com.capstone.hidroqu.ui.screen.detailcommunity.DetailPostCommunityActivity
 import com.capstone.hidroqu.ui.screen.detailmyplant.DetailMyPlantActivity
 import com.capstone.hidroqu.ui.screen.editprofile.EditProfileActivity
+import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
 import com.capstone.hidroqu.ui.screen.formaddplant.FormAddPlantActivity
 import com.capstone.hidroqu.ui.screen.formcommunity.FormAddCommunityActivity
 import com.capstone.hidroqu.ui.screen.historymyplant.HistoryMyPlantActivity
