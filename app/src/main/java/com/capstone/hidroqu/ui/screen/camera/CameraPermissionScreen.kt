@@ -55,7 +55,6 @@ import java.util.concurrent.Executors
 
 @Composable
 fun CameraPermissionScreen(cameraMode: String, navHostController: NavHostController) {
-    val systemUiController = rememberSystemUiController()
 
     var hasCameraPermission by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -65,15 +64,6 @@ fun CameraPermissionScreen(cameraMode: String, navHostController: NavHostControl
     ) { isGranted ->
         hasCameraPermission = isGranted
     }
-
-    systemUiController.setSystemBarsColor(
-        color = MaterialTheme.colorScheme.primaryContainer,
-    )
-
-    systemUiController.setNavigationBarColor(
-        color = MaterialTheme.colorScheme.onPrimary,
-    )
-
     LaunchedEffect(Unit) {
         when (PackageManager.PERMISSION_GRANTED) {
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {

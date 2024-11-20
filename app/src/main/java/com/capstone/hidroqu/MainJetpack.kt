@@ -1,6 +1,7 @@
 package com.capstone.hidroqu
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import com.capstone.hidroqu.ui.screen.register.RegisterActivity
 import com.capstone.hidroqu.ui.screen.resultpototanam.ResultPotoTanamActivity
 import com.capstone.hidroqu.ui.screen.resultscantanam.ResultScanTanamActivity
 import com.capstone.hidroqu.utils.dummyListUserData
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun MainJetpack(
@@ -43,6 +45,16 @@ fun MainJetpack(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    val systemUiController = rememberSystemUiController()
+
+    systemUiController.setSystemBarsColor(
+        color = MaterialTheme.colorScheme.primaryContainer,
+    )
+
+    systemUiController.setNavigationBarColor(
+        color = MaterialTheme.colorScheme.onPrimary,
+    )
     Scaffold(
         bottomBar = {
             if (currentRoute == Screen.Home.route || currentRoute == Screen.MyPlant.route || currentRoute == Screen.Community.route || currentRoute == Screen.Profile.route) {
