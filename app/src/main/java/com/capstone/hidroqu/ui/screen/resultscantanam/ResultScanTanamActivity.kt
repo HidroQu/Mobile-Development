@@ -24,6 +24,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
@@ -35,14 +36,19 @@ fun ResultScanTanamActivity(
     val imageUri = Uri.parse(photoUri)
 
     Scaffold(
+        topBar = {
+            SimpleLightTopAppBar(
+                title = "Detail tanaman",
+                navHostController = navHostController
+            )
+        },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+            ) {
                 Button(
                     onClick = {
-
-                        val plantId = 3
-                        navHostController.navigate(Screen.FormAddPlant.createRoute(plantId))
-
+                        navHostController.navigate(Screen.ChoosePlant.route)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -62,8 +68,8 @@ fun ResultScanTanamActivity(
                 .verticalScroll(rememberScrollState())
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(20.dp)
-                .padding(bottom = paddingValues.calculateBottomPadding()), // Padding untuk bottom bar
+                .padding(paddingValues)
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Tanaman Image + Nama Tanaman + Nama Latin

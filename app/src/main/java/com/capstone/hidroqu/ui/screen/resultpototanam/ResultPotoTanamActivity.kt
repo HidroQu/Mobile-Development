@@ -25,6 +25,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
@@ -64,8 +65,16 @@ fun ResultPotoTanamActivityContent(
     val imageUri = Uri.parse(photoUri)
 
     Scaffold(
+        topBar = {
+            SimpleLightTopAppBar(
+                title = "Penyakit terdeteksi",
+                navHostController = navHostController
+            )
+        },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+            ) {
                 Button(
                     onClick = {
                         navHostController.navigate(Screen.ChoosePlant.route)
@@ -76,7 +85,7 @@ fun ResultPotoTanamActivityContent(
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
-                        text = "Simpan ke koleksi tanaman anda",
+                        text = "Simpan riwayat penyakit",
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
@@ -88,8 +97,8 @@ fun ResultPotoTanamActivityContent(
                 .verticalScroll(rememberScrollState())
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(20.dp)
-                .padding(bottom = paddingValues.calculateBottomPadding()), // Padding untuk bottom bar
+                .padding(paddingValues)
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             AsyncImage(
