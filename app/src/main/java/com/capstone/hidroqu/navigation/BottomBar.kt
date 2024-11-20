@@ -83,7 +83,7 @@ fun BottomBar(
                         launchSingleTop = true
                     }
                 },
-                modifier = Modifier.padding(top = 12.dp, bottom = 16.dp),
+                modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
