@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
+import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.ui.component.CardPostComment
 import com.capstone.hidroqu.utils.ListCommunity
 import com.capstone.hidroqu.utils.ListDetailPostCommunity
@@ -50,33 +54,31 @@ fun DetailPostCommunityActivity(
     val post = getPostById(idPost)
 
     if (post != null) {
-        DetailPostCommunityContent(post, listComment)
+        DetailPostCommunityContent(post, listComment, navHostController)
     } else {
         Text("Postingan tidak ditemukan", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DetailPostCommunityContent(
     post: ListCommunity,
     listComment: List<ListDetailPostCommunity>,
+    navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     // State untuk teks komentar
     val commentText = remember { mutableStateOf("") }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
         content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.onPrimary)
                     .padding(paddingValues),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Konten utama yang sudah ada (gambar, teks, dll)
                 Column(
@@ -149,6 +151,12 @@ fun DetailPostCommunityContent(
                 }
             }
         },
+        topBar = {
+            SimpleLightTopAppBar(
+                "Postingan",
+                navHostController = navHostController
+            )
+        },
         bottomBar = {
             // Bar bagian bawah untuk input komentar dan tombol kirim
             Row(
@@ -195,6 +203,6 @@ fun DetailPostCommunityContent(
 private fun DetailPostCommunityPreview() {
     val navHostController = rememberNavController()
     HidroQuTheme {
-        DetailPostCommunityActivity(navHostController , 1)
+        DetailPostCommunityActivity(navHostController , 4)
     }
 }

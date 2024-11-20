@@ -213,7 +213,7 @@ fun DetailMyPlantContent(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Column (
-                        modifier = modifier
+                        modifier = Modifier
                             .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
                             .border(
                                 width = 1.dp,
@@ -227,6 +227,7 @@ fun DetailMyPlantContent(
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
+                        Spacer(modifier = Modifier.height(4.dp)) // Spacing between label and value
                         Text(
                             text = plant.dateSeeding,
                             style = MaterialTheme.typography.bodyMedium,
@@ -234,7 +235,7 @@ fun DetailMyPlantContent(
                         )
                     }
                     Column(
-                        modifier = modifier
+                        modifier = Modifier
                             .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
                             .border(
                                 width = 1.dp,
@@ -301,21 +302,17 @@ fun DetailMyPlantContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 healthHistoryList.forEach { healthHistory ->
-                    healthHistoryList.forEach { healthHistory ->
-                        CardHealthHistory(
-                            listHealthHistory = healthHistory,
-                            onClick = {
-                                navHostController.navigate(
-                                    Screen.HistoryMyPlant.createRoute(
-                                        plantId = plant.id,
-                                        healthId = healthHistory.healthId
-                                    )
+                    CardHealthHistory(
+                        listHealthHistory = healthHistory,
+                        onClick = {
+                            navHostController.navigate(
+                                Screen.HistoryMyPlant.createRoute(
+                                    plantId = plant.id,
+                                    healthId = healthHistory.healthId
                                 )
-                            }
-                        )
-
-                    }
-
+                            )
+                        }
+                    )
                 }
             }
         }

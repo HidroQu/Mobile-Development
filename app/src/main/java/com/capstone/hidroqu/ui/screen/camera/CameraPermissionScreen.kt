@@ -106,7 +106,7 @@ fun CameraPermissionScreen(cameraMode: String, navHostController: NavHostControl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraScreen(cameraMode: String, navController: NavController) {
+fun CameraScreen(cameraMode: String, navHostController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -201,10 +201,10 @@ fun CameraScreen(cameraMode: String, navController: NavController) {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { (context as ComponentActivity).finish() }) {
+                    IconButton(onClick = { navHostController.popBackStack() }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Kembali",
+                            contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
@@ -235,7 +235,7 @@ fun CameraScreen(cameraMode: String, navController: NavController) {
             BottomBar(
                 onGalleryClick = { galleryLauncher.launch("image/*") },
                 onCaptureClick = {
-                    takePhoto(context, imageCapture, cameraExecutor, flashEnabled, isFrontCamera, cameraMode, navController)
+                    takePhoto(context, imageCapture, cameraExecutor, flashEnabled, isFrontCamera, cameraMode, navHostController)
                 },
                 onSwitchCameraClick = {
                     isFrontCamera = !isFrontCamera

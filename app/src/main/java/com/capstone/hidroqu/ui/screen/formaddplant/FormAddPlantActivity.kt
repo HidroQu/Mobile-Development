@@ -26,6 +26,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.utils.ListMyAddPlant
 import com.capstone.hidroqu.utils.getAddPlantById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -46,6 +47,12 @@ fun FormAddPlantActivity(
     var note by remember { mutableStateOf("") } // Catatan pengguna
 
     Scaffold(
+        topBar = {
+            SimpleLightTopAppBar(
+                title = "Tambah Tanaman",
+                navHostController = navHostController
+            )
+        },
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.onPrimary,

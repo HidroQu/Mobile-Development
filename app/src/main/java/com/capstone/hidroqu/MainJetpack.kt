@@ -121,13 +121,7 @@ fun MainJetpack(
             composable(Screen.MyPlant.route) {
                 // Panggil MyPlantActivity di sini
                 MyPlantActivity(
-                    navHostController = navController,
-                    onAddClicked = {
-                        navController.navigate(Screen.AddPlant.route)
-                    },
-                    onDetailClicked = { plantId ->
-                        navController.navigate(Screen.DetailMyPlant.createRoute(plantId)) // Navigasi ke detail tanaman
-                    }
+                    navHostController = navController
                 )
             }
             ////add plant
@@ -207,7 +201,8 @@ fun MainJetpack(
                     },
                     onBioChanged = { newBio ->
                         // Logika untuk mengupdate bio jika perlu
-                    }
+                    },
+                    navHostController = navController
                 )
             }
         }

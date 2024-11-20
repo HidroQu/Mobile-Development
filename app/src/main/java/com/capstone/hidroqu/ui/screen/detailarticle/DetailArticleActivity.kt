@@ -50,16 +50,12 @@ fun DetailArticleScreen(
                 )
             },
             content = { paddingValues ->
-                Column(
-                    modifier = Modifier
-                        .padding(paddingValues) // Tambahkan padding dari Scaffold
-                        .fillMaxSize()
-                ) {
+
                     DetailArticleContent(
                         article = article,
                         modifier = Modifier.padding(paddingValues) // Gunakan paddingValues di sini
                     )
-                }
+
             }
         )
     } else {
@@ -69,11 +65,11 @@ fun DetailArticleScreen(
 
 @Composable
 fun DetailArticleContent(article: ListArticleHome, modifier: Modifier = Modifier) {
-    Column {
+    Column{
         Image(
             painter = painterResource(R.drawable.ic_launcher_background),
             contentDescription = "Artikel",
-            modifier = Modifier
+            modifier = modifier
                 .height(200.dp)
                 .fillMaxWidth(),
             contentScale = ContentScale.Crop
@@ -92,7 +88,7 @@ fun DetailArticleContent(article: ListArticleHome, modifier: Modifier = Modifier
                     style = MaterialTheme.typography.titleLarge
                 )
                 Row (
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){

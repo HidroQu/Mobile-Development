@@ -14,8 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,14 +22,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.R
+import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
+import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.utils.ListHealthHistory
 import com.capstone.hidroqu.utils.getHealthHistoryByPlantAndHealthId
-import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryMyPlantActivity(
     navHostController: NavHostController,
@@ -41,11 +41,31 @@ fun HistoryMyPlantActivity(
     // Fetching the health history for the given plantId and healthId
     val history = getHealthHistoryByPlantAndHealthId(plantId, healthId)
 
-    if (history != null) {
-        DetailHistoryContent(history)
-    } else {
-        Text("History tidak ditemukan", style = MaterialTheme.typography.bodyLarge)
-    }
+    Scaffold(
+        topBar = {
+            SimpleLightTopAppBar(
+                title = history?.dateHistory ?: "00/00/0000",
+                navHostController = navHostController
+            )
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxWidth()
+            ) {
+                if (history != null) {
+                    DetailHistoryContent(history)
+                } else {
+                    Text(
+                        "History tidak ditemukan",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        }
+    )
 }
 
 @Composable

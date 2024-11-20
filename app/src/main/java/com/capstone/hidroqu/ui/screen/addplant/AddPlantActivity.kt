@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.component.CardAddPlant
 import com.capstone.hidroqu.utils.ListMyAddPlant
 import com.capstone.hidroqu.utils.dummyListMyPlantTanamanku
@@ -29,6 +30,12 @@ fun AddPlantActivity(
     var selectedPlant by remember { mutableStateOf<ListMyAddPlant?>(null) }
 
     Scaffold(
+        topBar = {
+            SimpleLightTopAppBar(
+                title = "Pilih tanaman anda",
+                navHostController = navHostController
+            )
+        },
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.onPrimary

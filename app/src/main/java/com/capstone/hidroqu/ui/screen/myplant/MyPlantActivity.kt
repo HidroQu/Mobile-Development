@@ -28,15 +28,17 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.utils.dummyListPlants
 
 @Composable
 fun MyPlantActivity(
-    navHostController: NavHostController,
-    onAddClicked: () -> Unit,
-    onDetailClicked: (Int) -> Unit,
+    navHostController: NavHostController
 ) {
     Scaffold(
+        topBar = {
+            TopBarDefault("Tanamanku")
+        },
         floatingActionButton = {
             AddButton(onClick = {
                 navHostController.navigate(Screen.AddPlant.route) // Pindah ke halaman AddPlant
@@ -46,14 +48,13 @@ fun MyPlantActivity(
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp)
+                .padding(paddingValues)
                 .fillMaxSize()
         ) {
             if (dummyListPlants.isEmpty()) {
                 NoPlantList(modifier = Modifier.padding(paddingValues))
             } else {
                 MyPlantList(
-                    modifier = Modifier.padding(paddingValues),
                     onDetailClicked = { plantId ->
                         navHostController.navigate(Screen.DetailMyPlant.createRoute(plantId)){
                             popUpTo(Screen.MyPlant.route)
@@ -124,6 +125,8 @@ fun NoPlantList(
 @Composable
 fun MyPlantList(modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
     Column(
+        modifier = modifier
+            .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         dummyListPlants.forEach { plant ->
@@ -145,11 +148,7 @@ fun MyPlantActivityPreview() {
     HidroQuTheme {
         val navHostController = rememberNavController()
         MyPlantActivity(navHostController,
-            onAddClicked = {
-            },
-            onDetailClicked = {
 
-            }
         )
     }
 }

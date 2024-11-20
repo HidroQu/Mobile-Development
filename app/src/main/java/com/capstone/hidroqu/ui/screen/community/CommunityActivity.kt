@@ -12,12 +12,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,11 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.ui.component.CardCommunity
 import com.capstone.hidroqu.utils.dummyListPlants
 import com.capstone.hidroqu.utils.dummyListCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityActivity(
     navHostController: NavHostController,
@@ -40,6 +44,9 @@ fun CommunityActivity(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
+        topBar = {
+            TopBarDefault("Komunitas")
+        },
         floatingActionButton = {
             AskButton(onClick = onAddClicked)
         },
@@ -116,7 +123,9 @@ fun NoPostList(
 @Composable
 fun PostList(modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
+            .padding(20.dp)
     ) {
         dummyListCommunity.forEach { post ->
             CardCommunity (
