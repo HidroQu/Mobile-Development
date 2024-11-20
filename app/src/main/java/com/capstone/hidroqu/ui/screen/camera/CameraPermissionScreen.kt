@@ -114,13 +114,16 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             uri?.let {
-                val intent = Intent(context, ResultTesting::class.java).apply {
-                    putExtra("photo_uri", uri.toString())
+                val encodedUri = URLEncoder.encode(uri.toString(), "UTF-8")
+                if (cameraMode == "Poto Tanam") {
+                    navHostController.navigate("ResultPotoTanam/$encodedUri")
+                } else if (cameraMode == "Scan Tanam") {
+                    navHostController.navigate("ResultScanTanam/$encodedUri")
                 }
-                context.startActivity(intent)
             }
         }
     )
+
 
     // Fungsi untuk mengikat kamera ke lifecycle
     fun bindCameraUseCases() {

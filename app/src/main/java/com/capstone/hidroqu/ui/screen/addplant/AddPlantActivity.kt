@@ -43,9 +43,7 @@ fun AddPlantActivity(
                 Button(
                     onClick = {
                         selectedPlant?.let { plant ->
-                            navHostController.navigate(Screen.FormAddPlant.createRoute(plantId = plant.plantId)){
-                                popUpTo(Screen.MyPlant.route)
-                            }
+                            navHostController.navigate(Screen.FormAddPlant.createRoute(plantId = plant.plantId))
                         }
                     },
                     modifier = Modifier

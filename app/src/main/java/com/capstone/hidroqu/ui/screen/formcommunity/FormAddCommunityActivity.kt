@@ -33,7 +33,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.capstone.hidroqu.R
+import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
+import com.capstone.hidroqu.navigation.TopBarAction
+import com.capstone.hidroqu.navigation.TopBarButtonAction
 import com.capstone.hidroqu.utils.ListUserData
 import com.capstone.hidroqu.utils.dummyListUserData
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -57,7 +60,16 @@ fun FormAddCommunityActivity(
 
     Scaffold(
         topBar = {
-            SimpleLightTopAppBar("Tambah Postingan", navHostController)
+            TopBarButtonAction(
+                title = "Tambah Postingan",
+                navHostController = navHostController,
+                onActionClick = {
+                    //logika menyimpan ke database disini
+
+                    navHostController.popBackStack()
+                },
+                actionText = "Posting"
+            )
         },
         content = { paddingValues ->
             Column(
