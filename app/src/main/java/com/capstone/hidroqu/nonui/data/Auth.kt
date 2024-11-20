@@ -1,0 +1,48 @@
+package com.capstone.hidroqu.nonui.data
+
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class RegisterRequest(
+    val name: String,
+    val email: String,
+    val password: String,
+    val password_confirmation: String
+) : Parcelable
+
+@Parcelize
+data class LoginRequest(
+    val email: String,
+    val password: String
+) : Parcelable
+
+@Parcelize
+data class ForgotPasswordRequest(
+    val email: String
+) : Parcelable
+
+@Parcelize
+data class AuthResponse(
+    val token: String,
+    val user: User
+) : Parcelable
+
+@Parcelize
+data class User(
+    val id: Int,
+    val name: String,
+    val email: String
+) : Parcelable
+
+@Parcelize
+data class BasicResponse(
+    val message: String
+) : Parcelable
+
+@Parcelize
+data class ResetPasswordRequest(
+    val token: String,
+    val email: String,
+    val password: String
+) : Parcelable

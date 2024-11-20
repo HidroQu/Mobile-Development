@@ -26,21 +26,27 @@ import androidx.navigation.NavHostController
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.ui.component.TextFieldForm
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun LoginActivity(
     navHostController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = viewModel()
 ) {
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
+    var message by remember { mutableStateOf("") }
 
     // Fungsi validasi
     fun validateForm(): Boolean {
-        emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()) "Format email tidak valid" else null
+        emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue)
+                .matches()
+        ) "Format email tidak valid" else null
         passwordError = if (passwordValue.isBlank()) "Password tidak boleh kosong" else null
         return emailError == null && passwordError == null
     }
@@ -85,7 +91,7 @@ fun LoginActivity(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Login Form
-                    LoginForm(
+                    LoginForm(  // Pass emailValue and passwordValue here
                         email = emailValue,
                         password = passwordValue,
                         onEmailChanged = {
@@ -107,12 +113,23 @@ fun LoginActivity(
                         navHostController = navHostController,
                         onLogin = {
                             if (validateForm()) {
-                                navHostController.navigate(Screen.Home.route) {
-                                    popUpTo(Screen.Login.route) { inclusive = true }
-                                }
+                                viewModel.loginUser(
+                                    emailValue,
+                                    passwordValue,
+                                    onSuccess = {
+                                        navHostController.navigate(Screen.Home.route) {
+                                            popUpTo(Screen.Login.route) { inclusive = true }
+                                        }
+                                        message = "Login Successful! Token: ${it.token}"
+                                    },
+                                    onError = { error ->
+                                        message = error
+                                    }
+                                )
                             }
                         }
                     )
+                    Text(message)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Google Login Button
@@ -209,29 +226,34 @@ fun RegisterButton(
 fun ForgotPasswordButton(
     navHostController: NavHostController
 ) {
-    TextButton(
-        onClick = { navHostController.navigate(Screen.ForgotPassword.route) }
-    ) {
-        Text(
-            text = "Lupa password",
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.primary
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.End
-        )
-    }
+
+    Text(
+        text = "Lupa password",
+        style = MaterialTheme.typography.labelMedium.copy(
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.primary
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navHostController.navigate(Screen.ForgotPassword.route)
+            }
+            .padding(vertical = 4.dp, horizontal = 2.dp),
+        textAlign = TextAlign.End,
+    )
 }
+
 
 @Composable
 fun GoogleButton(
     navHostController: NavHostController,
 ) {
     TextButton(
-        onClick = { navHostController.navigate(Screen.Home.route) {
-            popUpTo(Screen.Login.route) { inclusive = true }
-        } },
+        onClick = {
+            navHostController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        },
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)

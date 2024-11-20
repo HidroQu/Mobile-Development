@@ -8,7 +8,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -20,29 +19,36 @@ import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.component.TextFieldForm
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
-
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun RegisterActivity(
     navHostController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = viewModel()
 ) {
     var nameValue by remember { mutableStateOf("") }
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
+    var passwordConfirmationValue by remember { mutableStateOf("") }
     var nameError by remember { mutableStateOf<String?>(null) }
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
+    var passwordConfirmationError by remember { mutableStateOf<String?>(null) }
+    var message by remember { mutableStateOf("") }
 
     // Fungsi validasi terpisah
     fun validateForm(): Boolean {
         nameError = if (nameValue.isBlank()) "Nama tidak boleh kosong" else null
         emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()) "Format email tidak valid" else null
         passwordError = if (passwordValue.isBlank()) "Password tidak boleh kosong" else null
-        return nameError == null && emailError == null && passwordError == null
+        passwordConfirmationError = if (passwordConfirmationValue.isBlank() || passwordConfirmationValue != passwordValue) {
+            "Konfirmasi password tidak sesuai"
+        } else null
+        return nameError == null && emailError == null && passwordError == null && passwordConfirmationError == null
     }
 
     Scaffold(
@@ -65,6 +71,7 @@ fun RegisterActivity(
                     name = nameValue,
                     email = emailValue,
                     password = passwordValue,
+                    passwordConfirmation = passwordConfirmationValue,
                     onNameChanged = {
                         nameValue = it
                         nameError = null // Reset error saat teks berubah
@@ -77,17 +84,36 @@ fun RegisterActivity(
                         passwordValue = it
                         passwordError = null // Reset error saat teks berubah
                     },
+                    onPasswordConfirmationChanged = {
+                        passwordConfirmationValue = it
+                        passwordConfirmationError = null // Reset error saat teks berubah
+                    },
                     nameError = nameError,
                     emailError = emailError,
-                    passwordError = passwordError
+                    passwordError = passwordError,
+                    passwordConfirmationError = passwordConfirmationError
                 )
                 Spacer(modifier = Modifier.height(32.dp))
-
+                Text(message)
                 RegisterButton(
                     navController = navHostController,
                     onRegister = {
                         if (validateForm()) {
-                            navHostController.navigate(Screen.Login.route)
+                            viewModel.registerUser(
+                                nameValue,
+                                emailValue,
+                                passwordValue,
+                                passwordConfirmationValue,
+                                onSuccess = {
+                                    navHostController.navigate(Screen.Login.route) {
+                                        popUpTo(Screen.Register.route) { inclusive = true }
+                                    }
+                                    message = "Registration Successful! Token: ${it.token}"
+                                },
+                                onError = { error ->
+                                    message = error
+                                }
+                            )
                         }
                     }
                 )
@@ -104,12 +130,15 @@ fun RegisterForm(
     name: String,
     email: String,
     password: String,
+    passwordConfirmation: String, // Perbaikan nama parameter
     onNameChanged: (String) -> Unit,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
+    onPasswordConfirmationChanged: (String) -> Unit,
     nameError: String?,
     emailError: String?,
-    passwordError: String?
+    passwordError: String?,
+    passwordConfirmationError: String?
 ) {
     TextFieldForm(
         modifier = Modifier.fillMaxWidth(),
@@ -140,6 +169,17 @@ fun RegisterForm(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         isError = passwordError != null,
         errorMessage = passwordError
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    TextFieldForm(
+        modifier = Modifier.fillMaxWidth(),
+        value = passwordConfirmation,
+        onValueChange = onPasswordConfirmationChanged,
+        label = "Konfirmasi Password",
+        visualTransformation = PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        isError = passwordConfirmationError != null,
+        errorMessage = passwordConfirmationError
     )
 }
 
@@ -194,12 +234,15 @@ fun RegisterActivityPreview() {
             name = "",
             email = "",
             password = "",
+            passwordConfirmation = "",
             onNameChanged = {},
             onEmailChanged = {},
             onPasswordChanged = {},
+            onPasswordConfirmationChanged = {},
             nameError = null,
             emailError = null,
-            passwordError = null
+            passwordError = null,
+            passwordConfirmationError = null
         )
     }
 }
