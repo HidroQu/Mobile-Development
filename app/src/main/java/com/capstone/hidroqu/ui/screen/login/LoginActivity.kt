@@ -52,6 +52,8 @@ fun LoginActivity(
         return emailError == null && passwordError == null
     }
 
+    val context = LocalContext.current // <-- Use it here inside @Composable function
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.hidroponikbg),
@@ -122,10 +124,12 @@ fun LoginActivity(
                                 viewModel.loginUser(
                                     emailValue,
                                     passwordValue,
-                                    onSuccess = {
+                                    context = context,
+                                    onSuccess = { loginResponse ->
                                         navHostController.navigate(Screen.Home.route) {
                                             popUpTo(Screen.Login.route) { inclusive = true }
                                         }
+
                                         message = "Login Successful!"
                                         isSuccess = true
                                     },

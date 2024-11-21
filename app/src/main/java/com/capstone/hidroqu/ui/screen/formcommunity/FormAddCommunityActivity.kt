@@ -28,14 +28,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.capstone.hidroqu.R
-import com.capstone.hidroqu.navigation.Screen
-import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
-import com.capstone.hidroqu.navigation.TopBarAction
 import com.capstone.hidroqu.navigation.TopBarButtonAction
 import com.capstone.hidroqu.utils.ListUserData
 import com.capstone.hidroqu.utils.dummyListUserData

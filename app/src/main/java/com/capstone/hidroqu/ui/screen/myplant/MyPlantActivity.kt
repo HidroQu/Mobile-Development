@@ -1,5 +1,6 @@
 package com.capstone.hidroqu.ui.screen.myplant
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -25,16 +29,34 @@ import com.capstone.hidroqu.R
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.component.CardMyPlant
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.TopBarDefault
-import com.capstone.hidroqu.utils.dummyListPlants
+import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.capstone.hidroqu.nonui.data.MyPlantResponse
+import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
 
 @Composable
 fun MyPlantActivity(
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    viewModel: MyPlantViewModel = viewModel(),
+    context: Context = LocalContext.current
 ) {
+    val myPlants by viewModel.myPlants.observeAsState(emptyList())
+    val isLoading by viewModel.isLoading.observeAsState(false)
+    val errorMessage by viewModel.errorMessage.observeAsState("")
+
+    LaunchedEffect(Unit) {
+        val token = SharedPreferencesHelper(context).getToken()
+        if (token != null) {
+            viewModel.fetchMyPlants(token)
+        } else {
+            // Tangani jika token tidak ada (misalnya, arahkan ke halaman login)
+        }
+    }
     Scaffold(
         topBar = {
             TopBarDefault("Tanamanku")
@@ -48,24 +70,58 @@ fun MyPlantActivity(
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
-                .padding(paddingValues)
                 .fillMaxSize()
+                .padding(paddingValues)
+
         ) {
-            if (dummyListPlants.isEmpty()) {
-                NoPlantList(modifier = Modifier.padding(paddingValues))
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (!errorMessage.isNullOrEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = errorMessage ?: "Unknown Error")
+                }
             } else {
-                MyPlantList(
-                    onDetailClicked = { plantId ->
-                        navHostController.navigate(Screen.DetailMyPlant.createRoute(plantId)){
-                            popUpTo(Screen.MyPlant.route)
-                        }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    if (myPlants.isEmpty()) {
+                        NoPlantList(modifier = Modifier.padding(paddingValues))
+                    } else {
+                        MyPlantList(
+                            plants = myPlants,
+                            onDetailClicked = { plantId ->
+                                navHostController.navigate(Screen.DetailMyPlant.createRoute(plantId)) {
+                                    popUpTo(Screen.MyPlant.route)
+                                }
+                            }
+                        )
                     }
-                )
+                }
             }
         }
     }
 }
-
+// Loading indicator
+@Composable
+fun LoadingIndicator(modifier: Modifier = Modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+    ) {
+        CircularProgressIndicator()
+    }
+}
 
 
 @Composable
@@ -123,15 +179,19 @@ fun NoPlantList(
 }
 
 @Composable
-fun MyPlantList(modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
+fun MyPlantList(
+    plants: List<MyPlantResponse>,
+    modifier: Modifier = Modifier,
+    onDetailClicked: (Int) -> Unit
+) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        dummyListPlants.forEach { plant ->
+        plants.forEach { plant ->
             CardMyPlant(
-                ListPlant = plant,
+                myplant = plant,
                 onClick = {
                     onDetailClicked(plant.id)
                 }
@@ -147,8 +207,9 @@ fun MyPlantList(modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
 fun MyPlantActivityPreview() {
     HidroQuTheme {
         val navHostController = rememberNavController()
-        MyPlantActivity(navHostController,
 
-        )
+        // Menampilkan MyPlantActivity dengan dummy data
+        MyPlantActivity(navHostController, context = LocalContext.current)
     }
 }
+

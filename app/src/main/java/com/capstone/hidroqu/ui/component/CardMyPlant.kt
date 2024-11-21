@@ -1,5 +1,6 @@
 package com.capstone.hidroqu.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,13 +16,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.capstone.hidroqu.utils.ListPlant
+import coil.decode.SvgDecoder
+import com.capstone.hidroqu.R
+import com.capstone.hidroqu.nonui.data.MyPlantResponse
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.foundation.Image
+import coil.ImageLoader
 
 @Composable
 fun CardMyPlant(
-    ListPlant: ListPlant,
+    myplant: MyPlantResponse,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -39,19 +46,28 @@ fun CardMyPlant(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val imageLoader = ImageLoader.Builder(LocalContext.current)
+            .components {
+                add(SvgDecoder.Factory())
+            }
+            .build()
+
         Image(
-            painter = painterResource(id = ListPlant.userPlantPhoto),
+            painter = rememberAsyncImagePainter(
+                model = myplant.plant.icon_plant,
+                imageLoader = imageLoader
+            ),
             contentDescription = "Gambar Tanaman",
             modifier = Modifier.size(40.dp)
         )
         Column {
             Text(
-                text = ListPlant.name,
+                text = myplant.plant.name,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = ListPlant.note,
+                text = myplant.notes.toString(),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 maxLines = 1

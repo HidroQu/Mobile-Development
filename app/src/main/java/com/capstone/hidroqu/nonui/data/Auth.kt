@@ -18,21 +18,33 @@ data class LoginRequest(
 ) : Parcelable
 
 @Parcelize
-data class ForgotPasswordRequest(
-    val email: String
-) : Parcelable
+data class LoginResponse(
+    val status: String,
+    val message: String,
+    val data: AuthResponse
+): Parcelable
 
 @Parcelize
 data class AuthResponse(
-    val token: String,
-    val user: User
+    val user: User,
+    val token: String
+): Parcelable
+
+@Parcelize
+data class ForgotPasswordRequest(
+    val email: String
 ) : Parcelable
 
 @Parcelize
 data class User(
     val id: Int,
     val name: String,
-    val email: String
+    val email: String,
+    val email_verified_at: String?,
+    val profile_image: String?,
+    val bio: String?,
+    val created_at: String,
+    val updated_at: String
 ) : Parcelable
 
 @Parcelize
