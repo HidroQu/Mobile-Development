@@ -43,7 +43,6 @@ fun LoginActivity(
     var message by remember { mutableStateOf("") }
     var isSuccess by remember { mutableStateOf(false) }
 
-    // Fungsi validasi
     fun validateForm(): Boolean {
         emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue)
                 .matches()

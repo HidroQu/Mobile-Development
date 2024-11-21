@@ -96,6 +96,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun isUserLoggedIn(): Boolean {
+        return sharedPreferencesHelper.getToken() != null
+    }
+
+
     fun forgotPassword(email: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         val request = ForgotPasswordRequest(email)
         viewModelScope.launch {
