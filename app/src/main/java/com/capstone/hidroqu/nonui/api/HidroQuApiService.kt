@@ -6,6 +6,7 @@ import com.capstone.hidroqu.nonui.data.ForgotPasswordRequest
 import com.capstone.hidroqu.nonui.data.LoginRequest
 import com.capstone.hidroqu.nonui.data.LoginResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
+import com.capstone.hidroqu.nonui.data.MyPlantDetailWrapper
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.PlantResponse
@@ -45,12 +46,14 @@ interface HidroQuApiService {
         @Body request: StorePlantRequest
     ): Call<BasicResponse>
 
-
     @GET("api/plants/my-plants")
     fun getMyPlants(
         @Header("Authorization") token: String // Menambahkan header Authorization
     ): Call<MyPlantResponseWrapper>
 
     @GET("api/plants/my-plants/{id}")
-    fun getMyPlantDetail(@Path("id") id: Int): Call<MyPlantDetailResponse>
+    fun getMyPlantDetail(
+        @Header("Authorization") token: String,
+        @Path("id") plantId: Int
+    ): Call<MyPlantDetailWrapper>
 }

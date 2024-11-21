@@ -25,12 +25,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import com.capstone.hidroqu.utils.ListHealthHistory
-import com.capstone.hidroqu.utils.dummyListHealthHistory
+import com.capstone.hidroqu.R
+import com.capstone.hidroqu.nonui.data.DiagnosticHistory
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
-fun CardHealthHistory(listHealthHistory: ListHealthHistory, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun CardHealthHistory(
+    listHealthHistory: DiagnosticHistory,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     // Health History Section
         Row(
             modifier = Modifier
@@ -51,7 +55,7 @@ fun CardHealthHistory(listHealthHistory: ListHealthHistory, onClick: () -> Unit,
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Image(
-                    painter = painterResource(id = listHealthHistory.userPlantPhoto),
+                    painter = painterResource(R.drawable.ic_launcher_background),
                     contentDescription = "Gambar Tanaman",
                     modifier = Modifier
                         .size(50.dp) // Ukuran gambar
@@ -94,19 +98,6 @@ fun CardHealthHistory(listHealthHistory: ListHealthHistory, onClick: () -> Unit,
     private fun CardHealthHistoryPreview() {
         HidroQuTheme {
             val navController = rememberNavController()
-            dummyListHealthHistory.forEach { healthhistory ->
-                CardHealthHistory(
-                    listHealthHistory = healthhistory,
-                    onClick = {
-                        navController.navigate("DetailArticle/${healthhistory.plantId}") {
-                            popUpTo("Home") { // Bersihkan halaman Home dari stack
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                )
-            }
+
         }
     }

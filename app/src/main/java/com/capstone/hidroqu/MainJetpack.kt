@@ -158,7 +158,7 @@ fun MainJetpack(
             ) { backStackEntry ->
                 val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
                 DetailMyPlantActivity(
-                    detailId = plantId,
+                    plantId = plantId,
                     navHostController = navController
                 )
             }

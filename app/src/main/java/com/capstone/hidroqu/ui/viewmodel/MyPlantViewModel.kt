@@ -9,6 +9,7 @@ import com.capstone.hidroqu.nonui.api.HidroQuApiConfig
 import com.capstone.hidroqu.nonui.api.HidroQuApiService
 import com.capstone.hidroqu.nonui.data.BasicResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
+import com.capstone.hidroqu.nonui.data.MyPlantDetailWrapper
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
@@ -25,60 +26,14 @@ class MyPlantViewModel : ViewModel() {
     private val _myPlants = MutableLiveData<List<MyPlantResponse>>()
     val myPlants: LiveData<List<MyPlantResponse>> get() = _myPlants
 
-    private val _plantDetail = MutableLiveData<MyPlantDetailResponse>()
-    val plantDetail: LiveData<MyPlantDetailResponse> get() = _plantDetail
+    private val _plantDetail = MutableLiveData<MyPlantDetailResponse?>()
+    val plantDetail: LiveData<MyPlantDetailResponse?> get() = _plantDetail
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> get() = _errorMessage
-
-    fun storePlant(token: String, plantId: Int, plantingDate: String, notes: String?) {
-        val request = StorePlantRequest(
-            plant_id = plantId,
-            planting_date = plantingDate,
-            notes = notes
-        )
-
-        // Lakukan request ke API untuk menyimpan tanaman
-        apiService.storePlant("Bearer $token", request).enqueue(object : Callback<BasicResponse> {
-            override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
-                if (response.isSuccessful) {
-                    // Berhasil menyimpan, lakukan tindakan seperti navigasi atau tampilkan pesan
-                } else {
-                    // Tangani kesalahan
-                }
-            }
-
-            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-                // Tangani kegagalan
-            }
-        })
-    }
-
-    fun fetchMyPlantDetail(token: String, plantId: Int) {
-        _isLoading.value = true
-        apiService.getMyPlantDetail(plantId)
-            .enqueue(object : Callback<MyPlantDetailResponse> {
-                override fun onResponse(
-                    call: Call<MyPlantDetailResponse>,
-                    response: Response<MyPlantDetailResponse>
-                ) {
-                    _isLoading.value = false
-                    if (response.isSuccessful) {
-                        _plantDetail.value = response.body()
-                    } else {
-                        _errorMessage.value = "Error fetching plant details"
-                    }
-                }
-
-                override fun onFailure(call: Call<MyPlantDetailResponse>, t: Throwable) {
-                    _isLoading.value = false
-                    _errorMessage.value = "Network error: ${t.message}"
-                }
-            })
-    }
 
     fun fetchMyPlants(token: String) {
         _isLoading.value = true
@@ -109,6 +64,58 @@ class MyPlantViewModel : ViewModel() {
                 _isLoading.value = false
                 _errorMessage.value = "Error: ${t.message}"
                 Log.e("MyPlantViewModel", "Failure: ${t.message}")
+            }
+        })
+    }
+
+    fun fetchMyPlantDetail(token: String, plantId: Int) {
+        _isLoading.value = true
+        apiService.getMyPlantDetail(("Bearer $token"), plantId).enqueue(object : Callback<MyPlantDetailWrapper> {
+            override fun onResponse(
+                call: Call<MyPlantDetailWrapper>,
+                response: Response<MyPlantDetailWrapper>
+            ) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    val plantDetail = response.body()?.data
+                    _plantDetail.value = plantDetail
+                    Log.d("MyPlantViewModel", "Fetched plant detail: ${response.body()}")
+                } else {
+                    _errorMessage.value = "Error fetching plant details: ${response.message()}"
+                    Log.e("MyPlantViewModel", "Error fetching details: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<MyPlantDetailWrapper>, t: Throwable) {
+                _isLoading.value = false
+                _errorMessage.value = "Error fetching plant details: ${t.message}"
+                Log.e("MyPlantViewModel", "Failure: ${t.message}")
+            }
+        })
+    }
+
+
+
+    // Store a new plant for the user
+    fun storePlant(token: String, plantId: Int, plantingDate: String, notes: String?) {
+        val request = StorePlantRequest(
+            plant_id = plantId,
+            planting_date = plantingDate,
+            notes = notes
+        )
+
+        // Request to store plant
+        apiService.storePlant("Bearer $token", request).enqueue(object : Callback<BasicResponse> {
+            override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
+                if (response.isSuccessful) {
+                    // Successfully saved the plant, perform navigation or show message
+                } else {
+                    _errorMessage.value = "Error storing plant: ${response.message()}"
+                }
+            }
+
+            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+                _errorMessage.value = "Network error: ${t.message}"
             }
         })
     }
