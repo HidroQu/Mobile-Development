@@ -22,13 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigation.NavHostController
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.ui.component.TextFieldForm
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
 import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 @SuppressLint("UnrememberedMutableState")
@@ -43,6 +41,7 @@ fun LoginActivity(
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf("") }
+    var isSuccess by remember { mutableStateOf(false) }
 
     // Fungsi validasi
     fun validateForm(): Boolean {
@@ -108,6 +107,13 @@ fun LoginActivity(
                     ForgotPasswordButton(navHostController = navHostController)
                     Spacer(modifier = Modifier.height(32.dp))
 
+                    Text(
+                        text = message,
+                        color = if (isSuccess) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     // Login Button
                     LoginButton(
                         navHostController = navHostController,
@@ -121,15 +127,16 @@ fun LoginActivity(
                                             popUpTo(Screen.Login.route) { inclusive = true }
                                         }
                                         message = "Login Successful!"
+                                        isSuccess = true
                                     },
-                                    onError = { error ->
-                                        message = error
+                                    onError = {
+                                        message = "Kesalahan! Akun Anda tidak ditemukan."
+                                        isSuccess = false
                                     }
                                 )
                             }
                         }
                     )
-                    Text(message)
 
                     Spacer(modifier = Modifier.height(8.dp))
 

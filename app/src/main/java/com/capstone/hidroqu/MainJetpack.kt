@@ -35,6 +35,7 @@ import com.capstone.hidroqu.ui.screen.profile.ProfileActivity
 import com.capstone.hidroqu.ui.screen.register.RegisterActivity
 import com.capstone.hidroqu.ui.screen.resultpototanam.ResultPotoTanamActivity
 import com.capstone.hidroqu.ui.screen.resultscantanam.ResultScanTanamActivity
+import com.capstone.hidroqu.ui.screen.splashscreen.SplashScreen
 import com.capstone.hidroqu.utils.dummyListUserData
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -68,6 +69,9 @@ fun MainJetpack(
             modifier = Modifier.padding(innerPadding)
         ) {
             //auth
+            composable(Screen.Splash.route) {
+                SplashScreen(navHostController = navController)
+            }
             composable(Screen.Login.route) {
                 LoginActivity(navHostController = navController)
             }

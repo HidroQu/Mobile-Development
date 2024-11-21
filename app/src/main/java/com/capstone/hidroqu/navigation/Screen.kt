@@ -3,6 +3,7 @@ package com.capstone.hidroqu.navigation
 sealed class Screen(val route: String) {
 
     //auth
+    object Splash : Screen("splash")
     object Login : Screen("login")
     object Register : Screen("register")
     object ForgotPassword : Screen("forgot")

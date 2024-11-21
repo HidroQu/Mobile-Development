@@ -39,6 +39,7 @@ fun RegisterActivity(
     var passwordError by remember { mutableStateOf<String?>(null) }
     var passwordConfirmationError by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf("") }
+    var isSuccess by remember { mutableStateOf(false) }
 
     // Fungsi validasi terpisah
     fun validateForm(): Boolean {
@@ -74,19 +75,19 @@ fun RegisterActivity(
                     passwordConfirmation = passwordConfirmationValue,
                     onNameChanged = {
                         nameValue = it
-                        nameError = null // Reset error saat teks berubah
+                        nameError = null
                     },
                     onEmailChanged = {
                         emailValue = it
-                        emailError = null // Reset error saat teks berubah
+                        emailError = null
                     },
                     onPasswordChanged = {
                         passwordValue = it
-                        passwordError = null // Reset error saat teks berubah
+                        passwordError = null
                     },
                     onPasswordConfirmationChanged = {
                         passwordConfirmationValue = it
-                        passwordConfirmationError = null // Reset error saat teks berubah
+                        passwordConfirmationError = null
                     },
                     nameError = nameError,
                     emailError = emailError,
@@ -94,7 +95,10 @@ fun RegisterActivity(
                     passwordConfirmationError = passwordConfirmationError
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(message)
+                Text(
+                    text = message,
+                    color = if (isSuccess) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                )
                 Spacer(modifier = Modifier.height(32.dp))
                 RegisterButton(
                     navController = navHostController,
@@ -109,10 +113,12 @@ fun RegisterActivity(
                                     navHostController.navigate(Screen.Login.route) {
                                         popUpTo(Screen.Register.route) { inclusive = true }
                                     }
-                                    message = "Daftar Berhasil"
+                                    message = "Daftar berhasil"
+                                    isSuccess = true
                                 },
-                                onError = { error ->
-                                    message = error
+                                onError = {
+                                    message = "Registrasi Anda gagal. Coba lagi!"
+                                    isSuccess = false
                                 }
                             )
                         }

@@ -23,7 +23,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun ForgotPasswordActivity(
     navHostController: NavHostController,
@@ -33,6 +32,7 @@ fun ForgotPasswordActivity(
     var emailValue by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf("") }
+    var isSuccess by remember { mutableStateOf(false) }
 
     // Fungsi validasi terpisah
     fun validateForm(): Boolean {
@@ -66,7 +66,11 @@ fun ForgotPasswordActivity(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(message)
+                // Menampilkan message dengan warna sesuai kondisi
+                Text(
+                    text = message,
+                    color = if (isSuccess) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -78,9 +82,11 @@ fun ForgotPasswordActivity(
                                 emailValue,
                                 onSuccess = {
                                     message = "Tautan berhasil dikirim ke email Anda!!"
+                                    isSuccess = true
                                 },
                                 onError = { error ->
-                                    message = error
+                                    message = "Oops! Sepertinya ada kesalahan dengan email Anda. Silakan periksa dan coba lagi."
+                                    isSuccess = false
                                 }
                             )
                         }
@@ -92,6 +98,8 @@ fun ForgotPasswordActivity(
         }
     }
 }
+
+
 
 @Composable
 fun ForgotPasswordForm(
