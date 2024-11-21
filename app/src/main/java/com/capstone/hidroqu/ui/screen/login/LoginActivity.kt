@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,7 +51,8 @@ fun LoginActivity(
         passwordError = if (passwordValue.isBlank()) "Password tidak boleh kosong" else null
         return emailError == null && passwordError == null
     }
-
+    val isLoading by viewModel.isLoading
+    val context = LocalContext.current // <-- Use it here inside @Composable function
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -116,11 +118,12 @@ fun LoginActivity(
                                 viewModel.loginUser(
                                     emailValue,
                                     passwordValue,
-                                    onSuccess = {
+                                    context = context,
+                                    onSuccess = { loginResponse ->
                                         navHostController.navigate(Screen.Home.route) {
                                             popUpTo(Screen.Login.route) { inclusive = true }
                                         }
-                                        message = "Login Successful! Token: ${it.token}"
+                                        message = "Login Successful! Token: ${loginResponse.data.token}"
                                     },
                                     onError = { error ->
                                         message = error

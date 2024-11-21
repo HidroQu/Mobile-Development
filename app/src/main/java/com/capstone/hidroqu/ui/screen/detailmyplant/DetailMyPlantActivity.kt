@@ -50,7 +50,11 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun DetailMyPlantActivity(detailId: Int, navHostController: NavHostController, modifier: Modifier = Modifier) {
+fun DetailMyPlantActivity(
+    detailId: Int,
+    navHostController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     val detail = getPlantById(detailId)
     val healthHistoryList = getHealthHistoryByPlantId(detailId)
 

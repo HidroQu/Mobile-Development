@@ -28,7 +28,6 @@ import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.component.CardAddPlant
 import com.capstone.hidroqu.ui.component.CardChoosePlant
-import com.capstone.hidroqu.utils.ListMyPlantTanamanku
 import com.capstone.hidroqu.utils.ListPlant
 import com.capstone.hidroqu.utils.dummyListPlants
 

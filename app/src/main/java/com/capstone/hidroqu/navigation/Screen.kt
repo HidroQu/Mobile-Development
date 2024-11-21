@@ -1,5 +1,7 @@
 package com.capstone.hidroqu.navigation
 
+import com.capstone.hidroqu.nonui.data.PlantResponse
+
 sealed class Screen(val route: String) {
 
     //auth
@@ -44,7 +46,7 @@ sealed class Screen(val route: String) {
 
     object AddPlant : Screen("addplant")
     object FormAddPlant : Screen("FormTanaman/{plantId}") {
-        fun createRoute(plantId: Int) = "FormTanaman/$plantId"
+        fun createRoute(plantId: PlantResponse) = "FormTanaman/$plantId"
     }
 
     //komunitas
