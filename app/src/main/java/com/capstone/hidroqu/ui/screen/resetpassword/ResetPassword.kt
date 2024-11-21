@@ -1,6 +1,8 @@
 package com.capstone.hidroqu.ui.screen.resetpassword
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,6 +33,21 @@ fun ResetPasswordActivity(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    val intent = (context as? ComponentActivity)?.intent
+    val uri: Uri? = intent?.data
+
+    // Menangkap token dan email dari URI
+    var token by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+
+    LaunchedEffect(uri) {
+        if (uri != null) {
+            token = uri.getQueryParameter("token") ?: ""
+            email = uri.getQueryParameter("email") ?: ""
+        }
+    }
+
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var newPasswordError by remember { mutableStateOf<String?>(null) }
@@ -38,7 +55,6 @@ fun ResetPasswordActivity(
     var serverResponse by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf("") }
 
-    // Fungsi validasi terpisah
     fun validateForm(): Boolean {
         newPasswordError = if (newPassword.isBlank()) "Kata sandi baru tidak boleh kosong" else null
         confirmPasswordError = if (confirmPassword != newPassword) "Kata sandi tidak cocok" else null
@@ -56,85 +72,73 @@ fun ResetPasswordActivity(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(20.dp)
-            ) {
-                ResetPasswordForm(
-                    newPassword = newPassword,
-                    confirmPassword = confirmPassword,
-                    onNewPasswordChanged = {
-                        newPassword = it
-                        newPasswordError = null
-                    },
-                    onConfirmPasswordChanged = {
-                        confirmPassword = it
-                        confirmPasswordError = null
-                    },
-                    newPasswordError = newPasswordError,
-                    newConfirmPasswordError = confirmPasswordError
-                )
+            Text("Email: $email")
+            Text("Token: $token")
 
-                Spacer(modifier = Modifier.height(8.dp))
+            ResetPasswordForm(
+                newPassword = newPassword,
+                confirmPassword = confirmPassword,
+                onNewPasswordChanged = {
+                    newPassword = it
+                    newPasswordError = null
+                },
+                onConfirmPasswordChanged = {
+                    confirmPassword = it
+                    confirmPasswordError = null
+                },
+                newPasswordError = newPasswordError,
+                newConfirmPasswordError = confirmPasswordError
+            )
 
-                Text(message)
+            Spacer(modifier = Modifier.height(32.dp))
 
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = {
-                        if (validateForm()) {
-                            viewModel.resetPassword(
-                                token = "user-token-placeholder",
-                                email = "user-email-placeholder",
-                                password = newPassword,
-                                onSuccess = {
-                                    serverResponse = it
-                                    navHostController.navigate(Screen.Login.route) {
-                                        popUpTo(Screen.ResetPassword.route) { inclusive = true }
-                                    }
-                                    message = "Tautan berhasil dikirim ke email Anda!!"
-                                },
-                                onError = {
-                                    serverResponse = it
+            Button(
+                onClick = {
+                    if (validateForm()) {
+                        viewModel.resetPassword(
+                            token = token,
+                            email = email,
+                            password = newPassword,
+                            onSuccess = {
+                                serverResponse = it
+                                navHostController.navigate(Screen.Login.route) {
+                                    popUpTo(Screen.ResetPassword.route) { inclusive = true }
                                 }
-                            )
-                        }
-                    },
-                    shape = RoundedCornerShape(100.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-                    )
-                ) {
-                    Text(
-                        text = "Atur Ulang Kata Sandi",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
+                                message = "Kata sandi berhasil diatur ulang."
+                            },
+                            onError = {
+                                serverResponse = it
+                                message = "Gagal mengatur ulang kata sandi."
+                            }
+                        )
+                    }
+                },
+                shape = RoundedCornerShape(100.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    text = "Atur Ulang Kata Sandi",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
 
-                serverResponse?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                LoginRedirectButton(navController = navHostController)
+            serverResponse?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
             }
         }
     }
 }
-
-
 
 @Composable
 fun ResetPasswordForm(

@@ -137,7 +137,7 @@ fun RegisterForm(
     name: String,
     email: String,
     password: String,
-    passwordConfirmation: String, // Perbaikan nama parameter
+    passwordConfirmation: String,
     onNameChanged: (String) -> Unit,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
