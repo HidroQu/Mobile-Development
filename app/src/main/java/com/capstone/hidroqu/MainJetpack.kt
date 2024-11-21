@@ -1,9 +1,12 @@
 package com.capstone.hidroqu
 
+import android.net.Uri
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +37,7 @@ import com.capstone.hidroqu.ui.screen.login.LoginActivity
 import com.capstone.hidroqu.ui.screen.myplant.MyPlantActivity
 import com.capstone.hidroqu.ui.screen.profile.ProfileActivity
 import com.capstone.hidroqu.ui.screen.register.RegisterActivity
+import com.capstone.hidroqu.ui.screen.resetpassword.ResetPasswordActivity
 import com.capstone.hidroqu.ui.screen.resultpototanam.ResultPotoTanamActivity
 import com.capstone.hidroqu.ui.screen.resultscantanam.ResultScanTanamActivity
 import com.capstone.hidroqu.ui.screen.splashscreen.SplashScreen
@@ -49,6 +53,16 @@ fun MainJetpack(
     val currentRoute = navBackStackEntry?.destination?.route
 
     val systemUiController = rememberSystemUiController()
+
+    val context = LocalContext.current
+    val intent = (context as? ComponentActivity)?.intent
+    val uri: Uri? = intent?.data
+
+    LaunchedEffect(uri) {
+        if (uri?.path == "/api/auth/reset-password.*") {
+            navController.navigate(Screen.ResetPassword.route)
+        }
+    }
 
     systemUiController.setSystemBarsColor(
         color = MaterialTheme.colorScheme.primaryContainer,
@@ -82,6 +96,10 @@ fun MainJetpack(
             composable(Screen.ForgotPassword.route) {
                 ForgotPasswordActivity(navHostController = navController)
             }
+            composable(Screen.ResetPassword.route) {
+                ResetPasswordActivity(navHostController = navController)
+            }
+
             //home
             composable(Screen.Home.route) {
                 HomeActivity(navHostController = navController)
