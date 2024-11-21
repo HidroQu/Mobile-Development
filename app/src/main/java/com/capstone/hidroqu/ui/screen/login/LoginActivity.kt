@@ -28,6 +28,7 @@ import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.ui.component.TextFieldForm
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
 import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 @SuppressLint("UnrememberedMutableState")
@@ -51,9 +52,8 @@ fun LoginActivity(
         passwordError = if (passwordValue.isBlank()) "Password tidak boleh kosong" else null
         return emailError == null && passwordError == null
     }
-    val isLoading by viewModel.isLoading
+
     val context = LocalContext.current // <-- Use it here inside @Composable function
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -65,15 +65,14 @@ fun LoginActivity(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .clickable { keyboardController?.hide() },
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.6f),
+                    .fillMaxHeight(0.7f),
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             ) {
                 Column(
@@ -107,6 +106,7 @@ fun LoginActivity(
                         emailError = emailError,
                         passwordError = passwordError
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
                     ForgotPasswordButton(navHostController = navHostController)
                     Spacer(modifier = Modifier.height(32.dp))
 
@@ -123,7 +123,8 @@ fun LoginActivity(
                                         navHostController.navigate(Screen.Home.route) {
                                             popUpTo(Screen.Login.route) { inclusive = true }
                                         }
-                                        message = "Login Successful! Token: ${loginResponse.data.token}"
+
+                                        message = "Login Successful!"
                                     },
                                     onError = { error ->
                                         message = error
@@ -133,6 +134,7 @@ fun LoginActivity(
                         }
                     )
                     Text(message)
+
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Google Login Button
@@ -229,21 +231,24 @@ fun RegisterButton(
 fun ForgotPasswordButton(
     navHostController: NavHostController
 ) {
-
-    Text(
-        text = "Lupa password",
-        style = MaterialTheme.typography.labelMedium.copy(
-            fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.primary
-        ),
+    Row (
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                navHostController.navigate(Screen.ForgotPassword.route)
-            }
-            .padding(vertical = 4.dp, horizontal = 2.dp),
-        textAlign = TextAlign.End,
-    )
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Text(
+            text = "Lupa password",
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.primary
+            ),
+            modifier = Modifier
+                .clickable {
+                    navHostController.navigate(Screen.ForgotPassword.route)
+                }
+                .padding(vertical = 8.dp, horizontal = 8.dp)
+        )
+    }
 }
 
 
@@ -289,4 +294,7 @@ fun GoogleButton(
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
+    LoginActivity(
+        navHostController = NavHostController(context = LocalContext.current),
+    )
 }

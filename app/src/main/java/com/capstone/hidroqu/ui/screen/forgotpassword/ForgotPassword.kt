@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -18,18 +19,20 @@ import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.component.TextFieldForm
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
-
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun ForgotPasswordActivity(
     navHostController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = viewModel()
 ) {
     var emailValue by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf<String?>(null) }
+    var message by remember { mutableStateOf("") }
 
     // Fungsi validasi terpisah
     fun validateForm(): Boolean {
@@ -61,13 +64,25 @@ fun ForgotPasswordActivity(
                     },
                     emailError = emailError,
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(message)
+
                 Spacer(modifier = Modifier.height(32.dp))
 
                 ForgotPasswordButton(
                     navController = navHostController,
                     onForget = {
                         if (validateForm()) {
-                            navHostController.navigate(Screen.Login.route)
+                            viewModel.forgotPassword(
+                                emailValue,
+                                onSuccess = {
+                                    message = "Tautan berhasil dikirim ke email Anda!!"
+                                },
+                                onError = { error ->
+                                    message = error
+                                }
+                            )
                         }
                     }
                 )
@@ -142,10 +157,8 @@ fun LoginRedirectButton(
 @Composable
 fun ForgetPasswordActivityPreview() {
     HidroQuTheme {
-        ForgotPasswordForm(
-            email = "",
-            onEmailChanged = {},
-            emailError = null,
+        ForgotPasswordActivity(
+            navHostController = NavHostController(context = LocalContext.current),
         )
     }
 }

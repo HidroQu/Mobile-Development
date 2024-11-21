@@ -93,8 +93,9 @@ fun RegisterActivity(
                     passwordError = passwordError,
                     passwordConfirmationError = passwordConfirmationError
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(message)
+                Spacer(modifier = Modifier.height(32.dp))
                 RegisterButton(
                     navController = navHostController,
                     onRegister = {
@@ -108,7 +109,7 @@ fun RegisterActivity(
                                     navHostController.navigate(Screen.Login.route) {
                                         popUpTo(Screen.Register.route) { inclusive = true }
                                     }
-                                    message = "Registration Successful! Token: ${it.token}"
+                                    message = "Daftar Berhasil"
                                 },
                                 onError = { error ->
                                     message = error
