@@ -1,10 +1,13 @@
 package com.capstone.hidroqu.ui.screen.historymyplant
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,17 +19,29 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
+import com.capstone.hidroqu.nonui.data.DiagnosticHistoryData
+import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 import com.capstone.hidroqu.utils.ListHealthHistory
 import com.capstone.hidroqu.utils.getHealthHistoryByPlantAndHealthId
 
@@ -36,32 +51,63 @@ fun HistoryMyPlantActivity(
     navHostController: NavHostController,
     plantId: Int,
     healthId: Int,
-    modifier: Modifier = Modifier
+    viewModel: MyPlantViewModel = viewModel(),
+    context: Context = LocalContext.current
 ) {
-    // Fetching the health history for the given plantId and healthId
-    val history = getHealthHistoryByPlantAndHealthId(plantId, healthId)
+
+    val plantDiagnostic by viewModel.plantDiagnostic.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState(false)
+    val errorMessage by viewModel.errorMessage.collectAsState("")
+
+    // Fetch plant details once the composable is launched
+    LaunchedEffect(plantId, healthId) {
+        val token = SharedPreferencesHelper(context).getToken()
+        if (token != null) {
+            viewModel.fetchMyPlantDetailDiagnostic(token, plantId, healthId)
+        } else {
+            // Handle the case when token is not available
+        }
+    }
 
     Scaffold(
         topBar = {
             SimpleLightTopAppBar(
-                title = history?.dateHistory ?: "00/00/0000",
+                title = plantDiagnostic?.diagnostic_history?.diagnosis_date ?: "00/00/0000",
                 navHostController = navHostController
             )
         },
         content = { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxWidth()
-            ) {
-                if (history != null) {
-                    DetailHistoryContent(history)
-                } else {
-                    Text(
-                        "History tidak ditemukan",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(16.dp)
-                    )
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (!errorMessage.isNullOrEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = errorMessage ?: "Unknown Error", style = MaterialTheme.typography.bodyLarge)
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxWidth()
+                ) {
+                    if (plantDiagnostic != null) {
+                        DetailHistoryContent(plantDiagnostic)
+                    } else {
+                        Text(
+                            "History tidak ditemukan",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
             }
         }
@@ -70,7 +116,7 @@ fun HistoryMyPlantActivity(
 
 @Composable
 fun DetailHistoryContent(
-    history: ListHealthHistory,
+    history: DiagnosticHistoryData?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -80,10 +126,18 @@ fun DetailHistoryContent(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Displaying related photo, diagnosis, symptoms, and cause
+        val imageLoader = ImageLoader.Builder(LocalContext.current)
+            .components {
+                add(SvgDecoder.Factory())
+            }
+            .build()
         Image(
-            painter = painterResource(R.drawable.ic_launcher_background),  // Replace with actual image
-            contentDescription = "User Photo",
+            painter = rememberAsyncImagePainter(
+                model = history?.diagnostic_history?.diagnostic?.image_disease ?: "Image disease",
+                imageLoader = imageLoader
+
+            ), // Replace with actual plant image
+            contentDescription = "Plant Image",
             modifier = Modifier
                 .height(200.dp)
                 .fillMaxWidth()
@@ -107,22 +161,30 @@ fun DetailHistoryContent(
                     style = MaterialTheme.typography.labelLarge
                 )
                 Text(
-                    text = history.issue,
+                    text = history?.diagnostic_history?.diagnostic?.disease_name ?: "Disease name",
                     style = MaterialTheme.typography.bodyMedium
                 )
-
-                // Displaying related photos in a LazyRow
+                // Menampilkan gambar terkait dalam LazyRow
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    items(history.relatedPhotos) { photo ->
+                    items(
+                        history?.diagnostic_history?.diagnostic?.related_photo ?: listOf()
+                    ) { photoUrl ->
                         Image(
-                            painter = painterResource(photo),
+                            painter = rememberAsyncImagePainter(
+                                model = photoUrl, // Gunakan URL gambar yang diterima langsung dari API
+                                imageLoader = imageLoader
+                            ),
                             contentDescription = "Related Photo",
                             modifier = Modifier
                                 .widthIn(min = 150.dp)
                                 .height(95.dp)
-                                .clip(RoundedCornerShape(25.dp))
-                                .border(2.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(25.dp)),
-                            contentScale = ContentScale.Crop
+                                .clip(RoundedCornerShape(25.dp)) // Gambar dengan sudut membulat
+                                .border(
+                                    2.dp,
+                                    MaterialTheme.colorScheme.outlineVariant,
+                                    RoundedCornerShape(25.dp)
+                                ),
+                            contentScale = ContentScale.Crop // Memotong gambar agar sesuai dengan ukuran dan bentuk
                         )
                     }
                 }
@@ -138,7 +200,7 @@ fun DetailHistoryContent(
                     style = MaterialTheme.typography.labelLarge
                 )
                 Text(
-                    text = history.symptoms,
+                    text = history?.diagnostic_history?.diagnostic?.indication ?: "Indication",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
@@ -156,7 +218,7 @@ fun DetailHistoryContent(
                     style = MaterialTheme.typography.labelLarge
                 )
                 Text(
-                    text = history.cause,
+                    text = history?.diagnostic_history?.diagnostic?.cause ?: "Cause",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))

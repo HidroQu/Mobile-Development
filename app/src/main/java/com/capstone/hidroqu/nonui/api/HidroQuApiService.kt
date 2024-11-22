@@ -2,6 +2,7 @@ package com.capstone.hidroqu.nonui.api
 
 import com.capstone.hidroqu.nonui.data.AuthResponse
 import com.capstone.hidroqu.nonui.data.BasicResponse
+import com.capstone.hidroqu.nonui.data.DiagnosticHistoryResponseWrapper
 import com.capstone.hidroqu.nonui.data.ForgotPasswordRequest
 import com.capstone.hidroqu.nonui.data.LoginRequest
 import com.capstone.hidroqu.nonui.data.LoginResponse
@@ -56,4 +57,13 @@ interface HidroQuApiService {
         @Header("Authorization") token: String,
         @Path("id") plantId: Int
     ): Call<MyPlantDetailWrapper>
+
+    // Endpoint untuk mendapatkan riwayat diagnostik tanaman
+    @GET("api/plants/my-plants/{id_plant}/diagnostics/{id_diagnostic}")
+    fun getDiagnosticHistory(
+        @Header("Authorization") token: String,
+        @Path("id_plant") plantId: Int,
+        @Path("id_diagnostic") diagnosticId: Int
+    ): Call<DiagnosticHistoryResponseWrapper>
+
 }

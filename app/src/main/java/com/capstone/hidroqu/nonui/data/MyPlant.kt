@@ -71,6 +71,18 @@ data class StorePlantRequest(
 ) : Parcelable
 
 @Parcelize
+data class DiagnosticHistoryResponseWrapper(
+    val status: String,
+    val message: String,
+    val data: DiagnosticHistoryData
+) : Parcelable
+
+@Parcelize
+data class DiagnosticHistoryData(
+    val diagnostic_history: DiagnosticHistory
+) : Parcelable
+
+@Parcelize
 data class DiagnosticHistory(
     val id: Int,
     val user_plant_id: Int,
@@ -89,6 +101,7 @@ data class DiagnosticResponse(
     val indication: String,
     val cause: String,
     val solution: String,
+    val related_photo: List<String>,
     val created_at: String,
     val updated_at: String
 ) : Parcelable

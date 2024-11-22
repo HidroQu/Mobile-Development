@@ -398,12 +398,12 @@ fun DetailMyPlantContent(
                     CardHealthHistory(
                         listHealthHistory = healthHistory,
                         onClick = {
-//                            navHostController.navigate(
-//                                Screen.HistoryMyPlant.createRoute(
-//                                    plantId = plant?.id ?: 0,
-//                                    healthId = healthHistory.date
-//                                )
-//                            )
+                            navHostController.navigate(
+                                Screen.HistoryMyPlant.createRoute(
+                                    plantId = plant?.id ?: 0,
+                                    healthId = healthHistory.id
+                                )
+                            )
                         }
                     )
                 }

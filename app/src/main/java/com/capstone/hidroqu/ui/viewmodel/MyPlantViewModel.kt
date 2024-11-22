@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.capstone.hidroqu.nonui.api.HidroQuApiConfig
 import com.capstone.hidroqu.nonui.api.HidroQuApiService
 import com.capstone.hidroqu.nonui.data.BasicResponse
+import com.capstone.hidroqu.nonui.data.DiagnosticHistoryData
+import com.capstone.hidroqu.nonui.data.DiagnosticHistoryResponseWrapper
 import com.capstone.hidroqu.nonui.data.LoginResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailWrapper
@@ -32,6 +34,9 @@ class MyPlantViewModel : ViewModel() {
 
     private val _plantDetail = MutableStateFlow<MyPlantDetailResponse?>(null)
     val plantDetail: StateFlow<MyPlantDetailResponse?> get() = _plantDetail
+
+    private val _plantDiagnostic = MutableStateFlow<DiagnosticHistoryData?>(null)
+    val plantDiagnostic: StateFlow<DiagnosticHistoryData?> get() = _plantDiagnostic
 
     private val _plants = MutableStateFlow<List<PlantResponse>>(emptyList())
     val plants: StateFlow<List<PlantResponse>> get() = _plants
@@ -101,7 +106,31 @@ class MyPlantViewModel : ViewModel() {
         })
     }
 
+    fun fetchMyPlantDetailDiagnostic(token: String, plantId: Int, diagnosticId: Int) {
+        _isLoading.value = true
+        apiService.getDiagnosticHistory(("Bearer $token"), plantId, diagnosticId).enqueue(object : Callback<DiagnosticHistoryResponseWrapper> {
+            override fun onResponse(
+                call: Call<DiagnosticHistoryResponseWrapper>,
+                response: Response<DiagnosticHistoryResponseWrapper>
+            ) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    val plantDetail = response.body()?.data
+                    _plantDiagnostic.value = plantDetail
+                    Log.d("MyPlantViewModel", "Fetched plant detail: ${response.body()}")
+                } else {
+                    _errorMessage.value = "Error fetching plant details: ${response.message()}"
+                    Log.e("MyPlantViewModel", "Error fetching details: ${response.message()}")
+                }
+            }
 
+            override fun onFailure(call: Call<DiagnosticHistoryResponseWrapper>, t: Throwable) {
+                _isLoading.value = false
+                _errorMessage.value = "Error fetching plant details: ${t.message}"
+                Log.e("MyPlantViewModel", "Failure: ${t.message}")
+            }
+        })
+    }
 
     // Store a new plant for the user
     fun storePlant(
