@@ -1,11 +1,13 @@
 package com.capstone.hidroqu.ui.screen.addplant
 
 import android.app.Application
+import android.content.Context
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
@@ -23,27 +25,32 @@ import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.nonui.data.PlantResponse
+import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
 import com.capstone.hidroqu.ui.component.CardAddPlant
-import com.capstone.hidroqu.ui.viewmodel.AddPlantViewModel
-import com.capstone.hidroqu.ui.viewmodel.ViewModelFactory
+import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 
 
 @Composable
 fun AddPlantActivity(
-    navHostController: NavHostController,
+    viewModel: MyPlantViewModel = viewModel(),
+    context: Context = LocalContext.current,
+    navHostController: NavHostController
 ) {
-    val context = LocalContext.current
-    val viewModel: AddPlantViewModel = viewModel(factory = ViewModelFactory(context))
 
     // Menangani state tanaman yang dipilih secara internal
     var selectedPlant by remember { mutableStateOf<PlantResponse?>(null) }
 
-    val plants by viewModel.plants.observeAsState(emptyList()) // Mengobservasi data tanaman
-    val isLoading by viewModel.isLoading.observeAsState(false)
-    val errorMessage by viewModel.errorMessage.observeAsState()
+    val plants by viewModel.plants.collectAsState(emptyList()) // Mengobservasi data tanaman
+    val isLoading by viewModel.isLoading.collectAsState(false)
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.fetchPlants() // Memuat data saat komponen diluncurkan
+        val token = SharedPreferencesHelper(context).getToken()
+        if (token != null) {
+            viewModel.fetchPlants(token) // Memuat data saat komponen diluncurkan
+        } else {
+            // Handle the case when token is not availabl
+        }
     }
     Scaffold(
         topBar = {
@@ -59,7 +66,9 @@ fun AddPlantActivity(
                 Button(
                     onClick = {
                         selectedPlant?.let { plant ->
-                            navHostController.navigate(Screen.FormAddPlant.createRoute(plantId = plant))
+                            navHostController.navigate(
+                                Screen.FormAddPlant.createRoute(plantId = plant.id)
+                            )
                         }
                     },
                     modifier = Modifier
@@ -79,33 +88,51 @@ fun AddPlantActivity(
         }
     )
     { paddingValues ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize()
-                .padding(20.dp)
-                .padding(paddingValues)
-        ) {
-            Text(
-                text = "Silahkan pilih tanaman Anda",
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Column(
+        if (isLoading) {
+            Box(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                contentAlignment = Alignment.Center
             ) {
-                plants.forEach { plant ->
-                    val isSelected = selectedPlant == plant
-                    CardAddPlant(
-                        ListPlant = plant,
-                        isSelected = isSelected,
-                        onClick = {
-                            selectedPlant = if (isSelected) null else plant
-                        }
-                    )
+                CircularProgressIndicator()
+            }
+        } else if (!errorMessage.isNullOrEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = errorMessage ?: "Unknown Error", style = MaterialTheme.typography.bodyLarge)
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()
+                    .padding(20.dp)
+                    .padding(paddingValues)
+            ) {
+                Text(
+                    text = "Silahkan pilih tanaman Anda",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    plants.forEach { plant ->
+                        val isSelected = selectedPlant == plant
+                        CardAddPlant(
+                            ListPlant = plant,
+                            isSelected = isSelected,
+                            onClick = {
+                                selectedPlant = if (isSelected) null else plant
+                            }
+                        )
+                    }
                 }
             }
         }

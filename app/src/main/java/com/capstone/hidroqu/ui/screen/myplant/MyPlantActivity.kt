@@ -1,6 +1,7 @@
 package com.capstone.hidroqu.ui.screen.myplant
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -45,12 +47,13 @@ fun MyPlantActivity(
     viewModel: MyPlantViewModel = viewModel(),
     context: Context = LocalContext.current
 ) {
-    val myPlants by viewModel.myPlants.observeAsState(emptyList())
-    val isLoading by viewModel.isLoading.observeAsState(false)
-    val errorMessage by viewModel.errorMessage.observeAsState("")
+    val myPlants by viewModel.myPlants.collectAsState(emptyList())
+    val isLoading by viewModel.isLoading.collectAsState(false)
+    val errorMessage by viewModel.errorMessage.collectAsState("")
 
     LaunchedEffect(Unit) {
         val token = SharedPreferencesHelper(context).getToken()
+        Log.d("MyPlantActivity", "Token: $token") // Log the token
         if (token != null) {
             viewModel.fetchMyPlants(token)
         } else {
@@ -72,7 +75,6 @@ fun MyPlantActivity(
                 .verticalScroll(rememberScrollState())
                 .fillMaxSize()
                 .padding(paddingValues)
-
         ) {
             if (isLoading) {
                 Box(

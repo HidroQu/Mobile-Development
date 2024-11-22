@@ -48,7 +48,7 @@ sealed class Screen(val route: String) {
 
     object AddPlant : Screen("addplant")
     object FormAddPlant : Screen("FormTanaman/{plantId}") {
-        fun createRoute(plantId: PlantResponse) = "FormTanaman/$plantId"
+        fun createRoute(plantId: Int) = "FormTanaman/$plantId"
     }
 
     //komunitas

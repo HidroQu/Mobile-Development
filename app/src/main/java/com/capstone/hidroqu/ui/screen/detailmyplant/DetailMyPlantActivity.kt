@@ -1,6 +1,8 @@
 package com.capstone.hidroqu.ui.screen.detailmyplant
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,6 +30,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -52,13 +55,46 @@ import com.capstone.hidroqu.utils.getPlantById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.capstone.hidroqu.nonui.data.DiagnosticHistory
+import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
 import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
-import com.capstone.hidroqu.utils.ListHealthHistory
-import com.capstone.hidroqu.utils.ListPlant
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+fun formatAndCalculateHarvestDate(plantingDate: String, daysToAdd: Int): Pair<String, String> {
+    return try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Menggunakan java.time untuk API 26 ke atas
+            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
+            val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("id", "ID"))
+            val date = LocalDate.parse(plantingDate.substring(0, 10)) // Hanya ambil bagian tanggal
+            val formattedDate = date.format(outputFormatter) // Format ke dd/MM/yyyy
+            val harvestDate = date.plusDays(daysToAdd.toLong()).format(outputFormatter) // Tambah 60 hari dan format
+            formattedDate to harvestDate
+        } else {
+            // Menggunakan SimpleDateFormat untuk API di bawah 26
+            val inputFormatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
+            val outputFormatter = java.text.SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID"))
+            val date = inputFormatter.parse(plantingDate)
+            val formattedDate = outputFormatter.format(date!!)
+            val calendar = java.util.Calendar.getInstance()
+            calendar.time = date
+            calendar.add(java.util.Calendar.DATE, daysToAdd) // Tambah 60 hari
+            val harvestDate = outputFormatter.format(calendar.time)
+            formattedDate to harvestDate
+        }
+    } catch (e: Exception) {
+        "00/00/0000" to "00/00/0000" // Jika tanggal tidak valid, fallback ke default
+    }
+}
+
+
+
 @Composable
 fun DetailMyPlantActivity(
     plantId: Int,
@@ -67,9 +103,9 @@ fun DetailMyPlantActivity(
     navHostController: NavHostController
 ) {
 
-    val plantDetail by viewModel.plantDetail.observeAsState()
-    val isLoading by viewModel.isLoading.observeAsState(false)
-    val errorMessage by viewModel.errorMessage.observeAsState("")
+    val plantDetail by viewModel.plantDetail.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState(false)
+    val errorMessage by viewModel.errorMessage.collectAsState("")
 
     // Fetch plant details once the composable is launched
     LaunchedEffect(plantId) {
@@ -89,8 +125,12 @@ fun DetailMyPlantActivity(
             },
             content = { paddingValues ->
                 if (isLoading) {
-                    // Show loading state
-                    CircularProgressIndicator()
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 } else if (!errorMessage.isNullOrEmpty()) {
                     Box(
                         modifier = Modifier
@@ -107,7 +147,7 @@ fun DetailMyPlantActivity(
                             .fillMaxSize()
                     ) {
                         DetailMyPlantContent(
-                            plant = plantDetail?.plant,
+                            plant = plantDetail,
                             healthHistoryList = plantDetail?.diagnostic_histories ?: listOf(),
                             navHostController = navHostController,
                             modifier = Modifier.fillMaxSize()
@@ -123,12 +163,17 @@ fun DetailMyPlantActivity(
 
 @Composable
 fun DetailMyPlantContent(
-    plant: PlantResponse?,
-    healthHistoryList: List<DiagnosticHistory>, // Accept health history list
+    plant: MyPlantDetailResponse?,
+    healthHistoryList: List<DiagnosticHistory>,
     navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     var isNotificationEnabled by remember { mutableStateOf(false) }
+
+    val daysToAdd = 60
+    val (formattedDate, harvestDate) = plant?.planting_date?.let { formatAndCalculateHarvestDate(it, daysToAdd) }
+        ?: ("00/00/0000" to "00/00/0000")
+
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -146,8 +191,17 @@ fun DetailMyPlantContent(
                 .background(MaterialTheme.colorScheme.onPrimary),
             contentAlignment = Alignment.Center
         ) {
+            val imageLoader = ImageLoader.Builder(LocalContext.current)
+                .components {
+                    add(SvgDecoder.Factory())
+                }
+                .build()
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground), // Replace with actual plant image
+                painter = rememberAsyncImagePainter(
+                        model = plant?.plant?.icon_plant,
+                        imageLoader = imageLoader
+
+                ), // Replace with actual plant image
                 contentDescription = "Plant Image",
                 modifier = Modifier.size(100.dp) // Adjust size as needed
             )
@@ -172,7 +226,7 @@ fun DetailMyPlantContent(
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = plant?.name ?: "Plant name",
+                    text = plant?.plant?.name ?: "Plant name",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -191,7 +245,7 @@ fun DetailMyPlantContent(
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = plant?.latin_name ?: "Latin name",
+                    text = plant?.plant?.latin_name ?: "Latin name",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -213,7 +267,7 @@ fun DetailMyPlantContent(
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = plant?.description ?: "note",
+                text = plant?.plant?.description ?: "note",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -240,6 +294,7 @@ fun DetailMyPlantContent(
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
+
                         text = "Dalam 60 hari ke depan, tanamamu siap panen",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
@@ -265,8 +320,9 @@ fun DetailMyPlantContent(
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Spacer(modifier = Modifier.height(4.dp)) // Spacing between label and value
+
                         Text(
-                            text = plant?.created_at ?: "00/00/0000",
+                            text = formattedDate,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -288,7 +344,7 @@ fun DetailMyPlantContent(
                         )
                         Spacer(modifier = Modifier.height(4.dp)) // Spacing between label and value
                         Text(
-                            text = plant?.updated_at ?: "00/00/0000",
+                            text = harvestDate,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onBackground
                         )

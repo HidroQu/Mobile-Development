@@ -69,7 +69,10 @@ fun HistoryMyPlantActivity(
 }
 
 @Composable
-fun DetailHistoryContent(history: ListHealthHistory, modifier: Modifier = Modifier) {
+fun DetailHistoryContent(
+    history: ListHealthHistory,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())

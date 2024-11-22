@@ -21,10 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.nonui.data.DiagnosticHistory
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -54,9 +58,18 @@ fun CardHealthHistory(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ){
+                val imageLoader = ImageLoader.Builder(LocalContext.current)
+                    .components {
+                        add(SvgDecoder.Factory())
+                    }
+                    .build()
                 Image(
-                    painter = painterResource(R.drawable.ic_launcher_background),
-                    contentDescription = "Gambar Tanaman",
+                    painter = rememberAsyncImagePainter(
+                        model = listHealthHistory.diagnostic.image_disease,
+                        imageLoader = imageLoader
+
+                    ), // Replace with actual plant image
+                    contentDescription = "Plant Image",
                     modifier = Modifier
                         .size(50.dp) // Ukuran gambar
                         .clip(CircleShape) // Membuat gambar menjadi bulat
@@ -71,12 +84,12 @@ fun CardHealthHistory(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
-                        text = listHealthHistory.issue,
+                        text = listHealthHistory.diagnostic.disease_name,
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text = listHealthHistory.dateHistory,
+                        text = listHealthHistory.diagnosis_date,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
