@@ -51,9 +51,9 @@ data class MyPlantDetailResponse(
     val notes: String?,
     val created_at: String?,
     val updated_at: String?,
-    val plant: PlantResponse?, // Model untuk data tanaman
-    val user: UserResponse?, // Model untuk data pengguna
-    val diagnostic_histories: List<DiagnosticHistory> = emptyList() // Riwayat diagnostik
+    val plant: PlantResponse?,
+    val user: UserResponse?,
+    val diagnostic_histories: List<DiagnosticHistory> = emptyList()
 ) : Parcelable
 
 @Parcelize

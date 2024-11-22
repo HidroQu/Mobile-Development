@@ -149,7 +149,7 @@ fun MainJetpack(
                 arguments = listOf(navArgument("plantId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
-                FormAddPlantActivity(navHostController = navController)
+                FormAddPlantActivity(plantId =  plantId, navHostController = navController)
             }
             /////detailmyplant
             composable(

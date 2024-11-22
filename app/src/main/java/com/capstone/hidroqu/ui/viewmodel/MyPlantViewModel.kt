@@ -8,12 +8,16 @@ import androidx.lifecycle.viewModelScope
 import com.capstone.hidroqu.nonui.api.HidroQuApiConfig
 import com.capstone.hidroqu.nonui.api.HidroQuApiService
 import com.capstone.hidroqu.nonui.data.BasicResponse
+import com.capstone.hidroqu.nonui.data.LoginResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailWrapper
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
+import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.StorePlantRequest
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -23,17 +27,20 @@ class MyPlantViewModel : ViewModel() {
 
     private val apiService: HidroQuApiService = HidroQuApiConfig.retrofit.create(HidroQuApiService::class.java)
 
-    private val _myPlants = MutableLiveData<List<MyPlantResponse>>()
-    val myPlants: LiveData<List<MyPlantResponse>> get() = _myPlants
+    private val _myPlants = MutableStateFlow<List<MyPlantResponse>>(emptyList())
+    val myPlants: StateFlow<List<MyPlantResponse>> get() = _myPlants
 
-    private val _plantDetail = MutableLiveData<MyPlantDetailResponse?>()
-    val plantDetail: LiveData<MyPlantDetailResponse?> get() = _plantDetail
+    private val _plantDetail = MutableStateFlow<MyPlantDetailResponse?>(null)
+    val plantDetail: StateFlow<MyPlantDetailResponse?> get() = _plantDetail
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
+    private val _plants = MutableStateFlow<List<PlantResponse>>(emptyList())
+    val plants: StateFlow<List<PlantResponse>> get() = _plants
 
-    private val _errorMessage = MutableLiveData<String?>()
-    val errorMessage: LiveData<String?> get() = _errorMessage
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> get() = _errorMessage
 
     fun fetchMyPlants(token: String) {
         _isLoading.value = true
@@ -97,7 +104,13 @@ class MyPlantViewModel : ViewModel() {
 
 
     // Store a new plant for the user
-    fun storePlant(token: String, plantId: Int, plantingDate: String, notes: String?) {
+    fun storePlant(
+        token: String,
+        plantId: Int,
+        plantingDate: String,
+        notes: String?,
+        onSuccess: (BasicResponse) -> Unit,
+    ) {
         val request = StorePlantRequest(
             plant_id = plantId,
             planting_date = plantingDate,
@@ -108,16 +121,43 @@ class MyPlantViewModel : ViewModel() {
         apiService.storePlant("Bearer $token", request).enqueue(object : Callback<BasicResponse> {
             override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
                 if (response.isSuccessful) {
-                    // Successfully saved the plant, perform navigation or show message
+                    Log.d("MyPlantViewModel", "Plant stored successfully: ${response.body()}")
+                    val responseBody = response.body()
+                    responseBody?.let {
+                        onSuccess(it)
+                    }
                 } else {
+                    Log.e("MyPlantViewModel", "Failed to store plant: ${response.message()}")
                     _errorMessage.value = "Error storing plant: ${response.message()}"
                 }
             }
 
             override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+                Log.e("MyPlantViewModel", "Network error: ${t.message}")
                 _errorMessage.value = "Network error: ${t.message}"
             }
         })
-    }
 
+    }
+    fun fetchPlants(token: String) {
+        _isLoading.value = true
+
+        // Menggunakan PlantResponseWrapper untuk mendapatkan data
+        apiService.getPlants("Bearer $token").enqueue(object : Callback<PlantResponseWrapper> {
+            override fun onResponse(call: Call<PlantResponseWrapper>, response: Response<PlantResponseWrapper>) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    // Ambil daftar tanaman dari response.body()?.data
+                    _plants.value = response.body()?.data ?: emptyList()
+                } else {
+                    _errorMessage.value = "Failed to load plants: ${response.message()}"
+                }
+            }
+
+            override fun onFailure(call: Call<PlantResponseWrapper>, t: Throwable) {
+                _isLoading.value = false
+                _errorMessage.value = "Error: ${t.message}"
+            }
+        })
+    }
 }
