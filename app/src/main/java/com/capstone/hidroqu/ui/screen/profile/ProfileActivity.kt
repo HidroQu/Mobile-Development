@@ -1,16 +1,19 @@
 package com.capstone.hidroqu.ui.screen.profile
 
+import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
@@ -18,20 +21,22 @@ import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.utils.ListUserData
 import com.capstone.hidroqu.utils.dummyListUserData
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.capstone.hidroqu.ui.viewmodel.ThemeViewModel
 
 @Composable
 fun ProfileActivity(
     navHostController: NavHostController,
     userData: ListUserData,
+    themeViewModel: ThemeViewModel,
     modifier: Modifier = Modifier
 ) {
+    val themeMode by themeViewModel.themeMode.collectAsState()
+
     Scaffold(
         topBar = {
-            // You can customize your top bar here, if needed
             TopBarDefault("Profil anda")
         },
         content = { paddingValues ->
-            // Profile Content
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -54,7 +59,7 @@ fun ProfileActivity(
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            painter = painterResource(id = userData.img), // Use the dynamic image
+                            painter = painterResource(id = userData.img),
                             contentDescription = "Profile Icon",
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(60.dp)
@@ -79,7 +84,12 @@ fun ProfileActivity(
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
-                    AppearanceSettings()
+
+                    // Appearance Settings (Theme change)
+                    AppearanceSettings(
+                        selectedMode = themeMode,
+                        onModeChange = { newMode -> themeViewModel.setTheme(newMode.lowercase()) }
+                    )
                 }
             }
         }
@@ -103,34 +113,43 @@ fun ProfileInfo(name: String, description: String) {
 }
 
 @Composable
-fun AppearanceSettings() {
+fun AppearanceSettings(
+    selectedMode: String,
+    onModeChange: (String) -> Unit
+) {
     Column(horizontalAlignment = Alignment.Start) {
         Text(
             "Appearance",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground // Appearance label color set to onBackground
         )
-        AppearanceOption("System default", selected = true)
-        AppearanceOption("Light", selected = false)
-        AppearanceOption("Dark", selected = false)
+        AppearanceOption("System", selected = selectedMode == "system", onClick = { onModeChange("system") })
+        AppearanceOption("Light", selected = selectedMode == "light", onClick = { onModeChange("light") })
+        AppearanceOption("Dark", selected = selectedMode == "dark", onClick = { onModeChange("dark") })
     }
 }
 
 @Composable
-fun AppearanceOption(text: String, selected: Boolean) {
+fun AppearanceOption(text: String, selected: Boolean, onClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
     ) {
         RadioButton(
             selected = selected,
-            onClick = { /* Handle selection */ },
+            onClick = onClick,
             colors = RadioButtonDefaults.colors(
-                unselectedColor = MaterialTheme.colorScheme.outline, // Set radio button border color to outline
-                selectedColor = MaterialTheme.colorScheme.primary // Set selected border color to primary
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.outline
             )
         )
-        Text(text, style = MaterialTheme.typography.bodySmall)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
@@ -139,7 +158,6 @@ fun AppearanceOption(text: String, selected: Boolean) {
 fun PreviewProfileScreen() {
     HidroQuTheme {
         val navController = rememberNavController()
-        val userData = dummyListUserData.first() // Ambil data pertama dari dummy list
-        ProfileActivity(navController, userData)
+        val userData = dummyListUserData.first()
     }
 }
