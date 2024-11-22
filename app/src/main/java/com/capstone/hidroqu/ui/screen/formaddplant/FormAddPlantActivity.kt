@@ -342,7 +342,7 @@ fun DatePickerField(
         ) { selectedDate ->
             val formattedDateForServer = selectedDate.atStartOfDay()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-            val formattedDateForDisplay = selectedDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+            val formattedDateForDisplay = selectedDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
             onDateSelected(formattedDateForServer, formattedDateForDisplay)
         }
     }
