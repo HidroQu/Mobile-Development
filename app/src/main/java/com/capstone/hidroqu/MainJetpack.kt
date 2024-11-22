@@ -69,15 +69,15 @@ fun MainJetpack(
         else -> isSystemInDarkTheme()
     }
 
-    systemUiController.setSystemBarsColor(
-        color = MaterialTheme.colorScheme.primaryContainer,
-    )
-
-    systemUiController.setNavigationBarColor(
-        color = MaterialTheme.colorScheme.onPrimary,
-    )
-
     HidroQuTheme(darkTheme = isDarkTheme){
+        systemUiController.setSystemBarsColor(
+            color = MaterialTheme.colorScheme.primaryContainer,
+        )
+
+        systemUiController.setNavigationBarColor(
+            color = MaterialTheme.colorScheme.onPrimary,
+        )
+
         Scaffold(
             bottomBar = {
                 if (currentRoute == Screen.Home.route || currentRoute == Screen.MyPlant.route || currentRoute == Screen.Community.route || currentRoute == Screen.Profile.route) {
