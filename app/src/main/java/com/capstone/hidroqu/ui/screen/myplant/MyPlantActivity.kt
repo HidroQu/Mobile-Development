@@ -1,6 +1,7 @@
 package com.capstone.hidroqu.ui.screen.myplant
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -52,6 +53,7 @@ fun MyPlantActivity(
 
     LaunchedEffect(Unit) {
         val token = SharedPreferencesHelper(context).getToken()
+        Log.d("MyPlantActivity", "Token: $token") // Log the token
         if (token != null) {
             viewModel.fetchMyPlants(token)
         } else {

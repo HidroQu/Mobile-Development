@@ -53,7 +53,7 @@ data class MyPlantDetailResponse(
     val updated_at: String?,
     val plant: PlantResponse?,
     val user: UserResponse?,
-    val diagnostic_histories: List<DiagnosticHistory> = emptyList()
+    val diagnostic_histories: List<DiagnosticHistory>
 ) : Parcelable
 
 @Parcelize
@@ -73,12 +73,24 @@ data class StorePlantRequest(
 @Parcelize
 data class DiagnosticHistory(
     val id: Int,
-    val dateHistory: String, // Tanggal riwayat
-    val issue: String, // Masalah atau diagnosis yang tercatat
-    val symptoms: String, // Gejala yang terdeteksi
-    val cause: String, // Penyebab masalah
-    val solution: String, // Solusi yang disarankan
-    val relatedPhotos: List<String> // Daftar URL foto terkait
+    val user_plant_id: Int,
+    val diagnostic_id: Int,
+    val diagnosis_date: String,
+    val created_at: String,
+    val updated_at: String,
+    val diagnostic: DiagnosticResponse
+) : Parcelable
+
+@Parcelize
+data class DiagnosticResponse(
+    val id: Int,
+    val disease_name: String,
+    val image_disease: String,
+    val indication: String,
+    val cause: String,
+    val solution: String,
+    val created_at: String,
+    val updated_at: String
 ) : Parcelable
 
 @Parcelize
