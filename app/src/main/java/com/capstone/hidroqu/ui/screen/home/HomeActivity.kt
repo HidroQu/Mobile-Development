@@ -6,10 +6,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,27 +31,42 @@ import com.capstone.hidroqu.ui.component.CardArticle
 import com.capstone.hidroqu.ui.component.CardCamera
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.nonui.data.UserPreferences
+import com.capstone.hidroqu.ui.viewmodel.HomeViewModel
 
 
 @Composable
 fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(20.dp)  // Already includes padding, but no conflict with Scaffold's padding
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        TopHome()
-        CameraSection(navHostController)
-        AlarmSection()
-        ArticleSection(navHostController)
+    val context = LocalContext.current
+    val userPreferences = remember { UserPreferences(context) }
+    val homeViewModel = HomeViewModel(userPreferences)
+
+    val isLoading by homeViewModel.isLoading.collectAsState()
+    val userName by homeViewModel.userName.collectAsState()
+
+    if (isLoading) {
+        LoadingScreen() // Tampilkan loading screen jika sedang loading
+    } else {
+        Column(
+            modifier = modifier
+                .verticalScroll(rememberScrollState())
+                .padding(20.dp)  // Already includes padding, but no conflict with Scaffold's padding
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            TopHome(viewModel = homeViewModel)
+            CameraSection(navHostController)
+            AlarmSection()
+            ArticleSection(navHostController)
+        }
     }
 }
 
 
 @Composable
-fun TopHome(modifier: Modifier = Modifier) {
+fun TopHome(viewModel: HomeViewModel, modifier: Modifier = Modifier) {
+    val userName by viewModel.userName.collectAsState()
+
     Column(
         modifier = modifier
             .fillMaxWidth(),
@@ -58,7 +77,7 @@ fun TopHome(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Halo Tifah 👋",
+                text = "Halo $userName 👋",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -76,6 +95,30 @@ fun TopHome(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.outline,
         )
+    }
+}
+
+@Composable
+fun LoadingScreen(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(50.dp),
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Memuat data...",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
 @Composable

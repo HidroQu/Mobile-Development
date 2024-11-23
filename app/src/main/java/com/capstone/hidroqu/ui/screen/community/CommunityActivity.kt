@@ -101,11 +101,18 @@ fun CommunityActivity(
             }
         }
         else {
-            PostList(posts = communityPosts, onDetailClicked = { idPost ->
-                navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)) {
-                    popUpTo(Screen.Community.route)
-                }
-            })
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(paddingValues) // Gunakan padding dari Scaffold
+                    .fillMaxSize()
+            ) {
+                PostList(posts = communityPosts, onDetailClicked = { idPost ->
+                    navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)) {
+                        popUpTo(Screen.Community.route)
+                    }
+                })
+            }
         }
     }
 }
