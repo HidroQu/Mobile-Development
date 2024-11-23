@@ -24,18 +24,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
+import com.capstone.hidroqu.nonui.data.PostData
 import com.capstone.hidroqu.utils.ListCommunity
 import com.capstone.hidroqu.utils.dummyListCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
 fun CardCommunity(
-    listCommunity: ListCommunity,
+    listCommunity: PostData,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -68,8 +73,17 @@ fun CardCommunity(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ){
+            val imageLoader = ImageLoader.Builder(LocalContext.current)
+                .components {
+                    add(SvgDecoder.Factory())
+                }
+                .build()
+
             Image(
-                painter = painterResource(listCommunity.userPostImg),
+                painter = rememberAsyncImagePainter(
+                    model = listCommunity.image,
+                    imageLoader = imageLoader
+                ),
                 contentDescription = "Gambar Tanaman",
                 modifier = Modifier
                     .size(50.dp) // Ukuran gambar
@@ -82,36 +96,22 @@ fun CardCommunity(
             )
             Column {
                 Text(
-                    text = listCommunity.userName,
+                    text = listCommunity.user.name,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = listCommunity.time,
+                    text = listCommunity.created_at,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
             }
         }
         Text(
-            text = listCommunity.txtPost,
+            text = listCommunity.content,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
-
-        // Image Post with conditional modifier for expanded state
-        if (listCommunity.imgPost != null) {
-            Image(
-                painter = painterResource(id = listCommunity.imgPost),
-                contentDescription = "Image Post",
-                modifier = imageModifier
-                    .fillMaxWidth()
-                    .clickable {
-                        // Toggle the image expanded state when clicked
-                        isImageExpanded.value = !isImageExpanded.value
-                    }
-            )
-        }
 
         Row(
             modifier = Modifier
@@ -126,7 +126,7 @@ fun CardCommunity(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "${listCommunity.commentList} Jawaban",
+                text = "${listCommunity.comments_count} Jawaban",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = SemiBold,
                 ),
@@ -140,13 +140,13 @@ fun CardCommunity(
 @Composable
 private fun CardCommunityPreview() {
     HidroQuTheme {
-        dummyListCommunity.forEach { post ->
-            CardCommunity (
-                listCommunity = post,
-                onClick = {
-                    // Handle onClick here
-                }
-            )
-        }
+//        dummyListCommunity.forEach { post ->
+//            CardCommunity (
+//                listCommunity = post,
+//                onClick = {
+//                    // Handle onClick here
+//                }
+//            )
+//        }
     }
 }

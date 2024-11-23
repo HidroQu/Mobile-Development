@@ -1,5 +1,7 @@
 package com.capstone.hidroqu.ui.screen.community
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,30 +21,54 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.TopBarDefault
+import com.capstone.hidroqu.nonui.data.PostData
+import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
 import com.capstone.hidroqu.ui.component.CardCommunity
-import com.capstone.hidroqu.utils.dummyListPlants
-import com.capstone.hidroqu.utils.dummyListCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun CommunityActivity(
     navHostController: NavHostController,
+    viewModel: CommunityViewModel = viewModel(),
+    context: Context = LocalContext.current,
     onAddClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val communityPosts by viewModel.communityPosts.collectAsState(emptyList())
+    val isLoading by viewModel.isLoading.collectAsState(false)
+    val errorMessage by viewModel.errorMessage.collectAsState("")
+
+    LaunchedEffect(Unit) {
+        val token = SharedPreferencesHelper(context).getToken()
+        Log.d("CommunityActivity", "Token: $token") // Log token
+        if (token != null) {
+            viewModel.fetchCommunityPosts(token)
+        } else {
+            Log.e("CommunityActivity", "Token is null. Redirect to login.")
+            // Tangani jika token tidak ada
+        }
+    }
+
+
     Scaffold(
         topBar = {
             TopBarDefault("Komunitas")
@@ -58,11 +84,11 @@ fun CommunityActivity(
                 .padding(paddingValues) // Gunakan padding dari Scaffold
                 .fillMaxSize()
         ) {
-            if (dummyListCommunity.isEmpty()) {
+            if (communityPosts.isEmpty()) {
                 NoPostList()
             } else {
-                PostList(onDetailClicked = { idPost ->
-                    navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)){
+                PostList(posts = communityPosts, onDetailClicked = { idPost ->
+                    navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)) {
                         popUpTo(Screen.Community.route)
                     }
                 })
@@ -121,17 +147,18 @@ fun NoPostList(
 }
 
 @Composable
-fun PostList(modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
+fun PostList(posts: List<PostData>, modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
             .padding(20.dp)
     ) {
-        dummyListCommunity.forEach { post ->
-            CardCommunity (
+        posts.forEach { post ->
+            Log.d("PostList", "Rendering post: ${post.user}, ID: ${post.id}")
+            CardCommunity(
                 listCommunity = post,
                 onClick = {
-                    onDetailClicked(post.idPost)
+                    onDetailClicked(post.id)
                 }
             )
         }
@@ -144,7 +171,8 @@ fun PostList(modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
 fun CommunityActivityPreview() {
     HidroQuTheme {
         val navController = rememberNavController()
-        CommunityActivity(navController,
+        CommunityActivity(
+            navController,
             onAddClicked = {
             },
         )

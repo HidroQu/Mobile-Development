@@ -1,4 +1,4 @@
-package com.capstone.hidroqu.ui.viewmodel
+package com.capstone.hidroqu.utils
 
 import android.content.Context
 import androidx.datastore.core.DataStore

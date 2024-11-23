@@ -2,6 +2,9 @@ package com.capstone.hidroqu.nonui.api
 
 import com.capstone.hidroqu.nonui.data.AuthResponse
 import com.capstone.hidroqu.nonui.data.BasicResponse
+import com.capstone.hidroqu.nonui.data.CommunityDetailWrapper
+import com.capstone.hidroqu.nonui.data.CommunityRequest
+import com.capstone.hidroqu.nonui.data.CommunityResponseWrapper
 import com.capstone.hidroqu.nonui.data.DiagnosticHistoryResponseWrapper
 import com.capstone.hidroqu.nonui.data.ForgotPasswordRequest
 import com.capstone.hidroqu.nonui.data.LoginRequest
@@ -10,6 +13,7 @@ import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailWrapper
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
+import com.capstone.hidroqu.nonui.data.MyPostsResponseWrapper
 import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.RegisterRequest
@@ -66,4 +70,29 @@ interface HidroQuApiService {
         @Path("id_diagnostic") diagnosticId: Int
     ): Call<DiagnosticHistoryResponseWrapper>
 
+    // Mendapatkan daftar komunitas
+    @GET("api/communities")
+    fun getCommunities(
+        @Header("Authorization") token: String
+    ): Call<CommunityResponseWrapper>
+
+    // Mendapatkan detail komunitas tertentu berdasarkan ID atau slug
+    @GET("api/communities/{community}")
+    fun getCommunityDetail(
+        @Header("Authorization") token: String,
+        @Path("community") communityIdOrSlug: Int
+    ): Call<CommunityDetailWrapper>
+
+    // Membuat komunitas baru
+    @POST("api/communities/store")
+    fun storeCommunity(
+        @Header("Authorization") token: String,
+        @Body communityRequest: CommunityRequest
+    ): Call<BasicResponse>
+
+    // Mendapatkan daftar postingan pengguna dalam komunitas
+    @GET("api/communities/my-posts")
+    fun getMyPosts(
+        @Header("Authorization") token: String
+    ): Call<MyPostsResponseWrapper>
 }
