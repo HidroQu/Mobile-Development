@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,14 +47,13 @@ fun CardCommunity(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    // State to track whether the image is expanded or not
     val isImageExpanded = remember { mutableStateOf(false) }
 
-    // Define the modifier for image size
+
     val imageModifier = if (isImageExpanded.value) {
-        Modifier.wrapContentHeight() // Full height when expanded
+        Modifier.wrapContentHeight()
     } else {
-        Modifier.height(190.dp) // Limited height when not expanded
+        Modifier.height(190.dp)
     }
 
     Column(
@@ -120,6 +121,29 @@ fun CardCommunity(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
+
+        val imageLoader = ImageLoader.Builder(LocalContext.current)
+            .components {
+                add(SvgDecoder.Factory())
+            }
+            .build()
+
+        Image(
+            painter = rememberAsyncImagePainter(
+                model = listCommunity.image,
+                imageLoader = imageLoader
+            ),
+            contentDescription = "Image Post",
+            modifier = imageModifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .clickable {
+                    // Toggle the image expanded state when clicked
+                    isImageExpanded.value = !isImageExpanded.value
+                },
+            contentScale = ContentScale.Crop
+        )
+
 
         Row(
             modifier = Modifier
