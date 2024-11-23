@@ -66,33 +66,75 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-fun formatAndCalculateHarvestDate(plantingDate: String, daysToAdd: Int): Pair<String, String> {
+fun formatDate(dateTime: String): String {
+    return try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Menggunakan java.time untuk API 26 ke atas
+            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
+            val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("id", "ID"))
+            val date = LocalDate.parse(dateTime.substring(0, 10)) // Hanya ambil bagian tanggal
+            date.format(outputFormatter) // Format ke dd/MM/yyyy
+        } else {
+            // Menggunakan SimpleDateFormat untuk API di bawah 26
+            val inputFormatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
+            val outputFormatter = java.text.SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID"))
+            val date = inputFormatter.parse(dateTime)
+            outputFormatter.format(date!!)
+        }
+    } catch (e: Exception) {
+        "00/00/0000" // Jika format tidak valid
+    }
+}
+fun calculateHarvestDate(plantingDate: String, daysToAdd: Int): String {
     return try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Menggunakan java.time untuk API 26 ke atas
             val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
             val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("id", "ID"))
             val date = LocalDate.parse(plantingDate.substring(0, 10)) // Hanya ambil bagian tanggal
-            val formattedDate = date.format(outputFormatter) // Format ke dd/MM/yyyy
-            val harvestDate = date.plusDays(daysToAdd.toLong()).format(outputFormatter) // Tambah 60 hari dan format
-            formattedDate to harvestDate
+            val harvestDate = date.plusDays(daysToAdd.toLong()).format(outputFormatter) // Tambah hari dan format
+            harvestDate
         } else {
             // Menggunakan SimpleDateFormat untuk API di bawah 26
             val inputFormatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
             val outputFormatter = java.text.SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID"))
             val date = inputFormatter.parse(plantingDate)
-            val formattedDate = outputFormatter.format(date!!)
             val calendar = java.util.Calendar.getInstance()
             calendar.time = date
-            calendar.add(java.util.Calendar.DATE, daysToAdd) // Tambah 60 hari
+            calendar.add(java.util.Calendar.DATE, daysToAdd) // Tambah hari
             val harvestDate = outputFormatter.format(calendar.time)
-            formattedDate to harvestDate
+            harvestDate
         }
     } catch (e: Exception) {
-        "00/00/0000" to "00/00/0000" // Jika tanggal tidak valid, fallback ke default
+        "00/00/0000" // Jika format tidak valid
     }
 }
 
+fun formatDateWithMonthName(dateTime: String): String {
+    return try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Menggunakan java.time untuk API 26 ke atas
+            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
+            val outputFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale("id", "ID"))
+            val date = LocalDate.parse(dateTime.substring(0, 10)) // Hanya ambil bagian tanggal
+            date.format(outputFormatter) // Format ke dd MMMM yyyy
+        } else {
+            // Menggunakan SimpleDateFormat untuk API di bawah 26
+            val inputFormatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
+            val outputFormatter = java.text.SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
+            val date = inputFormatter.parse(dateTime)
+            outputFormatter.format(date!!)
+        }
+    } catch (e: Exception) {
+        "00/00/0000" // Jika format tidak valid
+    }
+}
+
+fun formatAndCalculateHarvestDate(plantingDate: String, daysToAdd: Int): Pair<String, String> {
+    val formattedDate = formatDate(plantingDate) // Memformat tanggal tanam
+    val harvestDate = calculateHarvestDate(plantingDate, daysToAdd) // Menghitung tanggal panen
+    return formattedDate to harvestDate
+}
 
 
 @Composable

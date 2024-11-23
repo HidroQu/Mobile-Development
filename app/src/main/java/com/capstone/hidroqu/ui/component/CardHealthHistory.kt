@@ -31,6 +31,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.nonui.data.DiagnosticHistory
+import com.capstone.hidroqu.ui.screen.detailmyplant.formatDate
+import com.capstone.hidroqu.ui.screen.detailmyplant.formatDateWithMonthName
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
 @Composable
@@ -39,6 +41,7 @@ fun CardHealthHistory(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val formattedDate = formatDateWithMonthName(listHealthHistory.diagnosis_date)
     // Health History Section
         Row(
             modifier = Modifier
@@ -89,7 +92,7 @@ fun CardHealthHistory(
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text = listHealthHistory.diagnosis_date,
+                        text = formattedDate,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.outline
                     )

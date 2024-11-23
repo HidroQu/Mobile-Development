@@ -3,6 +3,10 @@ package com.capstone.hidroqu.ui.screen.addplant
 import android.app.Application
 import android.content.Context
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -107,7 +111,6 @@ fun AddPlantActivity(
         } else {
             Column(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState())
                     .fillMaxSize()
                     .padding(20.dp)
                     .padding(paddingValues)
@@ -118,19 +121,22 @@ fun AddPlantActivity(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3), // Menetapkan 2 kolom
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentPadding = PaddingValues(0.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    plants.forEach { plant ->
+                    items(plants) { plant ->
                         val isSelected = selectedPlant == plant
                         CardAddPlant(
                             ListPlant = plant,
                             isSelected = isSelected,
                             onClick = {
                                 selectedPlant = if (isSelected) null else plant
-                            }
+                            },
                         )
                     }
                 }

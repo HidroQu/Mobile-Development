@@ -33,7 +33,7 @@ fun CardAddPlant(
             .clickable(onClick = onClick)
             .border(
                 width = 2.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceDim,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                 shape = MaterialTheme.shapes.medium
             )
             .background(
@@ -67,7 +67,7 @@ fun CardAddPlant(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = ListPlant.name,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
             )

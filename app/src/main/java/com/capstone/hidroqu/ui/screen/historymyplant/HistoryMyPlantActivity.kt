@@ -40,6 +40,7 @@ import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.nonui.data.DiagnosticHistoryData
 import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.ui.screen.detailmyplant.formatDateWithMonthName
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 import com.capstone.hidroqu.utils.ListHealthHistory
@@ -58,7 +59,8 @@ fun HistoryMyPlantActivity(
     val plantDiagnostic by viewModel.plantDiagnostic.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
-
+    val formattedDate = formatDateWithMonthName(plantDiagnostic?.diagnostic_history?.diagnosis_date ?: "00/00/0000")
+    
     // Fetch plant details once the composable is launched
     LaunchedEffect(plantId, healthId) {
         val token = SharedPreferencesHelper(context).getToken()
@@ -72,7 +74,7 @@ fun HistoryMyPlantActivity(
     Scaffold(
         topBar = {
             SimpleLightTopAppBar(
-                title = plantDiagnostic?.diagnostic_history?.diagnosis_date ?: "00/00/0000",
+                title = formattedDate,
                 navHostController = navHostController
             )
         },
@@ -121,6 +123,7 @@ fun DetailHistoryContent(
 ) {
     Column(
         modifier = modifier
+            .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.background)
             .padding(20.dp),
@@ -203,6 +206,7 @@ fun DetailHistoryContent(
                     text = history?.diagnostic_history?.diagnostic?.indication ?: "Indication",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
+                        .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(16.dp)
@@ -221,6 +225,7 @@ fun DetailHistoryContent(
                     text = history?.diagnostic_history?.diagnostic?.cause ?: "Cause",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
+                        .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(16.dp)
