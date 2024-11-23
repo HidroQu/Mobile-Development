@@ -1,6 +1,7 @@
 package com.capstone.hidroqu.nonui.data
 
 import android.os.Parcelable
+import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -97,14 +98,21 @@ data class DiagnosticHistory(
 data class DiagnosticResponse(
     val id: Int,
     val disease_name: String,
-    val image_disease: String,
+    val image_disease: String, // Ubah ke List<String>
     val indication: String,
     val cause: String,
     val solution: String,
-    val related_photo: List<String>,
     val created_at: String,
     val updated_at: String
-) : Parcelable
+) : Parcelable {
+    fun getParsedImageDisease(): List<String> {
+        return try {
+            Gson().fromJson(image_disease, Array<String>::class.java).toList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+}
 
 @Parcelize
 data class UserResponse(

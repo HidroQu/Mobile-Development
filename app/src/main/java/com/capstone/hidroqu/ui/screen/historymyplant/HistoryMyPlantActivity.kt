@@ -137,11 +137,7 @@ fun DetailHistoryContent(
             }
             .build()
         Image(
-            painter = rememberAsyncImagePainter(
-                model = history?.diagnostic_history?.diagnostic?.image_disease ?: "Image disease",
-                imageLoader = imageLoader
-
-            ), // Replace with actual plant image
+            painter = painterResource(R.drawable.ic_launcher_background), // Replace with actual plant image
             contentDescription = "Plant Image",
             modifier = Modifier
                 .height(200.dp)
@@ -172,7 +168,7 @@ fun DetailHistoryContent(
                 // Menampilkan gambar terkait dalam LazyRow
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(
-                        history?.diagnostic_history?.diagnostic?.related_photo ?: listOf()
+                        history?.diagnostic_history?.diagnostic?.getParsedImageDisease() ?: listOf()
                     ) { photoUrl ->
                         Image(
                             painter = rememberAsyncImagePainter(
