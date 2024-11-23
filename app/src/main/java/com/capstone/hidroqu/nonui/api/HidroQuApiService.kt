@@ -30,6 +30,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface HidroQuApiService {
     @POST("api/auth/register")
@@ -78,7 +79,8 @@ interface HidroQuApiService {
     // Mendapatkan daftar komunitas
     @GET("api/communities")
     fun getCommunities(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
+        @Query("page") page: Int // Adding a page query parameter
     ): Call<CommunityResponseWrapper>
 
     // Mendapatkan detail komunitas tertentu berdasarkan ID atau slug

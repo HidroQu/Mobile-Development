@@ -61,14 +61,10 @@ fun CommunityActivity(
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(token) {
         token?.let {
-        Log.d("CommunityActivity", "Token: $token") // Log token
-            viewModel.fetchCommunityPosts(it)
-        } ?: run {
-            Log.e("CommunityActivity", "Token is null. Redirect to login.")
-            // Tangani jika token tidak ada
-        }
+            viewModel.fetchAllCommunityPosts(it)
+        } ?: Log.e("CommunityActivity", "Token is null. Redirect to login.")
     }
 
 

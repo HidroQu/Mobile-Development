@@ -82,7 +82,7 @@ fun CardCommunity(
 
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = listCommunity.image,
+                    model = listCommunity.user.profile_image,
                     imageLoader = imageLoader
                 ),
                 modifier = Modifier

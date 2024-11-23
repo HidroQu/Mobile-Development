@@ -37,7 +37,7 @@ import coil.compose.rememberImagePainter
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.TopBarButtonAction
-import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.utils.ListUserData
 import com.capstone.hidroqu.utils.dummyListUserData
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -50,6 +50,8 @@ fun FormAddCommunityActivity(
     context: Context = LocalContext.current,
     viewModel: CommunityViewModel = viewModel(),
 ) {
+    val userPreferences = UserPreferences(context)
+    val token by userPreferences.token.collectAsState(initial = null)
     val user = dummyListUserData[0]
     var postTittle by remember { mutableStateOf("") }
     var postText by remember { mutableStateOf("") }
@@ -70,12 +72,9 @@ fun FormAddCommunityActivity(
     }
 
     LaunchedEffect(Unit) {
-        val token = SharedPreferencesHelper(context).getToken()
-        if (token != null) {
-            viewModel.fetchCommunityPosts(token)
-        } else {
-            Log.e("CommunityActivity", "Token is null. Redirect to login.")
-        }
+        token?.let {
+            viewModel.fetchAllCommunityPosts(it)
+        } ?: Log.e("CommunityActivity", "Token is null. Redirect to login.")
     }
 
 
@@ -86,13 +85,14 @@ fun FormAddCommunityActivity(
                 navHostController = navHostController,
                 onActionClick = {
                     if (postTittle.isNotBlank() && postText.isNotBlank()) {
-                        val token = SharedPreferencesHelper(context).getToken()
+
                         if (token != null) {
                             viewModel.storePost(
-                                token = token,
+                                token = token!!,
                                 title = postTittle,
                                 content = postText,
                                 imageUri = imageUris.firstOrNull(), // Handle the first selected image
+                                context = context,
                                 onSuccess = { response ->
                                     // Handle success response
                                     Log.d("FormAddCommunityActivity", "Post added successfully: ${response.message}")
