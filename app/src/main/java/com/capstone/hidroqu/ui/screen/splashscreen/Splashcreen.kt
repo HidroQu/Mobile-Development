@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -25,10 +27,11 @@ fun SplashScreen(
     viewModel: AuthViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
+    // Observasi nilai LiveData
+    val isUserLoggedIn by viewModel.isUserLoggedIn().observeAsState(initial = false)
+
     LaunchedEffect(key1 = true) {
         delay(700L)
-
-        val isUserLoggedIn = viewModel.isUserLoggedIn()
 
         if (isUserLoggedIn) {
             navHostController.navigate(Screen.Home.route) {

@@ -38,7 +38,7 @@ import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
-import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.nonui.data.UserPreferences
 
 @Composable
 fun MyPlantActivity(
@@ -46,17 +46,19 @@ fun MyPlantActivity(
     viewModel: MyPlantViewModel = viewModel(),
     context: Context = LocalContext.current
 ) {
+    val userPreferences = UserPreferences(context)
+    val token by userPreferences.token.collectAsState(initial = null)
     val myPlants by viewModel.myPlants.collectAsState(emptyList())
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
 
-    LaunchedEffect(Unit) {
-        val token = SharedPreferencesHelper(context).getToken()
-        Log.d("MyPlantActivity", "Token: $token") // Log the token
-        if (token != null) {
-            viewModel.fetchMyPlants(token)
-        } else {
-            // Tangani jika token tidak ada (misalnya, arahkan ke halaman login)
+    LaunchedEffect(token) {
+        token?.let {
+            Log.d("MyPlantActivity", "Token: $it")
+            viewModel.fetchMyPlants(it)
+        } ?: run {
+            // Tangani kasus ketika token null, misalnya arahkan ke halaman login
+            Log.e("MyPlantActivity", "Token tidak ditemukan")
         }
     }
     Scaffold(

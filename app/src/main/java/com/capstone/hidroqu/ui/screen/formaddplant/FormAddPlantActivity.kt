@@ -37,7 +37,7 @@ import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.nonui.data.BasicResponse
 import com.capstone.hidroqu.nonui.data.PlantResponse
-import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.utils.ListMyAddPlant
 import com.capstone.hidroqu.utils.getAddPlantById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -55,6 +55,8 @@ fun FormAddPlantActivity(
     context: Context = LocalContext.current,
     navHostController: NavHostController
 ) {
+    val userPreferences = UserPreferences(context)
+    val token by userPreferences.token.collectAsState(initial = null)
     var plantingDateForServer by remember { mutableStateOf("") }
     var plantingDateForDisplay by remember { mutableStateOf("Pilih Tanggal Tanam") }
     var notes by remember { mutableStateOf("") }
@@ -68,9 +70,10 @@ fun FormAddPlantActivity(
     val plant = plants.find { it.id == plantId }
 
     LaunchedEffect(Unit) {
-        val token = SharedPreferencesHelper(context).getToken()
-        if (token != null && viewModel.plants.value.isEmpty()) {
-            viewModel.fetchPlants(token)
+        token?.let {
+            viewModel.fetchPlants(it)
+        } ?: run {
+
         }
     }
 
@@ -87,14 +90,13 @@ fun FormAddPlantActivity(
             ) {
                 Button(
                     onClick = {
-                        val token = SharedPreferencesHelper(context).getToken()
                         if (token != null && plantingDateForServer.isNotEmpty()) {
                             Log.d(
                                 "FormAddPlantActivity",
                                 "Token: $token, PlantId: $plantId, PlantingDate: $plantingDateForServer, Notes: $notes"
                             )
                             viewModel.storePlant(
-                                token = token,
+                                token = token!!,
                                 plantId = plantId,
                                 plantingDate = plantingDateForServer,
                                 notes = notes,

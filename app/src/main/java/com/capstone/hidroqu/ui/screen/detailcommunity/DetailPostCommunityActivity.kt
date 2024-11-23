@@ -52,7 +52,7 @@ import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.nonui.data.Comment
 import com.capstone.hidroqu.nonui.data.CommunityDetailResponse
 import com.capstone.hidroqu.nonui.data.DiagnosticHistory
-import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.component.CardPostComment
 import com.capstone.hidroqu.ui.screen.detailmyplant.DetailMyPlantContent
 import com.capstone.hidroqu.utils.ListCommunity
@@ -71,16 +71,17 @@ fun DetailPostCommunityActivity(
     context: Context = LocalContext.current,
     modifier: Modifier = Modifier
 ) {
+    val userPreferences = UserPreferences(context)
+    val token by userPreferences.token.collectAsState(initial = null)
     val communityDetail by viewModel.communityDetail.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
 
     LaunchedEffect(idPost) {
-        val token = SharedPreferencesHelper(context).getToken()
-        if (token != null) {
+        token?.let {
             Log.d("DetailPostCommunity", "Token ditemukan, memulai fetch detail komunitas")
-            viewModel.fetchCommunityDetail(token, idPost)
-        } else {
+            viewModel.fetchCommunityDetail(it, idPost)
+        } ?: run {
             Log.e("DetailPostCommunity", "Token tidak ditemukan. Tidak dapat memuat detail komunitas.")
         }
     }

@@ -29,7 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.nonui.data.PlantResponse
-import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.component.CardAddPlant
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 
@@ -44,15 +44,16 @@ fun AddPlantActivity(
     // Menangani state tanaman yang dipilih secara internal
     var selectedPlant by remember { mutableStateOf<PlantResponse?>(null) }
 
+    val userPreferences = UserPreferences(context)
+    val token by userPreferences.token.collectAsState(initial = null)
     val plants by viewModel.plants.collectAsState(emptyList()) // Mengobservasi data tanaman
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(Unit) {
-        val token = SharedPreferencesHelper(context).getToken()
-        if (token != null) {
-            viewModel.fetchPlants(token) // Memuat data saat komponen diluncurkan
-        } else {
+        token?.let {
+            viewModel.fetchPlants(it) // Memuat data saat komponen diluncurkan
+        } ?: run {
             // Handle the case when token is not availabl
         }
     }
