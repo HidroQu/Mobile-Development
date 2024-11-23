@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.capstone.hidroqu.nonui.api.HidroQuApiConfig
 import com.capstone.hidroqu.nonui.api.HidroQuApiService
@@ -18,7 +20,7 @@ import com.capstone.hidroqu.nonui.data.LoginRequest
 import com.capstone.hidroqu.nonui.data.LoginResponse
 import com.capstone.hidroqu.nonui.data.RegisterRequest
 import com.capstone.hidroqu.nonui.data.ResetPasswordRequest
-import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.nonui.data.UserPreferences
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -26,13 +28,15 @@ import retrofit2.Response
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val authService = HidroQuApiConfig.retrofit.create(HidroQuApiService::class.java)
-    private val sharedPreferencesHelper = SharedPreferencesHelper(application)
+    private val userPreferences = UserPreferences(application)
 
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
 
-    private val _loginResult = MutableLiveData<LoginResponse?>()
-    val loginResult: LiveData<LoginResponse?> = _loginResult
+    val userId = userPreferences.userId.asLiveData()
+    val userName = userPreferences.userName.asLiveData()
+    val userEmail = userPreferences.userEmail.asLiveData()
+    val token = userPreferences.token.asLiveData()
 
     fun registerUser(
         name: String,
@@ -78,8 +82,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     if (response.isSuccessful) {
                         val loginResponse = response.body()
                         loginResponse?.let {
-                            loginResponse.data.token.let { token ->
-                                sharedPreferencesHelper.saveToken(token)
+                            // Simpan data pengguna ke DataStore
+                            viewModelScope.launch {
+                                userPreferences.saveUserData(
+                                    userId = it.data.user.id,
+                                    userName = it.data.user.name,
+                                    userEmail = it.data.user.email,
+                                    token = it.data.token
+                                )
                             }
                             onSuccess(it)
                         }
@@ -96,10 +106,15 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun isUserLoggedIn(): Boolean {
-        return sharedPreferencesHelper.getToken() != null
+    fun isUserLoggedIn(): LiveData<Boolean> {
+        return token.map { it != null }
     }
 
+    fun logoutUser() {
+        viewModelScope.launch {
+            userPreferences.clearUserData()
+        }
+    }
 
     fun forgotPassword(email: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         val request = ForgotPasswordRequest(email)

@@ -104,7 +104,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
     //datastore
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
 

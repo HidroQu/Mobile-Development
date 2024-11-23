@@ -39,7 +39,7 @@ import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.nonui.data.DiagnosticHistoryData
-import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.screen.detailmyplant.formatDateWithMonthName
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
@@ -55,7 +55,8 @@ fun HistoryMyPlantActivity(
     viewModel: MyPlantViewModel = viewModel(),
     context: Context = LocalContext.current
 ) {
-
+    val userPreferences = UserPreferences(context)
+    val token by userPreferences.token.collectAsState(initial = null)
     val plantDiagnostic by viewModel.plantDiagnostic.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
@@ -63,10 +64,9 @@ fun HistoryMyPlantActivity(
     
     // Fetch plant details once the composable is launched
     LaunchedEffect(plantId, healthId) {
-        val token = SharedPreferencesHelper(context).getToken()
-        if (token != null) {
-            viewModel.fetchMyPlantDetailDiagnostic(token, plantId, healthId)
-        } else {
+        token?.let {
+            viewModel.fetchMyPlantDetailDiagnostic(it, plantId, healthId)
+        } ?: run {
             // Handle the case when token is not available
         }
     }
@@ -81,7 +81,9 @@ fun HistoryMyPlantActivity(
         content = { paddingValues ->
             if (isLoading) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -135,11 +137,7 @@ fun DetailHistoryContent(
             }
             .build()
         Image(
-            painter = rememberAsyncImagePainter(
-                model = history?.diagnostic_history?.diagnostic?.image_disease ?: "Image disease",
-                imageLoader = imageLoader
-
-            ), // Replace with actual plant image
+            painter = painterResource(R.drawable.ic_launcher_background), // Replace with actual plant image
             contentDescription = "Plant Image",
             modifier = Modifier
                 .height(200.dp)
@@ -170,7 +168,7 @@ fun DetailHistoryContent(
                 // Menampilkan gambar terkait dalam LazyRow
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(
-                        history?.diagnostic_history?.diagnostic?.related_photo ?: listOf()
+                        history?.diagnostic_history?.diagnostic?.getParsedImageDisease() ?: listOf()
                     ) { photoUrl ->
                         Image(
                             painter = rememberAsyncImagePainter(

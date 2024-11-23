@@ -3,6 +3,7 @@ package com.capstone.hidroqu.ui.screen.community
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -38,7 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.nonui.data.PostData
-import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.component.CardCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
@@ -53,16 +55,17 @@ fun CommunityActivity(
     onAddClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val userPreferences = UserPreferences(context)
+    val token by userPreferences.token.collectAsState(initial = null)
     val communityPosts by viewModel.communityPosts.collectAsState(emptyList())
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
 
     LaunchedEffect(Unit) {
-        val token = SharedPreferencesHelper(context).getToken()
+        token?.let {
         Log.d("CommunityActivity", "Token: $token") // Log token
-        if (token != null) {
-            viewModel.fetchCommunityPosts(token)
-        } else {
+            viewModel.fetchCommunityPosts(it)
+        } ?: run {
             Log.e("CommunityActivity", "Token is null. Redirect to login.")
             // Tangani jika token tidak ada
         }
@@ -78,15 +81,32 @@ fun CommunityActivity(
         },
         floatingActionButtonPosition = FabPosition.End
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(paddingValues) // Gunakan padding dari Scaffold
-                .fillMaxSize()
-        ) {
-            if (communityPosts.isEmpty()) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (!errorMessage.isNullOrEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center // Atur konten ke tengah
+            ) {
                 NoPostList()
-            } else {
+            }
+        }
+        else {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(paddingValues) // Gunakan padding dari Scaffold
+                    .fillMaxSize()
+            ) {
                 PostList(posts = communityPosts, onDetailClicked = { idPost ->
                     navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)) {
                         popUpTo(Screen.Community.route)

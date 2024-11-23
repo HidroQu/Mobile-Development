@@ -61,7 +61,7 @@ import coil.decode.SvgDecoder
 import com.capstone.hidroqu.nonui.data.DiagnosticHistory
 import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
 import com.capstone.hidroqu.nonui.data.PlantResponse
-import com.capstone.hidroqu.nonui.data.SharedPreferencesHelper
+import com.capstone.hidroqu.nonui.data.UserPreferences
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -144,17 +144,17 @@ fun DetailMyPlantActivity(
     context: Context = LocalContext.current,
     navHostController: NavHostController
 ) {
-
+    val userPreferences = UserPreferences(context)
+    val token by userPreferences.token.collectAsState(initial = null)
     val plantDetail by viewModel.plantDetail.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
 
     // Fetch plant details once the composable is launched
     LaunchedEffect(plantId) {
-        val token = SharedPreferencesHelper(context).getToken()
-        if (token != null) {
-            viewModel.fetchMyPlantDetail(token, plantId)
-        } else {
+        token?.let {
+            viewModel.fetchMyPlantDetail(it, plantId)
+        } ?: run {
             // Handle the case when token is not available
         }
     }
@@ -168,7 +168,9 @@ fun DetailMyPlantActivity(
             content = { paddingValues ->
                 if (isLoading) {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -309,7 +311,7 @@ fun DetailMyPlantContent(
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = plant?.plant?.description ?: "note",
+                text = plant?.notes ?: "note",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.outline
             )
