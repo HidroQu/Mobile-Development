@@ -19,11 +19,16 @@ import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.RegisterRequest
 import com.capstone.hidroqu.nonui.data.ResetPasswordRequest
 import com.capstone.hidroqu.nonui.data.StorePlantRequest
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface HidroQuApiService {
@@ -83,16 +88,19 @@ interface HidroQuApiService {
         @Path("community") communityIdOrSlug: Int
     ): Call<CommunityDetailWrapper>
 
-    // Membuat komunitas baru
-    @POST("api/communities/store")
-    fun storeCommunity(
-        @Header("Authorization") token: String,
-        @Body communityRequest: CommunityRequest
-    ): Call<BasicResponse>
-
     // Mendapatkan daftar postingan pengguna dalam komunitas
     @GET("api/communities/my-posts")
     fun getMyPosts(
         @Header("Authorization") token: String
     ): Call<MyPostsResponseWrapper>
+
+    //multipart api-store
+    @Multipart
+    @POST("api/communities/store")
+    fun storeCommunityPost(
+        @Header("Authorization") token: String,
+        @Part("title") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part image: MultipartBody.Part?
+    ): Call<BasicResponse>
 }

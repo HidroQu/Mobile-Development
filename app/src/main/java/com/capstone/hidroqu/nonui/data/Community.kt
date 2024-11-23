@@ -1,11 +1,13 @@
 package com.capstone.hidroqu.nonui.data
 
+import android.net.Uri
 import android.os.Parcelable
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import java.lang.reflect.Type
 import com.google.gson.JsonElement
 import kotlinx.parcelize.Parcelize
+import java.io.File
 
 @Parcelize
 data class CommunityResponseWrapper(
@@ -39,7 +41,8 @@ data class CommunityDetailWrapper(
 
 @Parcelize
 data class CommunityRequest(
-    val message: String
+    val title: String,
+    val content: String
 ) : Parcelable
 
 @Parcelize
@@ -52,6 +55,7 @@ data class MyPostsResponseWrapper(
 @Parcelize
 data class PostData(
     val id: Int,
+    val title: String,
     val content: String,
     val image: String,
     val user_id: Int,
@@ -64,6 +68,7 @@ data class PostData(
 @Parcelize
 data class CommunityDetailResponse(
     val id: Int,
+    val title: String,
     val content: String,
     val image: String,
     val user_id: Int,

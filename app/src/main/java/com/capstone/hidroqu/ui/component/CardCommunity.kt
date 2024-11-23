@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -84,7 +85,6 @@ fun CardCommunity(
                     model = listCommunity.image,
                     imageLoader = imageLoader
                 ),
-                contentDescription = "Gambar Tanaman",
                 modifier = Modifier
                     .size(50.dp) // Ukuran gambar
                     .clip(CircleShape) // Membuat gambar menjadi bulat
@@ -92,7 +92,8 @@ fun CardCommunity(
                         width = 2.dp, // Ketebalan border
                         color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
                         shape = CircleShape // Bentuk border bulat
-                    )
+                    ),
+                contentDescription = "Gambar Tanaman"
             )
             Column {
                 Text(
@@ -107,6 +108,13 @@ fun CardCommunity(
                 )
             }
         }
+        Text(
+            text = listCommunity.title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+
         Text(
             text = listCommunity.content,
             style = MaterialTheme.typography.bodyMedium,
