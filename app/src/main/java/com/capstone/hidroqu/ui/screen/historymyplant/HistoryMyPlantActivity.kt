@@ -81,7 +81,9 @@ fun HistoryMyPlantActivity(
         content = { paddingValues ->
             if (isLoading) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()

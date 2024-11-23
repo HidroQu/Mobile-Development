@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -70,61 +69,44 @@ fun MyPlantActivity(
             })
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (!errorMessage.isNullOrEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = errorMessage ?: "Unknown Error")
-                }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    if (myPlants.isEmpty()) {
-                        NoPlantList(modifier = Modifier.padding(paddingValues))
-                    } else {
-                        MyPlantList(
-                            plants = myPlants,
-                            onDetailClicked = { plantId ->
-                                navHostController.navigate(Screen.DetailMyPlant.createRoute(plantId)) {
-                                    popUpTo(Screen.MyPlant.route)
-                                }
-                            }
-                        )
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (!errorMessage.isNullOrEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center // Atur konten ke tengah
+            ) {
+                NoPlantList() // Panggil fungsi NoPlantList
+            }
+        }
+        else {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                MyPlantList(
+                    plants = myPlants,
+                    onDetailClicked = { plantId ->
+                        navHostController.navigate(Screen.DetailMyPlant.createRoute(plantId)) {
+                            popUpTo(Screen.MyPlant.route)
+                        }
                     }
-                }
+                )
             }
         }
     }
 }
-// Loading indicator
-@Composable
-fun LoadingIndicator(modifier: Modifier = Modifier) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
 
 @Composable
 fun AddButton(onClick: () -> Unit) {
@@ -138,7 +120,6 @@ fun AddButton(onClick: () -> Unit) {
     }
 }
 
-
 @Composable
 fun NoPlantList(
     modifier: Modifier = Modifier
@@ -147,7 +128,7 @@ fun NoPlantList(
 
     Column(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
