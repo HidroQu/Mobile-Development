@@ -58,6 +58,9 @@ fun MyPlantActivity(
             viewModel.fetchMyPlants(it)
         } ?: run {
             // Tangani kasus ketika token null, misalnya arahkan ke halaman login
+            navHostController.navigate(Screen.Login.route) {
+                popUpTo(Screen.MyPlant.route) { inclusive = true }
+            }
             Log.e("MyPlantActivity", "Token tidak ditemukan")
         }
     }

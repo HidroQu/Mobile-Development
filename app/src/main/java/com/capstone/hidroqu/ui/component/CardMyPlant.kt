@@ -67,7 +67,7 @@ fun CardMyPlant(
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = myplant.notes.toString(),
+                text = myplant.notes ?: "Tidak ada catatan untuk tanaman ini",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 maxLines = 1

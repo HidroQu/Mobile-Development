@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -42,7 +43,17 @@ fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modi
     val homeViewModel = HomeViewModel(userPreferences)
 
     val isLoading by homeViewModel.isLoading.collectAsState()
-    val userName by homeViewModel.userName.collectAsState()
+
+    val token by userPreferences.token.collectAsState(initial = null)
+
+    // Redirect jika token tidak ditemukan
+    LaunchedEffect(token) {
+        if (token == null) {
+            navHostController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Home.route) { inclusive = true } // Bersihkan stack navigasi
+            }
+        }
+    }
 
     if (isLoading) {
         LoadingScreen() // Tampilkan loading screen jika sedang loading
