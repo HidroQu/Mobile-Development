@@ -11,6 +11,7 @@ import com.capstone.hidroqu.nonui.data.BasicResponse
 import com.capstone.hidroqu.nonui.data.DiagnosticHistoryData
 import com.capstone.hidroqu.nonui.data.DiagnosticHistoryResponseWrapper
 import com.capstone.hidroqu.nonui.data.LoginResponse
+import com.capstone.hidroqu.nonui.data.MyPlantData
 import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailWrapper
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
@@ -18,9 +19,11 @@ import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.StorePlantRequest
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -48,36 +51,40 @@ class MyPlantViewModel : ViewModel() {
     val errorMessage: StateFlow<String?> get() = _errorMessage
 
     fun fetchMyPlants(token: String) {
-        _isLoading.value = true
-        apiService.getMyPlants("Bearer $token").enqueue(object : Callback<MyPlantResponseWrapper> {
-            override fun onResponse(
-                call: Call<MyPlantResponseWrapper>,
-                response: Response<MyPlantResponseWrapper>
-            ) {
-                _isLoading.value = false
-                Log.d("MyPlantViewModel", "API Response: ${response.body()}")
-
-                if (response.isSuccessful) {
-                    val plantList = response.body()?.data?.data ?: emptyList() // Mengambil data tanaman
-
-                    if (plantList.isEmpty()) {
-                        _errorMessage.value = "You have no plants yet."
-                    } else {
-                        _myPlants.value = plantList
-                        _errorMessage.value = null
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                var currentPage = 1
+                val allPlants = mutableListOf<MyPlantResponse>() // Ganti tipe ini dengan tipe data yang sesuai
+                do {
+                    val response = withContext(Dispatchers.IO) {
+                        apiService.getMyPlants("Bearer $token", currentPage).execute()
                     }
-                } else {
-                    _errorMessage.value = "Failed to load plants: ${response.message()}"
-                    Log.e("MyPlantViewModel", "Error: ${response.message()}")
-                }
-            }
 
-            override fun onFailure(call: Call<MyPlantResponseWrapper>, t: Throwable) {
+                    if (response.isSuccessful) {
+                        response.body()?.data?.let { wrapper ->
+                            allPlants.addAll(wrapper.data)
+                            currentPage = wrapper.current_page + 1
+                        }
+                    } else {
+                        _errorMessage.value = "Failed to load page $currentPage: ${response.message()}"
+                        break
+                    }
+                } while (response.body()?.data?.next_page_url != null)
+
+                if (allPlants.isEmpty()) {
+                    _errorMessage.value = "You have no plants yet."
+                } else {
+                    _myPlants.value = allPlants
+                    _errorMessage.value = null
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error fetching plants: ${e.message}"
+                Log.e("MyPlantViewModel", "Error fetching plants", e)
+            } finally {
                 _isLoading.value = false
-                _errorMessage.value = "Error: ${t.message}"
-                Log.e("MyPlantViewModel", "Failure: ${t.message}")
             }
-        })
+        }
     }
 
     fun fetchMyPlantDetail(token: String, plantId: Int) {

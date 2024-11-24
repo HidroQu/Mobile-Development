@@ -59,7 +59,8 @@ interface HidroQuApiService {
 
     @GET("api/plants/my-plants")
     fun getMyPlants(
-        @Header("Authorization") token: String // Menambahkan header Authorization
+        @Header("Authorization") token: String, // Menambahkan header Authorization
+        @Query("page") page: Int
     ): Call<MyPlantResponseWrapper>
 
     @GET("api/plants/my-plants/{id}")

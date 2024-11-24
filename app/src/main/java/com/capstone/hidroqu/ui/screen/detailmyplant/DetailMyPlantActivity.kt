@@ -311,7 +311,7 @@ fun DetailMyPlantContent(
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = plant?.notes ?: "note",
+                text = plant?.notes ?: "Tidak ada catatan untuk tanaman ini",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -339,7 +339,7 @@ fun DetailMyPlantContent(
                     )
                     Text(
 
-                        text = "Dalam 60 hari ke depan, tanamamu siap panen",
+                        text = "Dalam $daysToAdd hari ke depan, tanamamu siap panen",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )

@@ -30,17 +30,32 @@ data class MyPlantResponse(
     val plant_id: Int,
     val planting_date: String,
     val notes: String?,
+    val created_at: String,
+    val updated_at: String,
     val plant: PlantResponse
 ) : Parcelable
 
 @Parcelize
 data class MyPlantResponseWrapper(
+    val status: String,
+    val message: String,
     val data: MyPlantData
 ) : Parcelable
 
 @Parcelize
 data class MyPlantData(
-    val data: List<MyPlantResponse> // Menyimpan daftar tanaman
+    val current_page: Int,
+    val data: List<MyPlantResponse>, // Menyimpan daftar tanaman
+    val first_page_url: String?,
+    val last_page: Int,
+    val last_page_url: String?,
+    val next_page_url: String?,
+    val prev_page_url: String?,
+    val total: Int,
+    val per_page: Int,
+    val from: Int,
+    val to: Int,
+    val path: String
 ) : Parcelable
 
 @Parcelize
