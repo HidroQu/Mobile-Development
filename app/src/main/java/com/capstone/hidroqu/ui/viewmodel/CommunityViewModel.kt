@@ -15,12 +15,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.File
 
 class CommunityViewModel : ViewModel() {
 
@@ -42,14 +40,9 @@ class CommunityViewModel : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
 
-    // Fetch community detail
     fun fetchCommunityDetail(token: String, communityId: Int) {
         _isLoading.value = true
-        Log.d(
-            "CommunityViewModel",
-            "Fetching detail komunitas dengan ID=$communityId menggunakan token"
-        )
-
+        Log.d("CommunityViewModel", "Fetching detail komunitas dengan ID=$communityId menggunakan token")
         apiService.getCommunityDetail("Bearer $token", communityId)
             .enqueue(object : Callback<CommunityDetailWrapper> {
                 override fun onResponse(
@@ -57,24 +50,19 @@ class CommunityViewModel : ViewModel() {
                     response: Response<CommunityDetailWrapper>
                 ) {
                     _isLoading.value = false
+                    Log.d("CommunityViewModel", "Response diterima untuk fetchCommunityDetail")
                     if (response.isSuccessful) {
                         val detailData = response.body()?.data
                         if (detailData != null) {
                             _communityDetail.value = detailData
-                            Log.d(
-                                "CommunityViewModel",
-                                "Detail komunitas berhasil dimuat: $detailData"
-                            )
+                            Log.d("CommunityViewModel", "Detail komunitas berhasil dimuat: $detailData")
                         } else {
                             _errorMessage.value = "Data detail komunitas null"
                             Log.e("CommunityViewModel", "Detail komunitas null")
                         }
                     } else {
                         _errorMessage.value = "Gagal memuat detail komunitas: ${response.message()}"
-                        Log.e(
-                            "CommunityViewModel",
-                            "Response error: ${response.code()} - ${response.message()}"
-                        )
+                        Log.e("CommunityViewModel", "Response error: ${response.code()} - ${response.message()}")
                     }
                 }
 
@@ -86,28 +74,28 @@ class CommunityViewModel : ViewModel() {
             })
     }
 
-
-    // Fetch user's posts
     fun fetchMyPosts(token: String) {
         _isLoading.value = true
+        Log.d("CommunityViewModel", "Fetching user's posts with token: $token")
         apiService.getMyPosts("Bearer $token").enqueue(object : Callback<MyPostsResponseWrapper> {
             override fun onResponse(
                 call: Call<MyPostsResponseWrapper>,
                 response: Response<MyPostsResponseWrapper>
             ) {
                 _isLoading.value = false
+                Log.d("CommunityViewModel", "Response diterima untuk fetchMyPosts")
                 if (response.isSuccessful) {
                     val postData = response.body()?.data
                     if (postData != null) {
                         _myPosts.value = postData
                         Log.d("CommunityViewModel", "Fetched my post: ID=${postData.id}")
                     } else {
-                        Log.e("CommunityViewModel", "My post data is null")
                         _errorMessage.value = "Failed to fetch my post: Data is null"
+                        Log.e("CommunityViewModel", "My post data is null")
                     }
                 } else {
                     _errorMessage.value = "Failed to load your posts: ${response.message()}"
-                    Log.e("CommunityViewModel", "Error: ${response.message()}")
+                    Log.e("CommunityViewModel", "Response error: ${response.code()} - ${response.message()}")
                 }
             }
 
@@ -119,7 +107,6 @@ class CommunityViewModel : ViewModel() {
         })
     }
 
-    // Add a new post
     fun storePost(
         token: String,
         title: String,
@@ -129,21 +116,22 @@ class CommunityViewModel : ViewModel() {
         onSuccess: (BasicResponse) -> Unit,
         onError: (String) -> Unit
     ) {
+        Log.d("CommunityViewModel", "Storing post dengan title: $title")
         val titleRequestBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
         val contentRequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
 
         val imagePart: MultipartBody.Part? = imageUri?.let {
+            Log.d("CommunityViewModel", "Image Uri terdeteksi: $imageUri")
             val inputStream = context.contentResolver.openInputStream(it)
             val byteArray = inputStream?.readBytes()
             val requestFile = byteArray?.toRequestBody("image/jpeg".toMediaTypeOrNull())
             requestFile?.let { it1 ->
-                MultipartBody.Part.createFormData("image", "filename.jpg",
-                    it1
-                )
+                MultipartBody.Part.createFormData("image", "filename.jpg", it1)
             }
         }
 
         viewModelScope.launch {
+            Log.d("CommunityViewModel", "Mempersiapkan API call untuk storePost")
             apiService.storeCommunityPost(
                 "Bearer $token",
                 titleRequestBody,
@@ -151,52 +139,108 @@ class CommunityViewModel : ViewModel() {
                 imagePart
             ).enqueue(object : Callback<BasicResponse> {
                 override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
+                    Log.d("CommunityViewModel", "Response diterima untuk storePost")
                     if (response.isSuccessful) {
                         response.body()?.let {
+                            Log.d("CommunityViewModel", "Post berhasil disimpan: ${response.body()}")
                             onSuccess(it)
                         }
                     } else {
+                        Log.e("CommunityViewModel", "Error menyimpan post: ${response.message()}")
                         onError("Error: ${response.message()}")
                     }
                 }
 
                 override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+                    Log.e("CommunityViewModel", "Gagal menyimpan post: ${t.message}", t)
                     onError("Network error: ${t.message}")
                 }
             })
         }
     }
 
-
-    // Fungsi untuk mengambil semua postingan komunitas dari semua halaman
     fun fetchAllCommunityPosts(token: String) {
         viewModelScope.launch {
             _isLoading.value = true
+            Log.d("CommunityViewModel", "Fetching semua postingan komunitas")
             try {
                 var currentPage = 1
                 val allPosts = mutableListOf<PostData>()
                 do {
-                    val response = withContext(Dispatchers.IO) { // Perform network operations on IO thread
+                    val response = withContext(Dispatchers.IO) {
                         apiService.getCommunities("Bearer $token", currentPage).execute()
                     }
                     if (response.isSuccessful) {
                         response.body()?.data?.let { wrapper ->
+                            Log.d("CommunityViewModel", "Fetched page $currentPage: ${wrapper.data.size} posts")
                             allPosts.addAll(wrapper.data)
                             currentPage = wrapper.current_page + 1
                         }
                     } else {
+                        Log.e("CommunityViewModel", "Failed to load page $currentPage: ${response.message()}")
                         _errorMessage.value = "Failed to load page $currentPage: ${response.message()}"
                         break
                     }
                 } while (response.body()?.data?.next_page_url != null)
 
                 _communityPosts.value = allPosts
+                Log.d("CommunityViewModel", "Fetched semua postingan komunitas berhasil: ${allPosts.size} posts")
             } catch (e: Exception) {
-                _errorMessage.value = "Error fetching posts: ${e.message}"
                 Log.e("CommunityViewModel", "Error fetching posts", e)
+                _errorMessage.value = "Error fetching posts: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+
+    fun storeComment(
+        token: String,
+        communityId: Int,
+        content: String,
+        imageUri: Uri?,
+        context: Context,
+        onSuccess: (TestResponse) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        Log.d("CommunityViewModel", "Storing comment untuk communityId: $communityId")
+        val contentRequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val imagePart: MultipartBody.Part? = imageUri?.let {
+            Log.d("CommunityViewModel", "Image Uri untuk komentar terdeteksi: $imageUri")
+            val inputStream = context.contentResolver.openInputStream(it)
+            val byteArray = inputStream?.readBytes()
+            val requestFile = byteArray?.toRequestBody("image/jpeg".toMediaTypeOrNull())
+            requestFile?.let { it1 ->
+                MultipartBody.Part.createFormData("image", "filename.jpg", it1)
+            }
+        }
+
+        apiService.storeCommunityComment(
+            token = "Bearer $token",
+            communityId = communityId,
+            commentId = null,
+            content = contentRequestBody,
+            image = imagePart
+        ).enqueue(object : Callback<TestResponse> {
+            override fun onResponse(call: Call<TestResponse>, response: Response<TestResponse>) {
+                Log.d("CommunityViewModel", "Response diterima untuk storeComment")
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        Log.d("CommunityViewModel", "Comment berhasil disimpan: ${it}")
+                        Log.d("CommunityViewModel", "Status: ${it.status}, Message: ${it.message}, Data: ${it.data}")
+                        onSuccess(it)
+                    }
+                } else {
+                    Log.e("CommunityViewModel", "Error menyimpan komentar: ${response.message()}")
+                    onError("Error: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<TestResponse>, t: Throwable) {
+                Log.e("CommunityViewModel", "Gagal menyimpan komentar: ${t.message}", t)
+                onError("Network error: ${t.message}")
+            }
+        })
     }
 }

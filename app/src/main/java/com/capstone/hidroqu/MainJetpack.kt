@@ -216,6 +216,7 @@ fun MainJetpack(
                 composable(Screen.AddPostCommunity.route) {
                     FormAddCommunityActivity(navHostController = navController)
                 }
+
                 ////detail komunitas
                 composable(
                     route = Screen.DetailCommunity.route,

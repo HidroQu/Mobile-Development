@@ -52,6 +52,17 @@ data class BasicResponse(
     val message: String
 ) : Parcelable
 
+data class TestResponse(
+    val status: String,
+    val message: String,
+    val data: Any?
+) {
+    override fun toString(): String {
+        return "BasicResponse(status='$status', message='$message', data=$data)"
+    }
+}
+
+
 @Parcelize
 data class ResetPasswordRequest(
     val token: String,

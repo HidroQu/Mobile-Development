@@ -46,6 +46,13 @@ data class CommunityRequest(
 ) : Parcelable
 
 @Parcelize
+data class CommunityCommentRequest(
+    val community_id: Int,
+    val title: String,
+    val content: String
+) : Parcelable
+
+@Parcelize
 data class MyPostsResponseWrapper(
     val status: String,
     val message: String,
@@ -116,3 +123,4 @@ data class Reply( // Renamed from Replies to Reply
     val updated_at: String?,
     val user: UserData
 ) : Parcelable
+

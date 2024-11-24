@@ -49,7 +49,6 @@ fun CardCommunity(
 ) {
     val isImageExpanded = remember { mutableStateOf(false) }
 
-
     val imageModifier = if (isImageExpanded.value) {
         Modifier.wrapContentHeight()
     } else {
@@ -68,13 +67,14 @@ fun CardCommunity(
             )
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
+    ) {
+        // Row untuk informasi pengguna
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             val imageLoader = ImageLoader.Builder(LocalContext.current)
                 .components {
                     add(SvgDecoder.Factory())
@@ -94,7 +94,7 @@ fun CardCommunity(
                         color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
                         shape = CircleShape // Bentuk border bulat
                     ),
-                contentDescription = "Gambar Tanaman"
+                contentDescription = "Gambar Profil"
             )
             Column {
                 Text(
@@ -109,6 +109,8 @@ fun CardCommunity(
                 )
             }
         }
+
+        // Tampilkan judul dan konten
         Text(
             text = listCommunity.title,
             style = MaterialTheme.typography.bodyMedium,
@@ -122,37 +124,41 @@ fun CardCommunity(
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
-        val imageLoader = ImageLoader.Builder(LocalContext.current)
-            .components {
-                add(SvgDecoder.Factory())
-            }
-            .build()
+        // Periksa apakah gambar tersedia
+        if (!listCommunity.image.isNullOrEmpty()) {
+            val imageLoader = ImageLoader.Builder(LocalContext.current)
+                .components {
+                    add(SvgDecoder.Factory())
+                }
+                .build()
 
-        Image(
-            painter = rememberAsyncImagePainter(
-                model = listCommunity.image,
-                imageLoader = imageLoader
-            ),
-            contentDescription = "Image Post",
-            modifier = imageModifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .clickable {
-                    // Toggle the image expanded state when clicked
-                    isImageExpanded.value = !isImageExpanded.value
-                },
-            contentScale = ContentScale.Crop
-        )
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = listCommunity.image,
+                    imageLoader = imageLoader
+                ),
+                contentDescription = "Image Post",
+                modifier = imageModifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .clickable {
+                        // Toggle the image expanded state when clicked
+                        isImageExpanded.value = !isImageExpanded.value
+                    },
+                contentScale = ContentScale.Crop
+            )
+        }
 
+        // Bagian untuk komentar
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Icon(
                 painter = painterResource(R.drawable.ic_comment),
-                contentDescription = "See Health Details",
+                contentDescription = "Komentar",
                 tint = MaterialTheme.colorScheme.outline
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -166,6 +172,7 @@ fun CardCommunity(
         }
     }
 }
+
 
 @Preview
 @Composable

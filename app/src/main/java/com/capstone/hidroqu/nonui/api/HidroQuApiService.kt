@@ -3,26 +3,22 @@ package com.capstone.hidroqu.nonui.api
 import com.capstone.hidroqu.nonui.data.AuthResponse
 import com.capstone.hidroqu.nonui.data.BasicResponse
 import com.capstone.hidroqu.nonui.data.CommunityDetailWrapper
-import com.capstone.hidroqu.nonui.data.CommunityRequest
 import com.capstone.hidroqu.nonui.data.CommunityResponseWrapper
 import com.capstone.hidroqu.nonui.data.DiagnosticHistoryResponseWrapper
 import com.capstone.hidroqu.nonui.data.ForgotPasswordRequest
 import com.capstone.hidroqu.nonui.data.LoginRequest
 import com.capstone.hidroqu.nonui.data.LoginResponse
-import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailWrapper
-import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.MyPostsResponseWrapper
-import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.RegisterRequest
 import com.capstone.hidroqu.nonui.data.ResetPasswordRequest
 import com.capstone.hidroqu.nonui.data.StorePlantRequest
+import com.capstone.hidroqu.nonui.data.TestResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -106,13 +102,14 @@ interface HidroQuApiService {
         @Part image: MultipartBody.Part?
     ): Call<BasicResponse>
 
-//multipart api-comment
     @Multipart
     @POST("api/communities/{community}/comment")
     fun storeCommunityComment(
         @Header("Authorization") token: String,
-        @Part("comment_id") title: RequestBody,
+        @Path("community") communityId: Int,
+        @Part("comment_id") commentId: Int?,
         @Part("content") content: RequestBody,
-        @Part image: MultipartBody.Part?
-    ): Call<BasicResponse>
+        @Part image: MultipartBody.Part? = null
+    ): Call<TestResponse>
+
 }

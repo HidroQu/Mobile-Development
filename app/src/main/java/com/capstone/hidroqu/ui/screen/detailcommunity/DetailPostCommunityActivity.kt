@@ -32,6 +32,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -76,20 +78,15 @@ fun DetailPostCommunityActivity(
     context: Context = LocalContext.current,
     modifier: Modifier = Modifier
 ) {
-    val isImageExpanded = remember { mutableStateOf(false) }
-
-    val imageModifier = if (isImageExpanded.value) {
-        Modifier.wrapContentHeight()
-    } else {
-        Modifier.height(190.dp)
-    }
-
-
     val userPreferences = UserPreferences(context)
     val token by userPreferences.token.collectAsState(initial = null)
     val communityDetail by viewModel.communityDetail.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
+
+    // State for comment submission status
+    val isSubmittingComment = remember { mutableStateOf(false) }
+    val commentSubmissionError = remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(idPost) {
         token?.let {
@@ -136,11 +133,14 @@ fun DetailPostCommunityActivity(
                     DetailPostCommunityContent(
                         post = communityDetail,
                         listComment = communityDetail?.get_comments ?: listOf(),
-                        navHostController = navHostController
+                        navHostController = navHostController,
+                        token = token,
+                        viewModel = viewModel,
+                        isSubmittingComment = isSubmittingComment,
+                        commentSubmissionError = commentSubmissionError
                     )
                 }
             }
-
         }
     )
 }
@@ -151,10 +151,15 @@ fun DetailPostCommunityContent(
     post: CommunityDetailResponse?,
     listComment: List<Comment>,
     context: Context = LocalContext.current,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    token: String?,
+    viewModel: CommunityViewModel,
+    isSubmittingComment: MutableState<Boolean>,
+    commentSubmissionError: MutableState<String?>
 ) {
     // State for image expand/collapse
     val isImageExpanded = remember { mutableStateOf(false) }
+    val commentText = remember { mutableStateOf("") }
 
     val imageModifier = if (isImageExpanded.value) {
         Modifier.wrapContentHeight()
@@ -196,7 +201,7 @@ fun DetailPostCommunityContent(
                                     model = post.user.profile_image,
                                     imageLoader = imageLoader
                                 ),
-                                contentDescription = "post imagen",
+                                contentDescription = "User Profile Image",
                                 modifier = Modifier
                                     .size(50.dp)
                                     .clip(CircleShape)
@@ -221,21 +226,29 @@ fun DetailPostCommunityContent(
                             )
                         }
                     }
+                    Text(
+                        text = post?.title ?: "Lorem ipsum",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
 
-                    // Post Content and Image
+                    // Post Content
                     Text(
                         text = post?.content ?: "Lorem ipsum",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
 
-                    post?.image?.let { postImage ->
+                    // Only display the image if it's available
+                    if (!post?.image.isNullOrEmpty()) {
                         Image(
-                            painter = rememberAsyncImagePainter(postImage),
+                            painter = rememberAsyncImagePainter(post?.image),
                             contentDescription = "Post Image",
                             modifier = imageModifier
                                 .fillMaxWidth()
                                 .clickable {
+                                    // Toggle the image expanded state when clicked
                                     isImageExpanded.value = !isImageExpanded.value
                                 },
                             contentScale = ContentScale.Crop
@@ -250,6 +263,19 @@ fun DetailPostCommunityContent(
                         .padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
+                    if (isSubmittingComment.value) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+
+                    commentSubmissionError.value?.let { error ->
+                        Text(
+                            text = error,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
                     listComment.forEach { comment ->
                         CardPostComment(listComment = comment)
                     }
@@ -275,14 +301,41 @@ fun DetailPostCommunityContent(
                     modifier = Modifier.weight(1f),
                     maxLines = 1,
                     colors = TextFieldDefaults.textFieldColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.primary
+                    ),
+                    enabled = !isSubmittingComment.value
                 )
 
                 Button(
                     onClick = {
-                        // Handle comment submission
+                        if (token != null && post != null && commentText.value.isNotBlank()) {
+                            isSubmittingComment.value = true
+                            commentSubmissionError.value = null
+
+                            viewModel.storeComment(
+                                token = token,
+                                communityId = post.id,
+                                content = commentText.value,
+                                imageUri = null,
+                                context = context,
+                                onSuccess = { response ->
+                                    isSubmittingComment.value = false
+                                    commentText.value = ""
+                                    // Refresh the post details to show the new comment
+                                    viewModel.fetchCommunityDetail(token, post.id)
+                                },
+                                onError = { error ->
+                                    isSubmittingComment.value = false
+                                    commentSubmissionError.value = error
+                                }
+                            )
+                        }
                     },
+                    enabled = !isSubmittingComment.value && commentText.value.isNotBlank(),
                     modifier = Modifier.align(Alignment.CenterVertically)
                 ) {
                     Text("Kirim")
@@ -291,6 +344,7 @@ fun DetailPostCommunityContent(
         }
     )
 }
+
 
 
 @Preview
