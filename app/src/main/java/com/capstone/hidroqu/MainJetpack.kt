@@ -230,7 +230,7 @@ fun MainJetpack(
 
                 //profil
                 composable(Screen.Profile.route){
-                    ProfileActivity(navHostController = navController, dummyListUserData.first(), themeViewModel = themeViewModel)
+                    ProfileActivity(navHostController = navController, themeViewModel = themeViewModel)
                 }
                 ////edit profil
                 composable(Screen.EditProfile.route) {

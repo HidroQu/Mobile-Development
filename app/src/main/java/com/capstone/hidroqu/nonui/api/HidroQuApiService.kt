@@ -16,6 +16,7 @@ import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.MyPostsResponseWrapper
 import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
+import com.capstone.hidroqu.nonui.data.ProfileResponse
 import com.capstone.hidroqu.nonui.data.RegisterRequest
 import com.capstone.hidroqu.nonui.data.ResetPasswordRequest
 import com.capstone.hidroqu.nonui.data.StorePlantRequest
@@ -44,6 +45,11 @@ interface HidroQuApiService {
 
     @POST("api/auth/reset-password")
     fun resetPassword(@Body request: ResetPasswordRequest): Call<BasicResponse>
+
+    @GET("api/profile")
+    fun getUserProfile(
+        @Header("Authorization") token: String
+    ): Call<ProfileResponse>
 
     // New endpoints for "Tanamanku"
     @GET("api/plants")

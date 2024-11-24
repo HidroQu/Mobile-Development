@@ -64,7 +64,12 @@ fun CommunityActivity(
     LaunchedEffect(token) {
         token?.let {
             viewModel.fetchAllCommunityPosts(it)
-        } ?: Log.e("CommunityActivity", "Token is null. Redirect to login.")
+        } ?: run {
+            // Tangani kasus ketika token null, misalnya arahkan ke halaman login
+            navHostController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Community.route) { inclusive = true }
+            }
+        }
     }
 
 

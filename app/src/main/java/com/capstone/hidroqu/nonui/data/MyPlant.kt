@@ -68,7 +68,7 @@ data class MyPlantDetailResponse(
     val created_at: String?,
     val updated_at: String?,
     val plant: PlantResponse?,
-    val user: UserResponse?,
+    val user: User?,
     val diagnostic_histories: List<DiagnosticHistory>
 ) : Parcelable
 
@@ -129,14 +129,3 @@ data class DiagnosticResponse(
     }
 }
 
-@Parcelize
-data class UserResponse(
-    val id: Int,
-    val name: String,
-    val email: String,
-    val email_verified_at: String?,
-    val profile_image: String?,
-    val bio: String?,
-    val created_at: String?,
-    val updated_at: String?
-) : Parcelable
