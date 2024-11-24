@@ -5,13 +5,16 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -37,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +51,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
+import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.nonui.data.Comment
@@ -71,6 +76,15 @@ fun DetailPostCommunityActivity(
     context: Context = LocalContext.current,
     modifier: Modifier = Modifier
 ) {
+    val isImageExpanded = remember { mutableStateOf(false) }
+
+    val imageModifier = if (isImageExpanded.value) {
+        Modifier.wrapContentHeight()
+    } else {
+        Modifier.height(190.dp)
+    }
+
+
     val userPreferences = UserPreferences(context)
     val token by userPreferences.token.collectAsState(initial = null)
     val communityDetail by viewModel.communityDetail.collectAsState()
@@ -139,8 +153,14 @@ fun DetailPostCommunityContent(
     context: Context = LocalContext.current,
     navHostController: NavHostController
 ) {
-    // State untuk teks komentar
-    val commentText = remember { mutableStateOf("") }
+    // State for image expand/collapse
+    val isImageExpanded = remember { mutableStateOf(false) }
+
+    val imageModifier = if (isImageExpanded.value) {
+        Modifier.wrapContentHeight()
+    } else {
+        Modifier.height(190.dp)
+    }
 
     Scaffold(
         content = { paddingValues ->
@@ -150,7 +170,7 @@ fun DetailPostCommunityContent(
                     .fillMaxWidth()
                     .padding(paddingValues),
             ) {
-                // Konten utama yang sudah ada (gambar, teks, dll)
+                // Main content with post data
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -158,6 +178,7 @@ fun DetailPostCommunityContent(
                         .padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    // User and Post Info
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -172,7 +193,7 @@ fun DetailPostCommunityContent(
                         if (post != null) {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = post.image,
+                                    model = post.user.profile_image,
                                     imageLoader = imageLoader
                                 ),
                                 contentDescription = "post imagen",
@@ -186,6 +207,7 @@ fun DetailPostCommunityContent(
                                     )
                             )
                         }
+
                         Column {
                             Text(
                                 text = post?.user?.name ?: "Username",
@@ -193,19 +215,35 @@ fun DetailPostCommunityContent(
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text =  post?.created_at ?: "00/00/0000",
+                                text = post?.created_at ?: "00/00/0000",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.outline
                             )
                         }
                     }
+
+                    // Post Content and Image
                     Text(
-                        text =  post?.content ?: "Lorem ipsum",
+                        text = post?.content ?: "Lorem ipsum",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
+
+                    post?.image?.let { postImage ->
+                        Image(
+                            painter = rememberAsyncImagePainter(postImage),
+                            contentDescription = "Post Image",
+                            modifier = imageModifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    isImageExpanded.value = !isImageExpanded.value
+                                },
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
 
+                // Comments Section
                 Column(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
@@ -213,14 +251,13 @@ fun DetailPostCommunityContent(
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     listComment.forEach { comment ->
-                        CardPostComment(
-                            listComment = comment
-                        )
+                        CardPostComment(listComment = comment)
                     }
                 }
             }
         },
         bottomBar = {
+            // Bottom Comment Section
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -229,25 +266,22 @@ fun DetailPostCommunityContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                val commentText = remember { mutableStateOf("") }
+
                 TextField(
                     value = commentText.value,
                     onValueChange = { commentText.value = it },
                     label = { Text("Tambahkan komentar") },
-                    modifier = Modifier
-                        .weight(1f),
+                    modifier = Modifier.weight(1f),
                     maxLines = 1,
                     colors = TextFieldDefaults.textFieldColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.primary
+                        containerColor = MaterialTheme.colorScheme.onPrimary
                     )
                 )
 
                 Button(
                     onClick = {
-                        // Logika untuk mengirim komentar
+                        // Handle comment submission
                     },
                     modifier = Modifier.align(Alignment.CenterVertically)
                 ) {
@@ -257,6 +291,7 @@ fun DetailPostCommunityContent(
         }
     )
 }
+
 
 @Preview
 @Composable

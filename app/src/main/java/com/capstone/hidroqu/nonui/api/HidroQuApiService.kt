@@ -105,4 +105,14 @@ interface HidroQuApiService {
         @Part("content") content: RequestBody,
         @Part image: MultipartBody.Part?
     ): Call<BasicResponse>
+
+//multipart api-comment
+    @Multipart
+    @POST("api/communities/{community}/comment")
+    fun storeCommunityComment(
+        @Header("Authorization") token: String,
+        @Part("comment_id") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part image: MultipartBody.Part?
+    ): Call<BasicResponse>
 }

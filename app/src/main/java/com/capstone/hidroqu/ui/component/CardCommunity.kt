@@ -144,7 +144,6 @@ fun CardCommunity(
             contentScale = ContentScale.Crop
         )
 
-
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
