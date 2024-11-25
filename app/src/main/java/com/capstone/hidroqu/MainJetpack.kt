@@ -1,7 +1,9 @@
 package com.capstone.hidroqu
 
 import android.net.Uri
+import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -52,6 +54,7 @@ import com.capstone.hidroqu.ui.viewmodel.ThemeViewModel
 import com.capstone.hidroqu.utils.dummyListUserData
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainJetpack(
     modifier: Modifier = Modifier,
