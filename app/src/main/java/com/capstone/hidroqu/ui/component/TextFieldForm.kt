@@ -37,7 +37,7 @@ fun TextFieldForm(
     errorMessage: String? = null,
     labelTextStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
     singleLine: Boolean = true,  // Tambahkan parameter untuk singleLine
-    maxLines: Int = 1
+    maxLines: Int = 1,
 ) {
     Column {
         OutlinedTextField(

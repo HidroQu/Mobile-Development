@@ -252,13 +252,6 @@ fun MainJetpack(
                 ////edit profil
                 composable(Screen.EditProfile.route) {
                     EditProfileActivity(
-                        userData = dummyListUserData.first(), // Mengirim data pengguna
-                        onNameChanged = { newName ->
-                            // Logika untuk mengupdate nama jika perlu
-                        },
-                        onBioChanged = { newBio ->
-                            // Logika untuk mengupdate bio jika perlu
-                        },
                         navHostController = navController
                     )
                 }

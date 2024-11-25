@@ -79,6 +79,7 @@ fun TopBarAction(
     navHostController: NavHostController,
     onActionClick: () -> Unit,
     actionIcon: ImageVector,
+    isActionEnabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -100,7 +101,7 @@ fun TopBarAction(
             }
         },
         actions = {
-            IconButton(onClick = { onActionClick()}) {
+            IconButton(onClick = { onActionClick()}, enabled = isActionEnabled) {
                 Icon(
                     actionIcon,
                     contentDescription = "Action",
