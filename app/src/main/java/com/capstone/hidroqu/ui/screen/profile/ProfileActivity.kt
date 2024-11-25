@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -125,7 +126,7 @@ fun ProfileActivity(
                         verticalArrangement = Arrangement.spacedBy(24.dp),
                     ) {
                         AsyncImage(
-                            model = userData?.profile_image, // URL gambar dari userData
+                            model = userData?.photo, // URL gambar dari userData
                             contentDescription = "Profile Icon",
                             modifier = Modifier
                                 .size(120.dp)
@@ -187,7 +188,9 @@ fun ProfileInfo(
     ) {
         Text(
             text = name,
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.headlineLarge.copy(
+                fontSize = 28.sp
+            ),
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
