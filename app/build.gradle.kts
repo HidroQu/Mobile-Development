@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.volley)
+    implementation(libs.androidx.ui.test.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

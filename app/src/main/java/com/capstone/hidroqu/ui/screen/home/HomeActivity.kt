@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -32,7 +33,9 @@ import com.capstone.hidroqu.ui.component.CardArticle
 import com.capstone.hidroqu.ui.component.CardCamera
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.nonui.data.ArticleDetailResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
+import com.capstone.hidroqu.ui.viewmodel.ArticleViewModel
 import com.capstone.hidroqu.ui.viewmodel.HomeViewModel
 
 
@@ -41,16 +44,29 @@ fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modi
     val context = LocalContext.current
     val userPreferences = remember { UserPreferences(context) }
     val homeViewModel = HomeViewModel(userPreferences)
+    val articleViewModel = viewModel<ArticleViewModel>()
 
     val isLoading by homeViewModel.isLoading.collectAsState()
 
     val token by userPreferences.token.collectAsState(initial = null)
+
+    val articles by articleViewModel.articles.collectAsState(emptyList())
 
     // Redirect jika token tidak ditemukan
     LaunchedEffect(token) {
         if (token == null) {
             navHostController.navigate(Screen.Login.route) {
                 popUpTo(Screen.Home.route) { inclusive = true } // Bersihkan stack navigasi
+            }
+        }
+    }
+
+    LaunchedEffect(token) {
+        token?.let {
+            articleViewModel.fetchAllArticles(it) // Fetch the articles when the token is available
+        } ?: run {
+            navHostController.navigate(Screen.DetailArticle.route) {
+                popUpTo(Screen.Home.route) { inclusive = true }
             }
         }
     }
@@ -68,7 +84,7 @@ fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modi
             TopHome(viewModel = homeViewModel)
             CameraSection(navHostController)
             AlarmSection()
-            ArticleSection(navHostController)
+            ArticleSection(navHostController, articles = articles)
         }
     }
 }
@@ -201,7 +217,7 @@ fun AlarmSection(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifier) {
+fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifier, articles: List<ArticleDetailResponse>) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -236,7 +252,7 @@ fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifi
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp) // Jarak antar artikel
         ) {
-            dummyListArticles.forEach { article ->
+            articles.forEach { article ->
                 CardArticle(
                     article = article,
                     onClick = {

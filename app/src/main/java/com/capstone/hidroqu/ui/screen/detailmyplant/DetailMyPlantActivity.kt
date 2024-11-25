@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,6 +66,7 @@ import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
 import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.utils.HarvestNotificationHelper
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -222,8 +224,44 @@ fun DetailMyPlantContent(
         ?: ("00/00/0000" to "00/00/0000")
     val context = LocalContext.current
     val notificationHelper = remember { HarvestNotificationHelper(context) }
-    var isNotificationEnabled by remember { mutableStateOf(false) }
+    val userPreferences = remember { UserPreferences(context) }
+    val scope = rememberCoroutineScope()
+
+    // Menyimpan status Switch untuk setiap plantId
+    var isNotificationEnabledMap by remember { mutableStateOf(mutableMapOf<Int, Boolean>()) }
+
+    // Menggunakan Flow untuk mendapatkan status notifikasi tanaman ini
+    val isNotificationEnabled by plant?.id?.let { plantId ->
+        userPreferences.getPlantNotificationEnabled(plantId).collectAsState(initial = false)
+    } ?: remember { mutableStateOf(false) }
+
     var showPermissionDialog by remember { mutableStateOf(false) }
+
+    // Menginisialisasi status Switch sebagai false ketika pertama kali diload
+    LaunchedEffect(isNotificationEnabled) {
+        plant?.id?.let { plantId ->
+            if (isNotificationEnabled) {
+                if (!notificationHelper.canScheduleExactAlarms()) {
+                    userPreferences.savePlantNotificationEnabled(plantId, false)
+                    showPermissionDialog = true
+                } else {
+                    plant.plant?.name?.let { plantName ->
+                        val success = notificationHelper.scheduleHarvestReminders(
+                            plantName,
+                            calculateHarvestDate(plant.planting_date, daysToAdd)
+                        )
+                        if (!success) {
+                            userPreferences.savePlantNotificationEnabled(plantId, false)
+                        }
+                    }
+                }
+            } else {
+                notificationHelper.cancelHarvestReminders(
+                    calculateHarvestDate(plant.planting_date, daysToAdd)
+                )
+            }
+        }
+    }
 
     if (showPermissionDialog) {
         AlertDialog(
@@ -248,25 +286,6 @@ fun DetailMyPlantContent(
                 }
             }
         )
-    }
-
-    LaunchedEffect(isNotificationEnabled) {
-        if (isNotificationEnabled) {
-            if (!notificationHelper.canScheduleExactAlarms()) {
-                isNotificationEnabled = false
-                showPermissionDialog = true
-            } else {
-                plant?.plant?.name?.let { plantName ->
-                    val success = notificationHelper.scheduleHarvestReminders(plantName, harvestDate)
-                    if (!success) {
-                        isNotificationEnabled = false
-                        // Optionally show an error message to the user
-                    }
-                }
-            }
-        } else {
-            notificationHelper.cancelHarvestReminders(harvestDate)
-        }
     }
 
     Column(
@@ -464,10 +483,15 @@ fun DetailMyPlantContent(
                 Switch(
                     checked = isNotificationEnabled,
                     onCheckedChange = { newValue ->
-                        if (newValue && !notificationHelper.canScheduleExactAlarms()) {
-                            showPermissionDialog = true
-                        } else {
-                            isNotificationEnabled = newValue
+                        plant?.id?.let { plantId ->
+                            if (newValue && !notificationHelper.canScheduleExactAlarms()) {
+                                showPermissionDialog = true
+                            } else {
+                                // Launch in coroutine scope karena savePlantNotificationEnabled adalah suspend function
+                                scope.launch {
+                                    userPreferences.savePlantNotificationEnabled(plantId, newValue)
+                                }
+                            }
                         }
                     },
                     colors = SwitchDefaults.colors(
@@ -478,7 +502,50 @@ fun DetailMyPlantContent(
                     )
                 )
             }
+            }
         }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.onPrimary)
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = "Riwayat kesehatan",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            healthHistoryList.forEach { healthHistory ->
+                CardHealthHistory(
+                    listHealthHistory = healthHistory,
+                    onClick = {
+                        navHostController.navigate(
+                            Screen.HistoryMyPlant.createRoute(
+                                plantId = plant?.id ?: 0,
+                                healthId = healthHistory.id
+                            )
+                        )
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RiwayatKesehatanPreview() {
+    // Contoh data simulasi untuk riwayat kesehatan tanaman
+
+    val navHostController = rememberNavController()
+
+    HidroQuTheme {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -492,32 +559,6 @@ fun DetailMyPlantContent(
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                healthHistoryList.forEach { healthHistory ->
-                    CardHealthHistory(
-                        listHealthHistory = healthHistory,
-                        onClick = {
-                            navHostController.navigate(
-                                Screen.HistoryMyPlant.createRoute(
-                                    plantId = plant?.id ?: 0,
-                                    healthId = healthHistory.id
-                                )
-                            )
-                        }
-                    )
-                }
-            }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun DetailMyPlantActivityPreview() {
-    HidroQuTheme {
-        val navHostController = rememberNavController()
-//        DetailMyPlantActivity(2, navHostController)
     }
 }

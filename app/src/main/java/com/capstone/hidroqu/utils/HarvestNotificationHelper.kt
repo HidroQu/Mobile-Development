@@ -25,7 +25,7 @@ class HarvestNotificationHelper(private val context: Context) {
     companion object {
         const val CHANNEL_ID = "harvest_reminder"
         const val CHANNEL_NAME = "Harvest Reminder"
-        private val REMINDER_DAYS = listOf(7, 5, 3, 1)
+        private val REMINDER_DAYS = listOf(7, 6, 5, 4, 3, 2, 1)
     }
 
     init {
@@ -37,7 +37,7 @@ class HarvestNotificationHelper(private val context: Context) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_HIGH // Harus menggunakan IMPORTANCE_HIGH agar notifikasi dapat muncul dengan benar
             ).apply {
                 description = "Channel for harvest reminder notifications"
             }

@@ -13,14 +13,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
-import com.capstone.hidroqu.ui.screen.home.ListArticleHome
+import com.capstone.hidroqu.nonui.data.ArticleDetailResponse
 
 @Composable
-fun CardArticle(article: ListArticleHome, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun CardArticle(
+    article: ArticleDetailResponse,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -33,25 +42,41 @@ fun CardArticle(article: ListArticleHome, onClick: () -> Unit, modifier: Modifie
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.onPrimary),
         shape = MaterialTheme.shapes.medium
     ) {
+        val imageLoader = ImageLoader.Builder(LocalContext.current)
+            .components {
+                add(SvgDecoder.Factory())
+            }
+            .build()
+
+        val painter = if (!article.image.isNullOrEmpty()) {
+            rememberAsyncImagePainter(
+                model = article.image,
+                imageLoader = imageLoader
+            )
+        } else {
+            painterResource(id = R.drawable.ic_launcher_background)
+        }
+
         Image(
-            painter = painterResource(R.drawable.ic_launcher_background),
+            painter = painter,
             contentDescription = "Artikel",
             modifier = Modifier
                 .height(200.dp)
                 .fillMaxWidth(),
             contentScale = ContentScale.Crop
         )
-        Column (
+
+        Column(
             modifier = modifier
                 .padding(16.dp)
-        ){
+        ) {
             Text(
                 text = article.title,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = article.summary,
+                text = article.content,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.outline
             )

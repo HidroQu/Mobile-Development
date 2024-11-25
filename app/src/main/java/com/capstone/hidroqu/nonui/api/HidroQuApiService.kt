@@ -1,5 +1,7 @@
 package com.capstone.hidroqu.nonui.api
 
+import com.capstone.hidroqu.nonui.data.ArticleDetailWrapper
+import com.capstone.hidroqu.nonui.data.ArticleResponseWrapper
 import com.capstone.hidroqu.nonui.data.AuthResponse
 import com.capstone.hidroqu.nonui.data.BasicResponse
 import com.capstone.hidroqu.nonui.data.CommunityDetailWrapper
@@ -118,5 +120,18 @@ interface HidroQuApiService {
         @Part("content") content: RequestBody,
         @Part image: MultipartBody.Part? = null
     ): Call<TestResponse>
+
+    // Mendapatkan daftar article
+    @GET("api/articles")
+    fun getArticles(
+        @Header("Authorization") token: String,
+        @Query("page") page: Int // Adding a page query parameter
+    ): Call<ArticleResponseWrapper>
+    // Mendapatkan daftar komunitas
+    @GET("api/articles/{article}")
+    fun getArticleDetail(
+        @Header("Authorization") token: String,
+        @Path("article") articleId: Int
+    ): Call<ArticleDetailWrapper>
 
 }

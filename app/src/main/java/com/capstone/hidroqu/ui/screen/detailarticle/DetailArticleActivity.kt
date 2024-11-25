@@ -1,5 +1,7 @@
 package com.capstone.hidroqu.ui.screen.detailarticle
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,42 +19,82 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
+import com.capstone.hidroqu.nonui.data.ArticleDetailResponse
+import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.screen.home.ListArticleHome
 import com.capstone.hidroqu.ui.screen.home.getArticleById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.capstone.hidroqu.ui.viewmodel.ArticleViewModel
+import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DetailArticleScreen(
     navHostController: NavHostController,
-    articleId: Int
+    articleId: Int,
+    viewModel: ArticleViewModel = viewModel(),
+    context: Context = LocalContext.current,
+    modifier: Modifier = Modifier
 ) {
 
-    val article = getArticleById(articleId)
+    val userPreferences = UserPreferences(context)
+    val token by userPreferences.token.collectAsState(initial = null)
+    val articleDetail by viewModel.articleDetail.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState(false)
+    val errorMessage by viewModel.errorMessage.collectAsState("")
+    val currentBackStackEntry by navHostController.currentBackStackEntryAsState()
+    val shouldRefresh = currentBackStackEntry?.savedStateHandle?.get<Boolean>("refresh_comments") ?: false
 
-    if (article != null) {
+    LaunchedEffect(articleId, shouldRefresh) {
+        if (shouldRefresh) {
+            currentBackStackEntry?.savedStateHandle?.remove<Boolean>("refresh_comments")
+            token?.let {
+                viewModel.fetchArticleDetail(it, articleId)
+            }
+        }
+    }
+
+    LaunchedEffect(articleId) {
+        token?.let {
+            Log.d("DetailPostCommunity", "Token ditemukan, memulai fetch detail komunitas")
+            viewModel.fetchArticleDetail(it, articleId)
+        } ?: run {
+            Log.e("DetailPostCommunity", "Token tidak ditemukan. Tidak dapat memuat detail komunitas.")
+        }
+    }
+
+    if (articleDetail != null) {
         Scaffold(
             topBar = {
                 SimpleLightTopAppBar(
-                    title = article.title ?: "Detail Artikel", // Menampilkan judul artikel
+                    title = articleDetail?.title?: "Judul", // Menampilkan judul artikel
                     navHostController = navHostController
                 )
             },
             content = { paddingValues ->
 
                     DetailArticleContent(
-                        article = article,
+                        article = articleDetail,
                         modifier = Modifier.padding(paddingValues) // Gunakan paddingValues di sini
                     )
 
@@ -64,16 +106,10 @@ fun DetailArticleScreen(
 }
 
 @Composable
-fun DetailArticleContent(article: ListArticleHome, modifier: Modifier = Modifier) {
+fun DetailArticleContent(
+    article: ArticleDetailResponse?,
+    modifier: Modifier = Modifier) {
     Column{
-        Image(
-            painter = painterResource(R.drawable.ic_launcher_background),
-            contentDescription = "Artikel",
-            modifier = modifier
-                .height(200.dp)
-                .fillMaxWidth(),
-            contentScale = ContentScale.Crop
-        )
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
@@ -84,7 +120,7 @@ fun DetailArticleContent(article: ListArticleHome, modifier: Modifier = Modifier
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text (
-                    text = article.title,
+                    text = article?.title?: "Judul",
                     style = MaterialTheme.typography.titleLarge
                 )
                 Row (
@@ -93,21 +129,20 @@ fun DetailArticleContent(article: ListArticleHome, modifier: Modifier = Modifier
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     Text(
-                        text = "07 November 2024",
+                        text = article?.updatedAt?: "00/00/0000",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
                     Text(
-                        text = "Penulis: Syakillah Nachwa",
+                        text = article?.user?.name?: "00/00/0000",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
                 }
             }
 
-            // Article content
             Text(
-                text = article.summary,
+                text = article?.content?: "Lorem ipsum",
                 style = MaterialTheme.typography.bodyLarge
             )
         }
