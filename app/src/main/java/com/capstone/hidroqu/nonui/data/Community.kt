@@ -104,11 +104,11 @@ data class Comment(
     val comment_id: Int?,
     val user_id: Int,
     val content: String,
-    val images: String,
+    val image: String?, // Menggunakan `image` bukan `images`
     val created_at: String,
     val updated_at: String?,
     val user: UserData,
-    val replies: List<Reply> // Changed from Replies to List<Reply>
+    val replies: List<Reply>
 ) : Parcelable
 
 @Parcelize

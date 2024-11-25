@@ -5,9 +5,11 @@ import com.capstone.hidroqu.utils.dummyListDetailPostCommunity
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -21,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,27 +39,25 @@ fun CardPostComment(
     listComment: Comment,
     modifier: Modifier = Modifier,
 ) {
-    // State to track whether the image is expanded or not
     val isImageExpanded = remember { mutableStateOf(false) }
 
-    // Define the modifier for image size
     val imageModifier = if (isImageExpanded.value) {
-        Modifier.wrapContentHeight() // Full height when expanded
+        Modifier.wrapContentHeight()
     } else {
-        Modifier.height(190.dp) // Limited height when not expanded
+        Modifier.height(190.dp)
     }
 
     Column(
         modifier = modifier
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
-    ){
+    ) {
         Row(
             modifier = modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             val imageLoader = ImageLoader.Builder(LocalContext.current)
                 .components {
                     add(SvgDecoder.Factory())
@@ -65,17 +66,17 @@ fun CardPostComment(
 
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = listComment.images,
+                    model = listComment.user.profile_image,
                     imageLoader = imageLoader
                 ),
-                contentDescription = "profil",
+                contentDescription = "Profil",
                 modifier = Modifier
-                    .size(50.dp) // Ukuran gambar
-                    .clip(CircleShape) // Membuat gambar menjadi bulat
+                    .size(50.dp)
+                    .clip(CircleShape)
                     .border(
-                        width = 2.dp, // Ketebalan border
-                        color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
-                        shape = CircleShape // Bentuk border bulat
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape
                     )
             )
             Column {
@@ -91,12 +92,34 @@ fun CardPostComment(
                 )
             }
         }
+
         Text(
             text = listComment.content,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
+        if (!listComment.image.isNullOrEmpty()) { // Menggunakan `listComment.image`
+            val imageLoader = ImageLoader.Builder(LocalContext.current)
+                .components {
+                    add(SvgDecoder.Factory())
+                }
+                .build()
+
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = listComment.image, // Pastikan `image` digunakan
+                    imageLoader = imageLoader
+                ),
+                contentDescription = "Image Post",
+                modifier = imageModifier
+                    .fillMaxWidth()
+                    .clickable {
+                        isImageExpanded.value = !isImageExpanded.value
+                    },
+                contentScale = ContentScale.Crop
+            )
+        }
     }
 }
 

@@ -1,7 +1,10 @@
 package com.capstone.hidroqu.ui.screen.detailcommunity
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,6 +41,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,11 +54,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
+import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.nonui.data.Comment
@@ -84,9 +91,21 @@ fun DetailPostCommunityActivity(
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
 
+    val currentBackStackEntry by navHostController.currentBackStackEntryAsState()
+    val shouldRefresh = currentBackStackEntry?.savedStateHandle?.get<Boolean>("refresh_comments") ?: false
+
     // State for comment submission status
     val isSubmittingComment = remember { mutableStateOf(false) }
     val commentSubmissionError = remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(idPost, shouldRefresh) {
+        if (shouldRefresh) {
+            currentBackStackEntry?.savedStateHandle?.remove<Boolean>("refresh_comments")
+            token?.let {
+                viewModel.fetchCommunityDetail(it, idPost)
+            }
+        }
+    }
 
     LaunchedEffect(idPost) {
         token?.let {
@@ -160,6 +179,17 @@ fun DetailPostCommunityContent(
     // State for image expand/collapse
     val isImageExpanded = remember { mutableStateOf(false) }
     val commentText = remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+    var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+
+    val pickImages = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
+        if (uris.size > 1) {
+            errorMessage = "Hanya boleh memilih satu foto."
+        } else {
+            imageUris = uris
+            errorMessage = ""
+        }
+    }
 
     val imageModifier = if (isImageExpanded.value) {
         Modifier.wrapContentHeight()
@@ -288,17 +318,36 @@ fun DetailPostCommunityContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.onPrimary)
-                    .padding(end = 20.dp, top = 12.dp, bottom = 12.dp),
+                    .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 val commentText = remember { mutableStateOf("") }
 
+                Icon(
+                    painter = painterResource(R.drawable.ic_gallery),
+                    contentDescription = "Galeri",
+                    modifier = Modifier.clickable {
+                        // Navigasikan langsung ke halaman FormAddComment
+                        navHostController.navigate(Screen.AddPostComment.createRoute(post?.id ?: 0)) {
+                            popUpTo(Screen.Community.route) // Atur pop-up behavior sesuai kebutuhan
+                        }
+                    },
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
                 TextField(
                     value = commentText.value,
                     onValueChange = { commentText.value = it },
                     label = { Text("Tambahkan komentar") },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            navHostController.navigate(Screen.AddPostComment.createRoute(post?.id ?: 0)) {
+                                popUpTo(Screen.Community.route) // Opsional: Atur popUpTo jika perlu
+                            }
+                        },
+
                     maxLines = 1,
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -320,7 +369,7 @@ fun DetailPostCommunityContent(
                                 token = token,
                                 communityId = post.id,
                                 content = commentText.value,
-                                imageUri = null,
+                                imageUri = null, // Tetap null karena gambar tidak dipilih
                                 context = context,
                                 onSuccess = { response ->
                                     isSubmittingComment.value = false

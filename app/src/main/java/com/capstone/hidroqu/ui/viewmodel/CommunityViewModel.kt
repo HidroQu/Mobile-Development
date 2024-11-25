@@ -42,7 +42,10 @@ class CommunityViewModel : ViewModel() {
 
     fun fetchCommunityDetail(token: String, communityId: Int) {
         _isLoading.value = true
-        Log.d("CommunityViewModel", "Fetching detail komunitas dengan ID=$communityId menggunakan token")
+        Log.d(
+            "CommunityViewModel",
+            "Fetching detail komunitas dengan ID=$communityId menggunakan token"
+        )
         apiService.getCommunityDetail("Bearer $token", communityId)
             .enqueue(object : Callback<CommunityDetailWrapper> {
                 override fun onResponse(
@@ -55,14 +58,20 @@ class CommunityViewModel : ViewModel() {
                         val detailData = response.body()?.data
                         if (detailData != null) {
                             _communityDetail.value = detailData
-                            Log.d("CommunityViewModel", "Detail komunitas berhasil dimuat: $detailData")
+                            Log.d(
+                                "CommunityViewModel",
+                                "Detail komunitas berhasil dimuat: $detailData"
+                            )
                         } else {
                             _errorMessage.value = "Data detail komunitas null"
                             Log.e("CommunityViewModel", "Detail komunitas null")
                         }
                     } else {
                         _errorMessage.value = "Gagal memuat detail komunitas: ${response.message()}"
-                        Log.e("CommunityViewModel", "Response error: ${response.code()} - ${response.message()}")
+                        Log.e(
+                            "CommunityViewModel",
+                            "Response error: ${response.code()} - ${response.message()}"
+                        )
                     }
                 }
 
@@ -95,7 +104,10 @@ class CommunityViewModel : ViewModel() {
                     }
                 } else {
                     _errorMessage.value = "Failed to load your posts: ${response.message()}"
-                    Log.e("CommunityViewModel", "Response error: ${response.code()} - ${response.message()}")
+                    Log.e(
+                        "CommunityViewModel",
+                        "Response error: ${response.code()} - ${response.message()}"
+                    )
                 }
             }
 
@@ -138,11 +150,17 @@ class CommunityViewModel : ViewModel() {
                 contentRequestBody,
                 imagePart
             ).enqueue(object : Callback<BasicResponse> {
-                override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
+                override fun onResponse(
+                    call: Call<BasicResponse>,
+                    response: Response<BasicResponse>
+                ) {
                     Log.d("CommunityViewModel", "Response diterima untuk storePost")
                     if (response.isSuccessful) {
                         response.body()?.let {
-                            Log.d("CommunityViewModel", "Post berhasil disimpan: ${response.body()}")
+                            Log.d(
+                                "CommunityViewModel",
+                                "Post berhasil disimpan: ${response.body()}"
+                            )
                             onSuccess(it)
                         }
                     } else {
@@ -172,19 +190,29 @@ class CommunityViewModel : ViewModel() {
                     }
                     if (response.isSuccessful) {
                         response.body()?.data?.let { wrapper ->
-                            Log.d("CommunityViewModel", "Fetched page $currentPage: ${wrapper.data.size} posts")
+                            Log.d(
+                                "CommunityViewModel",
+                                "Fetched page $currentPage: ${wrapper.data.size} posts"
+                            )
                             allPosts.addAll(wrapper.data)
                             currentPage = wrapper.current_page + 1
                         }
                     } else {
-                        Log.e("CommunityViewModel", "Failed to load page $currentPage: ${response.message()}")
-                        _errorMessage.value = "Failed to load page $currentPage: ${response.message()}"
+                        Log.e(
+                            "CommunityViewModel",
+                            "Failed to load page $currentPage: ${response.message()}"
+                        )
+                        _errorMessage.value =
+                            "Failed to load page $currentPage: ${response.message()}"
                         break
                     }
                 } while (response.body()?.data?.next_page_url != null)
 
                 _communityPosts.value = allPosts
-                Log.d("CommunityViewModel", "Fetched semua postingan komunitas berhasil: ${allPosts.size} posts")
+                Log.d(
+                    "CommunityViewModel",
+                    "Fetched semua postingan komunitas berhasil: ${allPosts.size} posts"
+                )
             } catch (e: Exception) {
                 Log.e("CommunityViewModel", "Error fetching posts", e)
                 _errorMessage.value = "Error fetching posts: ${e.message}"
@@ -204,16 +232,33 @@ class CommunityViewModel : ViewModel() {
         onError: (String) -> Unit
     ) {
         Log.d("CommunityViewModel", "Storing comment untuk communityId: $communityId")
+        Log.d("CommunityViewModel", "Content: $content")
+        Log.d("CommunityViewModel", "ImageUri: $imageUri")
+
         val contentRequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
 
+        // Prepare image part
         val imagePart: MultipartBody.Part? = imageUri?.let {
-            Log.d("CommunityViewModel", "Image Uri untuk komentar terdeteksi: $imageUri")
-            val inputStream = context.contentResolver.openInputStream(it)
-            val byteArray = inputStream?.readBytes()
-            val requestFile = byteArray?.toRequestBody("image/jpeg".toMediaTypeOrNull())
-            requestFile?.let { it1 ->
-                MultipartBody.Part.createFormData("image", "filename.jpg", it1)
+            try {
+                Log.d("CommunityViewModel", "Mengakses gambar dari URI: $imageUri")
+                val inputStream = context.contentResolver.openInputStream(it)
+                val byteArray = inputStream?.readBytes()
+                inputStream?.close()
+                Log.d("CommunityViewModel", "Ukuran gambar (byte): ${byteArray?.size}")
+                val requestFile = byteArray?.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                val multipart = requestFile?.let { it1 ->
+                    MultipartBody.Part.createFormData("image", "filename.jpg", it1)
+                }
+                Log.d("CommunityViewModel", "Multipart berhasil dibuat: $multipart")
+                multipart
+            } catch (e: Exception) {
+                Log.e("CommunityViewModel", "Error saat memproses gambar: ${e.message}", e)
+                null
             }
+        }
+
+        if (imagePart == null && imageUri != null) {
+            Log.e("CommunityViewModel", "Gambar tidak dapat diproses menjadi MultipartBody.Part")
         }
 
         apiService.storeCommunityComment(
@@ -225,14 +270,22 @@ class CommunityViewModel : ViewModel() {
         ).enqueue(object : Callback<TestResponse> {
             override fun onResponse(call: Call<TestResponse>, response: Response<TestResponse>) {
                 Log.d("CommunityViewModel", "Response diterima untuk storeComment")
+                Log.d(
+                    "CommunityViewModel",
+                    "HTTP Code: ${response.code()}, Message: ${response.message()}"
+                )
                 if (response.isSuccessful) {
                     response.body()?.let {
                         Log.d("CommunityViewModel", "Comment berhasil disimpan: ${it}")
-                        Log.d("CommunityViewModel", "Status: ${it.status}, Message: ${it.message}, Data: ${it.data}")
+                        Log.d(
+                            "CommunityViewModel",
+                            "Status: ${it.status}, Message: ${it.message}, Data: ${it.data}"
+                        )
                         onSuccess(it)
                     }
                 } else {
-                    Log.e("CommunityViewModel", "Error menyimpan komentar: ${response.message()}")
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("CommunityViewModel", "Error menyimpan komentar: $errorBody")
                     onError("Error: ${response.message()}")
                 }
             }
@@ -244,3 +297,4 @@ class CommunityViewModel : ViewModel() {
         })
     }
 }
+

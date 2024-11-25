@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,6 +64,7 @@ import com.capstone.hidroqu.nonui.data.DiagnosticHistory
 import com.capstone.hidroqu.nonui.data.MyPlantDetailResponse
 import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
+import com.capstone.hidroqu.utils.HarvestNotificationHelper
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -137,6 +140,7 @@ fun formatAndCalculateHarvestDate(plantingDate: String, daysToAdd: Int): Pair<St
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DetailMyPlantActivity(
     plantId: Int,
@@ -205,6 +209,7 @@ fun DetailMyPlantActivity(
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DetailMyPlantContent(
     plant: MyPlantDetailResponse?,
@@ -212,11 +217,57 @@ fun DetailMyPlantContent(
     navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    var isNotificationEnabled by remember { mutableStateOf(false) }
-
-    val daysToAdd = 60
+    val daysToAdd = 2
     val (formattedDate, harvestDate) = plant?.planting_date?.let { formatAndCalculateHarvestDate(it, daysToAdd) }
         ?: ("00/00/0000" to "00/00/0000")
+    val context = LocalContext.current
+    val notificationHelper = remember { HarvestNotificationHelper(context) }
+    var isNotificationEnabled by remember { mutableStateOf(false) }
+    var showPermissionDialog by remember { mutableStateOf(false) }
+
+    if (showPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDialog = false },
+            title = { Text("Izin Diperlukan") },
+            text = { Text("Untuk mengaktifkan notifikasi panen, aplikasi memerlukan izin untuk mengatur alarm. Buka pengaturan untuk memberikan izin.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showPermissionDialog = false
+                        context.startActivity(notificationHelper.getAlarmPermissionSettingsIntent())
+                    }
+                ) {
+                    Text("Buka Pengaturan")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showPermissionDialog = false }
+                ) {
+                    Text("Batal")
+                }
+            }
+        )
+    }
+
+    LaunchedEffect(isNotificationEnabled) {
+        if (isNotificationEnabled) {
+            if (!notificationHelper.canScheduleExactAlarms()) {
+                isNotificationEnabled = false
+                showPermissionDialog = true
+            } else {
+                plant?.plant?.name?.let { plantName ->
+                    val success = notificationHelper.scheduleHarvestReminders(plantName, harvestDate)
+                    if (!success) {
+                        isNotificationEnabled = false
+                        // Optionally show an error message to the user
+                    }
+                }
+            }
+        } else {
+            notificationHelper.cancelHarvestReminders(harvestDate)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -412,7 +463,13 @@ fun DetailMyPlantContent(
                 )
                 Switch(
                     checked = isNotificationEnabled,
-                    onCheckedChange = { isNotificationEnabled = it },
+                    onCheckedChange = { newValue ->
+                        if (newValue && !notificationHelper.canScheduleExactAlarms()) {
+                            showPermissionDialog = true
+                        } else {
+                            isNotificationEnabled = newValue
+                        }
+                    },
                     colors = SwitchDefaults.colors(
                         checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
                         checkedThumbColor = MaterialTheme.colorScheme.primary,

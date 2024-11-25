@@ -34,6 +34,7 @@ import com.capstone.hidroqu.ui.screen.detailcommunity.DetailPostCommunityActivit
 import com.capstone.hidroqu.ui.screen.detailmyplant.DetailMyPlantActivity
 import com.capstone.hidroqu.ui.screen.editprofile.EditProfileActivity
 import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
+import com.capstone.hidroqu.ui.screen.formaddcomment.FormAddComment
 import com.capstone.hidroqu.ui.screen.formaddplant.FormAddPlantActivity
 import com.capstone.hidroqu.ui.screen.formcommunity.FormAddCommunityActivity
 import com.capstone.hidroqu.ui.screen.historymyplant.HistoryMyPlantActivity
@@ -228,6 +229,18 @@ fun MainJetpack(
                         idPost = idPost
                     )
                 }
+
+                composable(
+                    route = Screen.AddPostComment.route,
+                    arguments = listOf(navArgument("postId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val postId = backStackEntry.arguments?.getInt("postId") ?: 0
+                    FormAddComment(
+                        navHostController = navController,
+                        postId = postId
+                    )
+                }
+
 
                 //profil
                 composable(Screen.Profile.route){
