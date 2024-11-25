@@ -110,6 +110,29 @@ fun DetailArticleContent(
     article: ArticleDetailResponse?,
     modifier: Modifier = Modifier) {
     Column{
+        val imageLoader = ImageLoader.Builder(LocalContext.current)
+            .components {
+                add(SvgDecoder.Factory())
+            }
+            .build()
+
+        val painter = if (!article?.image.isNullOrEmpty()) {
+            rememberAsyncImagePainter(
+                model = article?.image,
+                imageLoader = imageLoader
+            )
+        } else {
+            painterResource(id = R.drawable.ic_launcher_background)
+        }
+        Image(
+            painter = painter,
+            contentDescription = "Artikel",
+            modifier = modifier
+                .height(200.dp)
+                .fillMaxWidth(),
+            contentScale = ContentScale.Crop
+        )
+
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())

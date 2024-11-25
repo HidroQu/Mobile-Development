@@ -63,7 +63,6 @@ fun ArticleActivity(
         token?.let {
             viewModel.fetchAllArticles(it)
         } ?: run {
-            // Tangani kasus ketika token null, misalnya arahkan ke halaman login
             navHostController.navigate(Screen.Login.route) {
                 popUpTo(Screen.Community.route) { inclusive = true }
             }
@@ -73,13 +72,11 @@ fun ArticleActivity(
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
-                if (!isSearchVisible) { // TopBar hanya muncul saat search tidak aktif
+                if (!isSearchVisible) {
                     TopBarAction(
                         title = "Artikel",
                         navHostController = navHostController,
-                        onActionClick = {
-                            isSearchVisible = true
-                        },
+                        onActionClick = { isSearchVisible = true },
                         actionIcon = Icons.Default.Search
                     )
                 }
@@ -101,22 +98,20 @@ fun ArticleActivity(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    NoPostList() // Assuming this is your error state or message
+                    NoPostList()
                 }
             } else {
-                // Display articles when not loading and no errors
                 if (!isSearchVisible) {
                     Article(
                         articles = articles,
-                        navHostController,
-                        searchQuery,
+                        navHostController = navHostController,
+                        searchQuery = searchQuery,
                         modifier = Modifier.padding(paddingValues)
                     )
                 }
             }
         }
 
-        // SearchBarScreen akan menutupi seluruh layar saat search aktif
         if (isSearchVisible) {
             SearchBarScreen(
                 searchQuery = searchQuery,
@@ -180,10 +175,13 @@ fun SearchBarScreen(
     }
 }
 
-
 @Composable
-fun Article(articles: List<ArticleDetailResponse>, navHostController: NavController, searchQuery: String, modifier: Modifier = Modifier) {
-    // Assuming articles is a list of ArticleDetailResponse fetched from the API
+fun Article(
+    articles: List<ArticleDetailResponse>,
+    navHostController: NavController,
+    searchQuery: String,
+    modifier: Modifier = Modifier
+) {
     val filteredArticles = remember(searchQuery) {
         articles.filter {
             it.title.contains(searchQuery, ignoreCase = true) ||
@@ -211,7 +209,6 @@ fun Article(articles: List<ArticleDetailResponse>, navHostController: NavControl
         }
     }
 }
-
 
 @Composable
 fun NoPostList(

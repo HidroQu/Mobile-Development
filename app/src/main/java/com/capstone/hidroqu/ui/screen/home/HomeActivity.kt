@@ -248,11 +248,10 @@ fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifi
                 }
             )
         }
-
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp) // Jarak antar artikel
         ) {
-            articles.forEach { article ->
+            articles.take(5).forEach { article ->
                 CardArticle(
                     article = article,
                     onClick = {
@@ -269,7 +268,6 @@ fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifi
         }
     }
 }
-
 
 @Preview(device = Devices.DEFAULT, showBackground = true)
 @Composable

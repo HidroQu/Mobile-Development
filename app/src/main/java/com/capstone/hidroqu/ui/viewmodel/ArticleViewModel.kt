@@ -68,8 +68,6 @@ class ArticleViewModel : ViewModel() {
         }
     }
 
-
-
     fun fetchArticleDetail(token: String, articleId: Int) {
         _isLoading.value = true
         Log.d(
