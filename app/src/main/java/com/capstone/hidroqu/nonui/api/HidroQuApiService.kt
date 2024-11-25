@@ -52,16 +52,17 @@ interface HidroQuApiService {
         @Header("Authorization") token: String
     ): Call<ProfileResponse>
 
-    @FormUrlEncoded
-    @PUT("api/profile/update")
+    @Multipart
+    @POST("api/profile/update")
     fun updateProfile(
         @Header("Authorization") token: String,
-        @Field("name") name: String,
-        @Field("email") email: String,
-        @Field("bio") bio: String,
-        @Field("photo") photo: String?,
-        @Field("password") password: String?,
-        @Field("password_confirmation") passwordConfirmation: String?
+        @Part("name") name: RequestBody,
+        @Part("email") email: RequestBody,
+        @Part("bio") bio: RequestBody,
+        @Part("password") password: RequestBody?,
+        @Part("password_confirmation") passwordConfirmation: RequestBody?,
+        @Part photo: MultipartBody.Part?,
+        @Part("_method") method: RequestBody
     ): Call<BasicResponse>
 
 

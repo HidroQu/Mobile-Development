@@ -2,8 +2,8 @@ package com.capstone.hidroqu.ui.viewmodel
 
 import android.content.Context
 import android.net.Uri
-import android.util.Base64
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capstone.hidroqu.nonui.api.HidroQuApiConfig
@@ -18,10 +18,13 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.net.URL
 
 class ProfileViewModel: ViewModel() {
     private val apiService: HidroQuApiService = HidroQuApiConfig.retrofit.create(HidroQuApiService::class.java)
@@ -57,23 +60,17 @@ class ProfileViewModel: ViewModel() {
             }
         })
     }
-    fun uriToBase64(uri: Uri, context: Context): String? {
+    fun isImageValid(uri: Uri, context: Context): Boolean {
         return try {
             val inputStream = context.contentResolver.openInputStream(uri)
             val byteArray = inputStream?.readBytes()
             inputStream?.close()
 
-            byteArray?.let {
-                if (it.size <= 2 * 1024 * 1024) { // Pastikan ukurannya <= 2MB
-                    Base64.encodeToString(it, Base64.NO_WRAP) // Konversi ke base64
-                } else {
-                    Log.e("ProfileViewModel", "File size exceeds 2MB.")
-                    null
-                }
-            }
+            // Pastikan file tidak null dan ukurannya <= 2MB
+            byteArray != null && byteArray.size <= 2 * 1024 * 1024
         } catch (e: Exception) {
             e.printStackTrace()
-            null
+            false
         }
     }
 
@@ -85,45 +82,64 @@ class ProfileViewModel: ViewModel() {
         context: Context,
         photoUri: Uri?,
         password: String?,
+        confirmPassword: String?,
         onComplete: (Boolean, String) -> Unit
     ) {
         _isLoading.value = true
-//        // Konversi data menjadi RequestBody
-//        val nameRequest = name.toRequestBody("text/plain".toMediaTypeOrNull())
-//        val emailRequest = email.toRequestBody("text/plain".toMediaTypeOrNull())
-//        val bioRequest = bio.toRequestBody("text/plain".toMediaTypeOrNull())
-//
-//        val passwordRequest = password?.toRequestBody("text/plain".toMediaTypeOrNull())
-//        val passwordConfirmationRequest = password?.toRequestBody("text/plain".toMediaTypeOrNull())
-//
-//        val photoPart: MultipartBody.Part? = photoUri?.let { uri ->
-//            if (isImageValid(uri, context)) {
-//                val inputStream = context.contentResolver.openInputStream(uri)
-//                val byteArray = inputStream?.readBytes()
-//                inputStream?.close()
-//
-//                byteArray?.let { bytes ->
-//                    val requestFile = bytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
-//                    MultipartBody.Part.createFormData("photo", "profile.jpg", requestFile)
-//                }
-//            } else {
-//                Log.e("ProfileViewModel", "Invalid image format or size.")
-//                null
-//            }
-//        }
+        // Konversi data menjadi RequestBody
+        val nameRequest = name.toRequestBody("text/plain".toMediaTypeOrNull())
+        val emailRequest = email.toRequestBody("text/plain".toMediaTypeOrNull())
+        val bioRequest = bio.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val passwordRequest = password?.toRequestBody("text/plain".toMediaTypeOrNull())
+        val passwordConfirmationRequest = confirmPassword?.toRequestBody("text/plain".toMediaTypeOrNull())
+        val method = RequestBody.create("text/plain".toMediaTypeOrNull(), "PUT")
+
+        val photoPart: MultipartBody.Part? = photoUri?.let { uri ->
+            try {
+                val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg" // Deteksi MIME type
+                val byteArray = if (uri.scheme == "http" || uri.scheme == "https") {
+                    // Unduh file jika URI adalah URL
+                    downloadFile(context, uri)?.readBytes()
+                } else {
+                    // Baca file lokal sebagai byte array
+                    context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                }
+
+                // Validasi ukuran file (<= 2MB)
+                if (byteArray != null && byteArray.size > 2 * 1024 * 1024) {
+                    Toast.makeText(context, "Ukuran file terlalu besar", Toast.LENGTH_SHORT).show()
+                    return@let null
+                }
+
+                // Buat RequestBody dan MultipartBody.Part
+                val requestFile = byteArray?.toRequestBody(mimeType.toMediaTypeOrNull())
+                requestFile?.let {
+                    MultipartBody.Part.createFormData(
+                        "photo",
+                        "filename.${mimeType.split("/").last()}",
+                        it
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(context, "Gagal membaca file", Toast.LENGTH_SHORT).show()
+                null
+            }
+        }
 
         Log.d("ProfileViewModel", "Request: name=$name, email=$email, bio=$bio, password=$password, photoUri=$photoUri")
-//        Log.d("ProfileUpdate", "NameRequest: $nameRequest, EmailRequest: $emailRequest, BioRequest: $bioRequest")
-        val photoBase64: String? = photoUri?.let { uriToBase64(it, context) }
+        Log.d("ProfileUpdate", "NameRequest: $nameRequest, EmailRequest: $emailRequest, BioRequest: $bioRequest, PasswordRequest: $passwordRequest, PhotoRequest: $photoPart")
 
         apiService.updateProfile(
             token = "Bearer $token",
-            name = name,
-            email = email,
-            bio = bio,
-            photo = photoBase64,
-            password = password,
-            passwordConfirmation = password
+            name = nameRequest,
+            email = emailRequest,
+            bio = bioRequest,
+            password = passwordRequest,
+            passwordConfirmation = passwordConfirmationRequest,
+            photo = photoPart,
+            method = method
         ).enqueue(object : Callback<BasicResponse> {
             override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
                 _isLoading.value = false
@@ -143,4 +159,23 @@ class ProfileViewModel: ViewModel() {
             }
         })
     }
+
+    // Fungsi untuk mengunduh file jika URI adalah URL
+    private fun downloadFile(context: Context, uri: Uri): File? {
+        return try {
+            val url = URL(uri.toString())
+            val connection = url.openConnection()
+            connection.connect()
+            val inputStream = connection.getInputStream()
+            val tempFile = File(context.cacheDir, "temp_image.jpg")
+            tempFile.outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+            tempFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
 }
