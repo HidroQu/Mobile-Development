@@ -226,7 +226,7 @@ fun DetailPostCommunityContent(
                         if (post != null) {
                             Image(
                                 painter = rememberAsyncImagePainter(
-                                    model = post.user.profile_image,
+                                    model = post.user.photo,
                                     imageLoader = imageLoader
                                 ),
                                 contentDescription = "User Profile Image",
