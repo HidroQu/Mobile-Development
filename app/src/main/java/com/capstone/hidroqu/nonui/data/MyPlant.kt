@@ -130,3 +130,63 @@ data class DiagnosticResponse(
     }
 }
 
+// NutrientPredictionResponse and related classes
+@Parcelize
+data class NutrientPredictionResponse(
+    val data: NutrientData,
+    val status: String
+) : Parcelable
+
+@Parcelize
+data class NutrientData(
+    val confidence: Double,
+    val diagnostic: DiagnosticInfo,
+    val predicted_label: String
+) : Parcelable
+
+@Parcelize
+data class DiagnosticInfo(
+    val cause: String,
+    val disease_image: List<String>,
+    val disease_label: String,
+    val id: Int,
+    val indication: String,
+    val name_disease: String,
+    val solution: String
+) : Parcelable
+    // {
+//    fun getParsedImageDisease(): List<String> {
+//        return try {
+//            Gson().fromJson(disease_image, Array<String>::class.java).toList()
+//        } catch (e: Exception) {
+//            emptyList()
+//        }
+//    }
+//}
+
+// PlantPredictionResponse and related classes
+@Parcelize
+data class PlantPredictionResponse(
+    val data: PlantPredictionData,
+    val status: String
+) : Parcelable
+
+@Parcelize
+data class PlantPredictionData(
+    val confidence: Double,
+    val plant: Plant,
+    val predicted_label: String
+) : Parcelable
+
+@Parcelize
+data class Plant(
+    val latin_name: String,
+    val name: String,
+    val description: String,
+    val planting_guide: String,
+    val duration_plant: Int,
+    val fertilizer_type: String,
+    val icon_plant: String,
+    val id: Int,
+    val fun_fact: String
+) : Parcelable
