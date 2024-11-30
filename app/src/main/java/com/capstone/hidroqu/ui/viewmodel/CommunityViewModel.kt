@@ -1,6 +1,8 @@
 package com.capstone.hidroqu.ui.viewmodel
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -19,6 +21,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 class CommunityViewModel : ViewModel() {
 
@@ -133,17 +137,16 @@ class CommunityViewModel : ViewModel() {
         val contentRequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
 
         val imagePart: MultipartBody.Part? = imageUri?.let {
-            Log.d("CommunityViewModel", "Image Uri terdeteksi: $imageUri")
-            val inputStream = context.contentResolver.openInputStream(it)
-            val byteArray = inputStream?.readBytes()
-            val requestFile = byteArray?.toRequestBody("image/jpeg".toMediaTypeOrNull())
-            requestFile?.let { it1 ->
-                MultipartBody.Part.createFormData("image", "filename.jpg", it1)
+            // Kompresi gambar sebelum diunggah
+            val compressedImageFile = compressImage(context, it)
+
+            compressedImageFile?.let { file ->
+                val requestFile = file.readBytes().toRequestBody("image/jpeg".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("image", "compressed_image.jpg", requestFile)
             }
         }
 
         viewModelScope.launch {
-            Log.d("CommunityViewModel", "Mempersiapkan API call untuk storePost")
             apiService.storeCommunityPost(
                 "Bearer $token",
                 titleRequestBody,
@@ -154,18 +157,14 @@ class CommunityViewModel : ViewModel() {
                     call: Call<BasicResponse>,
                     response: Response<BasicResponse>
                 ) {
-                    Log.d("CommunityViewModel", "Response diterima untuk storePost")
                     if (response.isSuccessful) {
                         response.body()?.let {
-                            Log.d(
-                                "CommunityViewModel",
-                                "Post berhasil disimpan: ${response.body()}"
-                            )
                             onSuccess(it)
                         }
                     } else {
-                        Log.e("CommunityViewModel", "Error menyimpan post: ${response.message()}")
-                        onError("Error: ${response.message()}")
+                        val errorMessage = response.errorBody()?.string() ?: response.message()
+                        Log.e("CommunityViewModel", "Error menyimpan post: $errorMessage")
+                        onError("Error: $errorMessage")
                     }
                 }
 
@@ -174,6 +173,42 @@ class CommunityViewModel : ViewModel() {
                     onError("Network error: ${t.message}")
                 }
             })
+        }
+    }
+
+    private fun compressImage(context: Context, imageUri: Uri): File? {
+        try {
+            val inputStream = context.contentResolver.openInputStream(imageUri)
+            val originalBitmap = BitmapFactory.decodeStream(inputStream)
+
+            // Resize gambar sebelum kompresi
+            val resizedBitmap = Bitmap.createScaledBitmap(
+                originalBitmap,
+                originalBitmap.width / 2,  // Kurangi lebar menjadi setengahnya
+                originalBitmap.height / 2, // Kurangi tinggi menjadi setengahnya
+                true
+            )
+
+            // Calculate compression
+            val maxFileSize = 1 * 1024 * 1024 // Kurangi menjadi 1MB
+            var quality = 80  // Mulai dari kualitas 80%
+            var compressedFile: File
+
+            do {
+                val baos = ByteArrayOutputStream()
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
+                val compressedBytes = baos.toByteArray()
+
+                compressedFile = File(context.cacheDir, "compressed_image.jpg")
+                compressedFile.writeBytes(compressedBytes)
+
+                quality -= 10  // Turunkan kualitas lebih cepat
+            } while (compressedFile.length() > maxFileSize && quality > 10)
+
+            return compressedFile
+        } catch (e: Exception) {
+            Log.e("ImageCompression", "Error compressing image", e)
+            return null
         }
     }
 

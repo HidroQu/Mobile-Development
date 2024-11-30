@@ -206,13 +206,13 @@ fun AlarmSection(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.outline
             )
         }
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp) // Jarak antar elemen dalam daftar
-        ) {
-            dummyListAlarmHome.forEach { alarm ->
-                CardAlarm(alarm)
-            }
-        }
+//        Column(
+//            verticalArrangement = Arrangement.spacedBy(8.dp) // Jarak antar elemen dalam daftar
+//        ) {
+//            dummyListAlarmHome.forEach { alarm ->
+//                CardAlarm(alarm)
+//            }
+//        }
     }
 }
 

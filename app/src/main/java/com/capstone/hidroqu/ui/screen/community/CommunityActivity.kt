@@ -44,6 +44,8 @@ import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.component.CardCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 
@@ -169,13 +171,22 @@ fun NoPostList(
 
 @Composable
 fun PostList(posts: List<PostData>, modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.getDefault()) // Sesuaikan dengan format API yang diterima
+
+    val sortedPosts = posts.sortedByDescending { post ->
+        try {
+            dateFormat.parse(post.created_at)?.time ?: 0
+        } catch (e: Exception) {
+            0
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
-            .padding(20.dp)
+        modifier = modifier.padding(20.dp)
     ) {
-        posts.forEach { post ->
-            Log.d("PostList", "Rendering post: ${post.user}, ID: ${post.id}")
+        sortedPosts.forEach { post ->
+            Log.d("PostList", "Rendering post: ${post.user.name}, ID: ${post.id}, Date: ${post.created_at}")
             CardCommunity(
                 listCommunity = post,
                 onClick = {

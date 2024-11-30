@@ -33,10 +33,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.TopBarButtonAction
+import com.capstone.hidroqu.nonui.data.PostData
+import com.capstone.hidroqu.nonui.data.UserData
 import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.utils.ListUserData
 import com.capstone.hidroqu.utils.dummyListUserData
@@ -52,7 +57,7 @@ fun FormAddCommunityActivity(
 ) {
     val userPreferences = UserPreferences(context)
     val token by userPreferences.token.collectAsState(initial = null)
-    val user = dummyListUserData[0]
+    val communityPosts by viewModel.communityPosts.collectAsState(emptyList())
     var postTittle by remember { mutableStateOf("") }
     var postText by remember { mutableStateOf("") }
     var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
@@ -123,7 +128,7 @@ fun FormAddCommunityActivity(
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                UserItem(user = user)
+                UserItem(userPreferences = userPreferences)
 
                 TextField(
                     value = postTittle,
@@ -280,15 +285,26 @@ fun FormAddCommunityActivity(
 }
 
 @Composable
-fun UserItem(user: ListUserData) {
+fun UserItem(
+    userPreferences: UserPreferences = UserPreferences(LocalContext.current)
+) {
+    // Collect user data from preferences
+    val userName by userPreferences.userName.collectAsState(initial = null)
+    val userEmail by userPreferences.userEmail.collectAsState(initial = null)
+
     Row(
         modifier = Modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // Profile Image (you might want to fetch from userPreferences or API)
         Image(
-            painter = painterResource(id = user.img),
+            painter = rememberAsyncImagePainter(
+                model = userPreferences.userProfileImage,
+                placeholder = painterResource(R.drawable.ic_launcher_background),
+                error = painterResource(R.drawable.ic_launcher_background)
+            ),
             contentDescription = "Profile Picture",
             modifier = Modifier
                 .size(50.dp)
@@ -299,8 +315,10 @@ fun UserItem(user: ListUserData) {
                     shape = CircleShape
                 )
         )
+
+        // User Name
         Text(
-            text = user.name,
+            text = userName ?: "Pengguna",
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary
         )

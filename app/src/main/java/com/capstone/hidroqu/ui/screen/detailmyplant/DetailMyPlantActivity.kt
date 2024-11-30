@@ -1,6 +1,7 @@
 package com.capstone.hidroqu.ui.screen.detailmyplant
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -70,6 +71,11 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import android.app.Activity
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 fun formatDate(dateTime: String): String {
     return try {
@@ -155,6 +161,8 @@ fun DetailMyPlantActivity(
     val plantDetail by viewModel.plantDetail.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
+    val context = LocalContext.current
+    val notificationHelper = remember { HarvestNotificationHelper(context) }
 
     // Fetch plant details once the composable is launched
     LaunchedEffect(plantId) {
@@ -219,13 +227,34 @@ fun DetailMyPlantContent(
     navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val daysToAdd = 2
+    val daysToAdd = 6
     val (formattedDate, harvestDate) = plant?.planting_date?.let { formatAndCalculateHarvestDate(it, daysToAdd) }
         ?: ("00/00/0000" to "00/00/0000")
     val context = LocalContext.current
     val notificationHelper = remember { HarvestNotificationHelper(context) }
     val userPreferences = remember { UserPreferences(context) }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when (PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    POST_NOTIFICATIONS // Gunakan POST_NOTIFICATIONS langsung
+                ) -> {
+                    Log.d("NotificationDebug", "Notification permission already granted")
+                }
+                else -> {
+                    ActivityCompat.requestPermissions(
+                        context as Activity,
+                        arrayOf(POST_NOTIFICATIONS), // Gunakan POST_NOTIFICATIONS langsung
+                        123
+                    )
+                    Log.d("NotificationDebug", "Requesting notification permission")
+                }
+            }
+        }
+    }
 
     // Menyimpan status Switch untuk setiap plantId
     var isNotificationEnabledMap by remember { mutableStateOf(mutableMapOf<Int, Boolean>()) }
@@ -484,12 +513,30 @@ fun DetailMyPlantContent(
                     checked = isNotificationEnabled,
                     onCheckedChange = { newValue ->
                         plant?.id?.let { plantId ->
-                            if (newValue && !notificationHelper.canScheduleExactAlarms()) {
-                                showPermissionDialog = true
+                            if (newValue) {
+                                if (!notificationHelper.canScheduleExactAlarms()) {
+                                    showPermissionDialog = true
+                                } else {
+                                    // Aktifkan notifikasi
+                                    plant.plant?.name?.let { plantName ->
+                                        scope.launch {
+                                            val success = notificationHelper.scheduleHarvestReminders(
+                                                plantName,
+                                                calculateHarvestDate(plant.planting_date, daysToAdd)
+                                            )
+                                            if (success) {
+                                                userPreferences.savePlantNotificationEnabled(plantId, true)
+                                            }
+                                        }
+                                    }
+                                }
                             } else {
-                                // Launch in coroutine scope karena savePlantNotificationEnabled adalah suspend function
+                                // Nonaktifkan notifikasi
                                 scope.launch {
-                                    userPreferences.savePlantNotificationEnabled(plantId, newValue)
+                                    notificationHelper.cancelHarvestReminders(
+                                        calculateHarvestDate(plant.planting_date, daysToAdd)
+                                    )
+                                    userPreferences.savePlantNotificationEnabled(plantId, false)
                                 }
                             }
                         }

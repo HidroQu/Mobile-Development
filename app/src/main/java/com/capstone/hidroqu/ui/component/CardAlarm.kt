@@ -9,18 +9,27 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.capstone.hidroqu.ui.screen.home.ListAlarmHome
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
+import com.capstone.hidroqu.nonui.data.MyPlantResponse
 
 @Composable
-fun CardAlarm(listAlarmHome: ListAlarmHome, modifier: Modifier = Modifier) {
+fun CardAlarm(
+    listAlarmHome: MyPlantResponse,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -28,25 +37,33 @@ fun CardAlarm(listAlarmHome: ListAlarmHome, modifier: Modifier = Modifier) {
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.surfaceDim, // Warna outline
-                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
+                shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val imageLoader = ImageLoader.Builder(LocalContext.current)
+            .components {
+                add(SvgDecoder.Factory())
+            }
+            .build()
         Image(
-            painter = painterResource(id = listAlarmHome.imgAlarmHome),
+            painter = rememberAsyncImagePainter(
+                model = listAlarmHome.plant.icon_plant,
+                imageLoader = imageLoader
+            ),
             contentDescription = "Gambar Tanaman",
             modifier = Modifier.size(40.dp)
         )
         Column {
             Text(
-                text = stringResource(id = listAlarmHome.txtAlarmHome),
+                text = listAlarmHome.plant.name,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = stringResource(id = listAlarmHome.descAlarmHome),
+                text = listAlarmHome.descAlarmHome,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )

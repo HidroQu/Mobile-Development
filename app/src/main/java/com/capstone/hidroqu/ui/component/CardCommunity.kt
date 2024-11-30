@@ -40,6 +40,8 @@ import com.capstone.hidroqu.nonui.data.PostData
 import com.capstone.hidroqu.utils.ListCommunity
 import com.capstone.hidroqu.utils.dummyListCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun CardCommunity(
