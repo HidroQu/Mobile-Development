@@ -177,7 +177,6 @@ fun DetailPostCommunityContent(
     isSubmittingComment: MutableState<Boolean>,
     commentSubmissionError: MutableState<String?>
 ) {
-    // State for image expand/collapse
     val isImageExpanded = remember { mutableStateOf(false) }
     val commentText = remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }

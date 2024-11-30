@@ -171,23 +171,15 @@ fun NoPostList(
 
 @Composable
 fun PostList(posts: List<PostData>, modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
-    // Menggunakan formatDate yang telah dibuat
-    val sortedPosts = posts.sortedByDescending { post ->
-        try {
-            val formattedDate = formatDate(post.created_at)
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID")) // Format yang dihasilkan oleh formatDate
-            dateFormat.parse(formattedDate)?.time ?: 0
-        } catch (e: Exception) {
-            0
-        }
-    }
+    // Sort posts first by page (desc), then by ID (desc) within each page
+    val sortedPosts = posts.sortedWith(compareByDescending<PostData> { it.id })
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier.padding(20.dp)
     ) {
         sortedPosts.forEach { post ->
-            Log.d("PostList", "Rendering post: ${post.user.name}, ID: ${post.id}, Date: ${post.created_at}")
+            Log.d("PostList", "Rendering post: ${post.user.name}, ID: ${post.id}")
             CardCommunity(
                 listCommunity = post,
                 onClick = {
