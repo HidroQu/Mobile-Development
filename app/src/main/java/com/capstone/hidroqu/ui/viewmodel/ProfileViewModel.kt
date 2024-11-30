@@ -9,12 +9,16 @@ import androidx.lifecycle.viewModelScope
 import com.capstone.hidroqu.nonui.api.HidroQuApiConfig
 import com.capstone.hidroqu.nonui.api.HidroQuApiService
 import com.capstone.hidroqu.nonui.data.BasicResponse
+import com.capstone.hidroqu.nonui.data.MyPostData
+import com.capstone.hidroqu.nonui.data.MyPostsResponseWrapper
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.ProfileResponse
 import com.capstone.hidroqu.nonui.data.User
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -34,9 +38,11 @@ class ProfileViewModel: ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
-    private val _errorMessage = MutableStateFlow("")
-    val errorMessage: StateFlow<String> get() = _errorMessage
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> get() = _errorMessage
 
+    private val _myPost = MutableStateFlow<List<MyPostData>>(emptyList())
+    val myPost: StateFlow<List<MyPostData>> get() = _myPost
 
     fun fetchUserProfile(token: String) {
         _isLoading.value = true
@@ -60,19 +66,45 @@ class ProfileViewModel: ViewModel() {
             }
         })
     }
-    fun isImageValid(uri: Uri, context: Context): Boolean {
-        return try {
-            val inputStream = context.contentResolver.openInputStream(uri)
-            val byteArray = inputStream?.readBytes()
-            inputStream?.close()
 
-            // Pastikan file tidak null dan ukurannya <= 2MB
-            byteArray != null && byteArray.size <= 2 * 1024 * 1024
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
+    fun getMyPost(
+        token: String
+    ){
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                var currentPage = 1
+                val allmypost = mutableListOf<MyPostData>()
+                do{
+                    val response = withContext(Dispatchers.IO) {
+                        apiService.getMyPosts("Bearer $token", currentPage).execute()
+                    }
+
+                    if (response.isSuccessful) {
+                        response.body()?.data?.let { wrapper ->
+                            allmypost.addAll(wrapper.data)
+                            currentPage = wrapper.current_page + 1
+                        }
+                    } else {
+                        _errorMessage.value = "Failed to load page $currentPage: ${response.message()}"
+                        break
+                    }
+                } while (response.body()?.data?.next_page_url != null)
+
+                if (allmypost.isEmpty()) {
+                    _errorMessage.value = "Belum ada postingan"
+                } else {
+                    _myPost.value = allmypost
+                    _errorMessage.value = null
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error fetching mypost: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
+
 
     fun updateProfile(
         token: String,

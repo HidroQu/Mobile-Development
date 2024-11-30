@@ -46,7 +46,7 @@ data class MyPlantResponseWrapper(
 @Parcelize
 data class MyPlantData(
     val current_page: Int,
-    val data: List<MyPlantResponse>, // Menyimpan daftar tanaman
+    val data: List<MyPlantResponse>,
     val first_page_url: String?,
     val last_page: Int,
     val last_page_url: String?,

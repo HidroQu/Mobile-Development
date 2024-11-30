@@ -1,14 +1,10 @@
 package com.capstone.hidroqu.ui.screen.profile
 
 import android.content.Context
-import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -34,15 +30,18 @@ import coil.compose.AsyncImage
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.TopBarAction
-import com.capstone.hidroqu.navigation.TopBarDefault
-import com.capstone.hidroqu.nonui.data.User
+import com.capstone.hidroqu.nonui.data.MyPostData
+import com.capstone.hidroqu.nonui.data.PostData
 import com.capstone.hidroqu.nonui.data.UserPreferences
-import com.capstone.hidroqu.utils.ListUserData
+import com.capstone.hidroqu.ui.component.CardCommunity
+import com.capstone.hidroqu.ui.component.CardMyPost
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 import com.capstone.hidroqu.ui.viewmodel.ProfileViewModel
 import com.capstone.hidroqu.ui.viewmodel.ThemeViewModel
 import com.capstone.hidroqu.utils.dummyListUserData
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun ProfileActivity(
@@ -60,11 +59,24 @@ fun ProfileActivity(
     val isLoading by profileViewModel.isLoading.collectAsState()
     val errorMessage by profileViewModel.errorMessage.collectAsState()
 
+    // Fetch user profile data
+    LaunchedEffect(token) {
+        token?.let {
+            profileViewModel.fetchUserProfile(it)
+            profileViewModel.getMyPost(it) // Fetch user's posts
+        } ?: run {
+            // If token is null, navigate to login screen
+            navHostController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Profile.route) { inclusive = true }
+            }
+        }
+    }
+    val myPosts by profileViewModel.myPost.collectAsState()
+
     // Dummy data for posts
     var visiblePostsCount by remember { mutableStateOf(5) }
-    val dummyPosts = List(20) { "Post #${it + 1}" } // Dummy post titles
-    val displayedPosts = dummyPosts.take(visiblePostsCount)
-    val isMoreAvailable = visiblePostsCount < dummyPosts.size
+    val displayedPosts = myPosts.take(visiblePostsCount)
+    val isMoreAvailable = visiblePostsCount < myPosts.size
 
     LaunchedEffect(token) {
         token?.let {
@@ -100,7 +112,7 @@ fun ProfileActivity(
                 ) {
                     CircularProgressIndicator()
                 }
-            } else if (errorMessage.isNotEmpty()) {
+            } else if (errorMessage?.isNotEmpty() == true) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -166,7 +178,12 @@ fun ProfileActivity(
                         MyPostsSection(
                             posts = displayedPosts,
                             onLoadMore = { visiblePostsCount += 5 },
-                            isMoreAvailable = isMoreAvailable
+                            isMoreAvailable = isMoreAvailable,
+                            onDetailClicked = { idPost ->
+                                navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)) {
+                                    popUpTo(Screen.Profile.route)
+                                }
+                            }
                         )
                     }
                 }
@@ -249,10 +266,11 @@ fun AppearanceOption(text: String, selected: Boolean, onClick: () -> Unit) {
 
 @Composable
 fun MyPostsSection(
-    posts: List<String>,
+    posts: List<MyPostData>,
     onLoadMore: () -> Unit,
     isMoreAvailable: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDetailClicked: (Int) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -268,7 +286,12 @@ fun MyPostsSection(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ){
             posts.forEach { post ->
-                PostItem(postTitle = post)
+                CardMyPost(
+                    listCommunity = post,
+                    onClick = {
+                        onDetailClicked(post.id)
+                    }
+                )
             }
 
             // Load More Button
@@ -283,38 +306,6 @@ fun MyPostsSection(
         }
     }
 }
-
-
-@Composable
-fun PostItem(postTitle: String) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { /* Navigate to post detail or edit */ },
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = postTitle,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Icon(
-                imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "View Post",
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
 
 @Preview(showBackground = true)
 @Composable

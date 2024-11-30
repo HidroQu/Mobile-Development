@@ -87,42 +87,6 @@ class CommunityViewModel : ViewModel() {
             })
     }
 
-    fun fetchMyPosts(token: String) {
-        _isLoading.value = true
-        Log.d("CommunityViewModel", "Fetching user's posts with token: $token")
-        apiService.getMyPosts("Bearer $token").enqueue(object : Callback<MyPostsResponseWrapper> {
-            override fun onResponse(
-                call: Call<MyPostsResponseWrapper>,
-                response: Response<MyPostsResponseWrapper>
-            ) {
-                _isLoading.value = false
-                Log.d("CommunityViewModel", "Response diterima untuk fetchMyPosts")
-                if (response.isSuccessful) {
-                    val postData = response.body()?.data
-                    if (postData != null) {
-                        _myPosts.value = postData
-                        Log.d("CommunityViewModel", "Fetched my post: ID=${postData.id}")
-                    } else {
-                        _errorMessage.value = "Failed to fetch my post: Data is null"
-                        Log.e("CommunityViewModel", "My post data is null")
-                    }
-                } else {
-                    _errorMessage.value = "Failed to load your posts: ${response.message()}"
-                    Log.e(
-                        "CommunityViewModel",
-                        "Response error: ${response.code()} - ${response.message()}"
-                    )
-                }
-            }
-
-            override fun onFailure(call: Call<MyPostsResponseWrapper>, t: Throwable) {
-                _isLoading.value = false
-                _errorMessage.value = "Error: ${t.message}"
-                Log.e("CommunityViewModel", "Error fetching my posts: ${t.message}", t)
-            }
-        })
-    }
-
     fun storePost(
         token: String,
         title: String,

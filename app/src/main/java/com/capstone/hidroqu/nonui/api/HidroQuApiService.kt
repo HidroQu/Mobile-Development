@@ -12,6 +12,7 @@ import com.capstone.hidroqu.nonui.data.LoginRequest
 import com.capstone.hidroqu.nonui.data.LoginResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailWrapper
 import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
+import com.capstone.hidroqu.nonui.data.MyPostResponse
 import com.capstone.hidroqu.nonui.data.MyPostsResponseWrapper
 import com.capstone.hidroqu.nonui.data.NutrientPredictionResponse
 import com.capstone.hidroqu.nonui.data.PlantPredictionResponse
@@ -119,8 +120,9 @@ interface HidroQuApiService {
     // Mendapatkan daftar postingan pengguna dalam komunitas
     @GET("api/communities/my-posts")
     fun getMyPosts(
-        @Header("Authorization") token: String
-    ): Call<MyPostsResponseWrapper>
+        @Header("Authorization") token: String,
+        @Query("page") page: Int
+    ): Call<MyPostResponse>
 
     //multipart api-store
     @Multipart
