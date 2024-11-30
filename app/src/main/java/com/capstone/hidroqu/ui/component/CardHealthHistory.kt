@@ -31,7 +31,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.nonui.data.DiagnosticHistory
-import com.capstone.hidroqu.ui.screen.detailmyplant.formatDate
 import com.capstone.hidroqu.ui.screen.detailmyplant.formatDateWithMonthName
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
@@ -42,7 +41,6 @@ fun CardHealthHistory(
     modifier: Modifier = Modifier
 ) {
     val formattedDate = formatDateWithMonthName(listHealthHistory.diagnosis_date)
-    // Health History Section
         Row(
             modifier = Modifier
                 .clickable { onClick() }
@@ -50,8 +48,8 @@ fun CardHealthHistory(
                 .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
                 .border(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
-                    shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = MaterialTheme.shapes.medium
                 )
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -71,18 +69,17 @@ fun CardHealthHistory(
                         model = listHealthHistory.diagnostic.image_disease,
                         imageLoader = imageLoader
 
-                    ), // Replace with actual plant image
+                    ),
                     contentDescription = "Plant Image",
                     modifier = Modifier
-                        .size(50.dp) // Ukuran gambar
-                        .clip(CircleShape) // Membuat gambar menjadi bulat
+                        .size(50.dp)
+                        .clip(CircleShape)
                         .border(
-                            width = 2.dp, // Ketebalan border
-                            color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
-                            shape = CircleShape // Bentuk border bulat
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            shape = CircleShape
                         )
                 )
-
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
@@ -108,12 +105,10 @@ fun CardHealthHistory(
         }
     }
 
-
     @Preview(showBackground = false)
     @Composable
     private fun CardHealthHistoryPreview() {
         HidroQuTheme {
             val navController = rememberNavController()
-
         }
     }

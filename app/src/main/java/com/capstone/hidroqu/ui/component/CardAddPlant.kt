@@ -78,20 +78,20 @@ fun CardAddPlant(
 @Preview
 @Composable
 fun CardAddPlantPreview() {
-    CardAddPlant(
-        ListPlant = PlantResponse(
-            id = 1,
-            name = "Aloe Vera",
-            latin_name = "Aloe barbadensis miller",
-            icon_plant = "https://4.bp.blogspot.com/-JSteHDHGpV4/UUCsnJmlnWI/AAAAAAAAEps/8A7zoM3T5jU/s1600/Wallpaper+Gambar+Burung+Betet.jpeg", // URL gambar, ganti dengan URL yang valid
-            description = "Aloe vera is a succulent plant species of the genus Aloe.",
-            planting_guide = "Plant in well-drained soil and place it in a sunny spot.",
-            fertilizer_type = "Use a balanced fertilizer every 6-8 weeks.",
-            fun_fact = "Aloe vera is known for its healing properties, especially for skin burns.",
-            created_at = "2024-01-01T10:00:00Z",
-            updated_at = "2024-01-10T12:00:00Z"
-        ),
-        isSelected = false,
-        onClick = {}
-    )
+//    CardAddPlant(
+//        ListPlant = PlantResponse(
+//            id = 1,
+//            name = "Aloe Vera",
+//            latin_name = "Aloe barbadensis miller",
+//            icon_plant = "https://4.bp.blogspot.com/-JSteHDHGpV4/UUCsnJmlnWI/AAAAAAAAEps/8A7zoM3T5jU/s1600/Wallpaper+Gambar+Burung+Betet.jpeg", // URL gambar, ganti dengan URL yang valid
+//            description = "Aloe vera is a succulent plant species of the genus Aloe.",
+//            planting_guide = "Plant in well-drained soil and place it in a sunny spot.",
+//            fertilizer_type = "Use a balanced fertilizer every 6-8 weeks.",
+//            fun_fact = "Aloe vera is known for its healing properties, especially for skin burns.",
+//            created_at = "2024-01-01T10:00:00Z",
+//            updated_at = "2024-01-10T12:00:00Z"
+//        ),
+//        isSelected = false,
+//        onClick = {}
+//    )
 }

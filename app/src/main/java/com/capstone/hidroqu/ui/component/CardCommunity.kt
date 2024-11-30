@@ -1,5 +1,6 @@
 package com.capstone.hidroqu.ui.component
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,7 +41,10 @@ import com.capstone.hidroqu.nonui.data.PostData
 import com.capstone.hidroqu.utils.ListCommunity
 import com.capstone.hidroqu.utils.dummyListCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.capstone.hidroqu.utils.formatDate
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Composable
@@ -105,7 +109,7 @@ fun CardCommunity(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = listCommunity.created_at,
+                    text = formatDate(listCommunity.created_at),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.outline
                 )

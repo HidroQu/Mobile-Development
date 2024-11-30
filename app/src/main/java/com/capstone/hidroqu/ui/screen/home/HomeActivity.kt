@@ -52,18 +52,17 @@ fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modi
 
     val articles by articleViewModel.articles.collectAsState(emptyList())
 
-    // Redirect jika token tidak ditemukan
     LaunchedEffect(token) {
         if (token == null) {
             navHostController.navigate(Screen.Login.route) {
-                popUpTo(Screen.Home.route) { inclusive = true } // Bersihkan stack navigasi
+                popUpTo(Screen.Home.route) { inclusive = true }
             }
         }
     }
 
     LaunchedEffect(token) {
         token?.let {
-            articleViewModel.fetchAllArticles(it) // Fetch the articles when the token is available
+            articleViewModel.fetchAllArticles(it)
         } ?: run {
             navHostController.navigate(Screen.DetailArticle.route) {
                 popUpTo(Screen.Home.route) { inclusive = true }
@@ -88,7 +87,6 @@ fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modi
         }
     }
 }
-
 
 @Composable
 fun TopHome(viewModel: HomeViewModel, modifier: Modifier = Modifier) {

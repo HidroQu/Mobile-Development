@@ -76,24 +76,8 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.capstone.hidroqu.utils.formatDate
 
-fun formatDate(dateTime: String): String {
-    return try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
-            val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("id", "ID"))
-            val date = LocalDate.parse(dateTime.substring(0, 10)) // Hanya ambil bagian tanggal
-            date.format(outputFormatter) // Format ke dd/MM/yyyy
-        } else {
-            val inputFormatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
-            val outputFormatter = java.text.SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID"))
-            val date = inputFormatter.parse(dateTime)
-            outputFormatter.format(date!!)
-        }
-    } catch (e: Exception) {
-        "00/00/0000"
-    }
-}
 fun calculateHarvestDate(plantingDate: String, daysToAdd: Int): String {
     return try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -219,7 +203,7 @@ fun DetailMyPlantContent(
     navHostController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val daysToAdd = 6
+    val daysToAdd = plant?.plant?.duration_plant ?: 7
     val (formattedDate, harvestDate) = plant?.planting_date?.let { formatAndCalculateHarvestDate(it, daysToAdd) }
         ?: ("00/00/0000" to "00/00/0000")
     val context = LocalContext.current
@@ -437,8 +421,8 @@ fun DetailMyPlantContent(
                             .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
                             .border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
-                                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
+                                color = MaterialTheme.colorScheme.outlineVariant,
+                                shape = MaterialTheme.shapes.medium
                             )
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                     ){

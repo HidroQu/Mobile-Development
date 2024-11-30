@@ -44,6 +44,7 @@ import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.component.CardCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
+import com.capstone.hidroqu.utils.formatDate
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -67,7 +68,6 @@ fun CommunityActivity(
         token?.let {
             viewModel.fetchAllCommunityPosts(it)
         } ?: run {
-            // Tangani kasus ketika token null, misalnya arahkan ke halaman login
             navHostController.navigate(Screen.Login.route) {
                 popUpTo(Screen.Community.route) { inclusive = true }
             }
@@ -98,7 +98,7 @@ fun CommunityActivity(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                contentAlignment = Alignment.Center // Atur konten ke tengah
+                contentAlignment = Alignment.Center
             ) {
                 NoPostList()
             }
@@ -107,7 +107,7 @@ fun CommunityActivity(
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
-                    .padding(paddingValues) // Gunakan padding dari Scaffold
+                    .padding(paddingValues)
                     .fillMaxSize()
             ) {
                 PostList(posts = communityPosts, onDetailClicked = { idPost ->
@@ -171,11 +171,12 @@ fun NoPostList(
 
 @Composable
 fun PostList(posts: List<PostData>, modifier: Modifier = Modifier, onDetailClicked: (Int) -> Unit) {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", Locale.getDefault()) // Sesuaikan dengan format API yang diterima
-
+    // Menggunakan formatDate yang telah dibuat
     val sortedPosts = posts.sortedByDescending { post ->
         try {
-            dateFormat.parse(post.created_at)?.time ?: 0
+            val formattedDate = formatDate(post.created_at)
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID")) // Format yang dihasilkan oleh formatDate
+            dateFormat.parse(formattedDate)?.time ?: 0
         } catch (e: Exception) {
             0
         }
@@ -196,7 +197,6 @@ fun PostList(posts: List<PostData>, modifier: Modifier = Modifier, onDetailClick
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
