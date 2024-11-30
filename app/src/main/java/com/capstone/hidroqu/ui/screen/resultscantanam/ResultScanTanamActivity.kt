@@ -83,21 +83,26 @@ fun ResultScanTanamActivity(
         },
         bottomBar = {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Button(
                     onClick = {
-                        navHostController.navigate(Screen.ChoosePlant.route)
+                        val plantId = plantPrediction?.data?.plant?.id
+                        plantId?.let {
+                            navHostController.navigate(
+                                Screen.FormAddPlant.createRoute(plantId = it)
+                            )
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp),
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
-                ) {
-                    Text(
-                        text = "Simpan ke koleksi tanaman anda",
-                        style = MaterialTheme.typography.labelLarge
+                    enabled = true, // Always enabled
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
+                ) {
+                    Text(text = "Lanjut", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
