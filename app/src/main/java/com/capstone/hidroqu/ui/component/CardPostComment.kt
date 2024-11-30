@@ -33,6 +33,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.nonui.data.Comment
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
+import com.capstone.hidroqu.utils.formatDate
 
 @Composable
 fun CardPostComment(
@@ -86,7 +87,7 @@ fun CardPostComment(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = listComment.created_at,
+                    text = formatDate(listComment.created_at),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -99,7 +100,7 @@ fun CardPostComment(
             color = MaterialTheme.colorScheme.onPrimaryContainer
         )
 
-        if (!listComment.image.isNullOrEmpty()) { // Menggunakan `listComment.image`
+        if (!listComment.image.isNullOrEmpty()) {
             val imageLoader = ImageLoader.Builder(LocalContext.current)
                 .components {
                     add(SvgDecoder.Factory())
@@ -108,7 +109,7 @@ fun CardPostComment(
 
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = listComment.image, // Pastikan `image` digunakan
+                    model = listComment.image,
                     imageLoader = imageLoader
                 ),
                 contentDescription = "Image Post",

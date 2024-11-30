@@ -79,13 +79,12 @@ interface HidroQuApiService {
     fun storePlant(
         @Header("Authorization") token: String,
 
-
         @Body request: StorePlantRequest
     ): Call<BasicResponse>
 
     @GET("api/plants/my-plants")
     fun getMyPlants(
-        @Header("Authorization") token: String, // Menambahkan header Authorization
+        @Header("Authorization") token: String,
         @Query("page") page: Int
     ): Call<MyPlantResponseWrapper>
 
@@ -95,7 +94,7 @@ interface HidroQuApiService {
         @Path("id") plantId: Int
     ): Call<MyPlantDetailWrapper>
 
-    // Endpoint untuk mendapatkan riwayat diagnostik tanaman
+
     @GET("api/plants/my-plants/{id_plant}/diagnostics/{id_diagnostic}")
     fun getDiagnosticHistory(
         @Header("Authorization") token: String,

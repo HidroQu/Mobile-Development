@@ -14,6 +14,7 @@ data class PlantResponse(
     val planting_guide: String,
     val fertilizer_type: String,
     val fun_fact: String,
+    val duration_plant: Int,
     val created_at: String?,
     val updated_at: String?
 ) : Parcelable

@@ -159,11 +159,9 @@ class HarvestNotificationHelper(private val context: Context) {
                 }
             }
         } else {
-            // Hapus referensi plantName jika tidak diperlukan
             NOTIFICATION_DAYS.forEach { daysBeforeHarvest ->
                 val intent = Intent(context, HarvestNotificationReceiver::class.java).apply {
                     putExtra("daysBeforeHarvest", daysBeforeHarvest)
-                    // Tidak perlu menyertakan plantName di sini, karena yang penting adalah daysBeforeHarvest
                 }
                 val pendingIntent = PendingIntent.getBroadcast(
                     context,

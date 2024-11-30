@@ -76,6 +76,7 @@ import com.capstone.hidroqu.utils.getPostById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
+import com.capstone.hidroqu.utils.formatDate
 
 @Composable
 fun DetailPostCommunityActivity(
@@ -176,7 +177,6 @@ fun DetailPostCommunityContent(
     isSubmittingComment: MutableState<Boolean>,
     commentSubmissionError: MutableState<String?>
 ) {
-    // State for image expand/collapse
     val isImageExpanded = remember { mutableStateOf(false) }
     val commentText = remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -205,7 +205,6 @@ fun DetailPostCommunityContent(
                     .fillMaxWidth()
                     .padding(paddingValues),
             ) {
-                // Main content with post data
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -213,7 +212,6 @@ fun DetailPostCommunityContent(
                         .padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // User and Post Info
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -250,7 +248,7 @@ fun DetailPostCommunityContent(
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = post?.created_at ?: "00/00/0000",
+                                text = formatDate(post?.created_at ?: "00/00/0000"),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.outline
                             )
@@ -393,8 +391,6 @@ fun DetailPostCommunityContent(
         }
     )
 }
-
-
 
 @Preview
 @Composable
