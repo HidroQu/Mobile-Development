@@ -29,6 +29,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ProfileViewModel: ViewModel() {
     private val apiService: HidroQuApiService = HidroQuApiConfig.retrofit.create(HidroQuApiService::class.java)
@@ -46,8 +48,6 @@ class ProfileViewModel: ViewModel() {
 
     fun fetchUserProfile(token: String) {
         _isLoading.value = true
-
-        // Menggunakan PlantResponseWrapper untuk mendapatkan data
         apiService.getUserProfile("Bearer $token").enqueue(object : Callback<ProfileResponse> {
             override fun onResponse(call: Call<ProfileResponse>, response: Response<ProfileResponse>) {
                 _isLoading.value = false
@@ -94,7 +94,15 @@ class ProfileViewModel: ViewModel() {
                 if (allmypost.isEmpty()) {
                     _errorMessage.value = "Belum ada postingan"
                 } else {
-                    _myPost.value = allmypost
+                    val sortedPosts = allmypost.sortedByDescending { post ->
+                        try {
+                            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault())
+                                .parse(post.created_at)?.time ?: 0
+                        } catch (e: Exception) {
+                            0
+                        }
+                    }
+                    _myPost.value = sortedPosts
                     _errorMessage.value = null
                 }
             } catch (e: Exception) {

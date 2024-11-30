@@ -37,6 +37,7 @@ import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.nonui.data.MyPostData
 import com.capstone.hidroqu.nonui.data.PostData
+import com.capstone.hidroqu.utils.formatDate
 
 @Composable
 fun CardMyPost(
@@ -100,7 +101,7 @@ fun CardMyPost(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = listCommunity.created_at,
+                    text = formatDate(listCommunity.created_at),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.outline
                 )

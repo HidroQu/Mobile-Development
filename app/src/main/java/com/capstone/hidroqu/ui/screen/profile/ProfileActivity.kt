@@ -1,6 +1,7 @@
 package com.capstone.hidroqu.ui.screen.profile
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -273,9 +274,20 @@ fun MyPostsSection(
     modifier: Modifier = Modifier,
     onDetailClicked: (Int) -> Unit
 ) {
+    // Sort posts immediately when received
+    val sortedPosts = remember(posts) {
+        posts.sortedByDescending {
+            try {
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault())
+                    .parse(it.created_at)?.time ?: 0
+            } catch (e: Exception) {
+                0
+            }
+        }
+    }
+
     Column(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
@@ -285,8 +297,8 @@ fun MyPostsSection(
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
-        ){
-            posts.forEach { post ->
+        ) {
+            sortedPosts.forEach { post ->
                 CardMyPost(
                     listCommunity = post,
                     onClick = {
@@ -294,14 +306,12 @@ fun MyPostsSection(
                     }
                 )
             }
-
-            // Load More Button
             if (isMoreAvailable) {
                 Button(
                     onClick = onLoadMore,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Load More")
+                    Text("Lihat yang lain")
                 }
             }
         }
