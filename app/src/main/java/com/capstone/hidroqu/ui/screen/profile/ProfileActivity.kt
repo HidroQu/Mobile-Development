@@ -30,6 +30,7 @@ import coil.compose.AsyncImage
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.TopBarAction
+import com.capstone.hidroqu.navigation.TopBarDefaultAction
 import com.capstone.hidroqu.nonui.data.MyPostData
 import com.capstone.hidroqu.nonui.data.PostData
 import com.capstone.hidroqu.nonui.data.UserPreferences
@@ -91,7 +92,7 @@ fun ProfileActivity(
 
     Scaffold(
         topBar = {
-            TopBarAction(
+            TopBarDefaultAction(
                 title = "Profil anda",
                 navHostController = navHostController,
                 onActionClick = {
@@ -275,7 +276,7 @@ fun MyPostsSection(
     Column(
         modifier = modifier
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
             text = "My Posts",
