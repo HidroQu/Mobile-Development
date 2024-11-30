@@ -72,12 +72,12 @@ fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modi
     }
 
     if (isLoading) {
-        LoadingScreen() // Tampilkan loading screen jika sedang loading
+        LoadingScreen()
     } else {
         Column(
             modifier = modifier
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp)  // Already includes padding, but no conflict with Scaffold's padding
+                .padding(20.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
