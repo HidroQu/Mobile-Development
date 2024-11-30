@@ -8,12 +8,14 @@ import com.capstone.hidroqu.nonui.api.HidroQuApiService
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.UserPreferences
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,9 +30,8 @@ class HomeViewModel(private val userPreferences: UserPreferences) : ViewModel() 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
 
-    // StateFlow untuk menampung tanaman yang akan dipanen
-    private val _plantsToHarvest = MutableStateFlow(emptyList<MyPlantResponse>())
-    val plantsToHarvest: StateFlow<List<MyPlantResponse>> get() = _plantsToHarvest.asStateFlow()
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> get() = _errorMessage
 
     init {
         loadUserData()
@@ -50,5 +51,4 @@ class HomeViewModel(private val userPreferences: UserPreferences) : ViewModel() 
                 }
         }
     }
-
 }

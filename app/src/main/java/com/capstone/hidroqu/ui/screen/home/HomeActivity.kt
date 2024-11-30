@@ -1,5 +1,7 @@
 package com.capstone.hidroqu.ui.screen.home
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -34,23 +36,29 @@ import com.capstone.hidroqu.ui.component.CardCamera
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.nonui.data.ArticleDetailResponse
+import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.viewmodel.ArticleViewModel
 import com.capstone.hidroqu.ui.viewmodel.HomeViewModel
+import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 
 
 @Composable
-fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val userPreferences = remember { UserPreferences(context) }
-    val homeViewModel = HomeViewModel(userPreferences)
+fun HomeActivity(
+    navHostController: NavHostController,
+    modifier: Modifier = Modifier,
+    myPlantViewModel: MyPlantViewModel = viewModel(),
+    context: Context = LocalContext.current
+) {
+    val userPreferences = UserPreferences(context)
     val articleViewModel = viewModel<ArticleViewModel>()
-
-    val isLoading by homeViewModel.isLoading.collectAsState()
+    val viewModel = HomeViewModel(userPreferences)
+    val isLoading by viewModel.isLoading.collectAsState()
 
     val token by userPreferences.token.collectAsState(initial = null)
 
     val articles by articleViewModel.articles.collectAsState(emptyList())
+    val plantsToHarvest by myPlantViewModel.myPlants.collectAsState(emptyList())
 
     LaunchedEffect(token) {
         if (token == null) {
@@ -63,6 +71,7 @@ fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modi
     LaunchedEffect(token) {
         token?.let {
             articleViewModel.fetchAllArticles(it)
+            myPlantViewModel.fetchMyPlants(it)
         } ?: run {
             navHostController.navigate(Screen.DetailArticle.route) {
                 popUpTo(Screen.Home.route) { inclusive = true }
@@ -80,9 +89,9 @@ fun HomeActivity(navHostController: NavHostController, modifier: Modifier = Modi
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            TopHome(viewModel = homeViewModel)
+            TopHome(viewModel = viewModel)
             CameraSection(navHostController)
-            AlarmSection()
+            AlarmSection(userPreferences = userPreferences, plantsToHarvest = plantsToHarvest)
             ArticleSection(navHostController, articles = articles)
         }
     }
@@ -188,7 +197,11 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
 }
 
 @Composable
-fun AlarmSection(modifier: Modifier = Modifier) {
+fun AlarmSection(
+    userPreferences: UserPreferences,
+    plantsToHarvest: List<MyPlantResponse>,
+    modifier: Modifier = Modifier
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -204,13 +217,29 @@ fun AlarmSection(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.outline
             )
         }
-//        Column(
-//            verticalArrangement = Arrangement.spacedBy(8.dp) // Jarak antar elemen dalam daftar
-//        ) {
-//            dummyListAlarmHome.forEach { alarm ->
-//                CardAlarm(alarm)
-//            }
-//        }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp) // Jarak antar elemen dalam daftar
+        ) {
+            Log.d("AlarmSection", "Plants to harvest: $plantsToHarvest")
+
+            if (plantsToHarvest.isNotEmpty()) {
+                plantsToHarvest.forEach { plant ->
+                    val isNotificationEnabled by userPreferences.getPlantNotificationEnabled(plant.id)
+                        .collectAsState(initial = false)
+
+                    if (isNotificationEnabled) {
+                        // Tampilkan card untuk tanaman yang notifikasinya aktif
+                        CardAlarm(plant) // Tampilkan card untuk tanaman yang siap dipanen
+                    }
+                }
+            } else {
+                Text(
+                    text = "Tidak ada tanaman dengan status panen aktif.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
     }
 }
 
