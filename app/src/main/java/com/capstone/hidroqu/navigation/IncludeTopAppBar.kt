@@ -116,6 +116,39 @@ fun TopBarAction(
 }
 
 @Composable
+fun TopBarDefaultAction(
+    title: String,
+    navHostController: NavHostController,
+    onActionClick: () -> Unit,
+    actionIcon: ImageVector,
+    isActionEnabled: Boolean = true,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        actions = {
+            IconButton(onClick = { onActionClick()}, enabled = isActionEnabled) {
+                Icon(
+                    actionIcon,
+                    contentDescription = "Action",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+        colors = TopAppBarDefaults.mediumTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary
+        )
+    )
+}
+
+@Composable
 fun TopBarButtonAction(
     title: String,
     navHostController: NavHostController,
