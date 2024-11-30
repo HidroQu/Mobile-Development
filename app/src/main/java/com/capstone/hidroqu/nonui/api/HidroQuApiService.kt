@@ -13,6 +13,8 @@ import com.capstone.hidroqu.nonui.data.LoginResponse
 import com.capstone.hidroqu.nonui.data.MyPlantDetailWrapper
 import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.MyPostsResponseWrapper
+import com.capstone.hidroqu.nonui.data.NutrientPredictionResponse
+import com.capstone.hidroqu.nonui.data.PlantPredictionResponse
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.ProfileResponse
 import com.capstone.hidroqu.nonui.data.RegisterRequest
@@ -64,7 +66,6 @@ interface HidroQuApiService {
         @Part photo: MultipartBody.Part?,
         @Part("_method") method: RequestBody
     ): Call<BasicResponse>
-
 
 
     // New endpoints for "Tanamanku"
@@ -147,6 +148,7 @@ interface HidroQuApiService {
         @Header("Authorization") token: String,
         @Query("page") page: Int // Adding a page query parameter
     ): Call<ArticleResponseWrapper>
+
     // Mendapatkan daftar komunitas
     @GET("api/articles/{article}")
     fun getArticleDetail(
@@ -154,4 +156,18 @@ interface HidroQuApiService {
         @Path("article") articleId: Int
     ): Call<ArticleDetailWrapper>
 
+    // Post Camera
+    @Multipart
+    @POST("predictNutrient")
+    fun predictNutrient(
+        @Header("Authorization") token: String,
+        @Part nutrient_img: MultipartBody.Part? = null
+    ): Call<NutrientPredictionResponse>
+
+    @Multipart
+    @POST("predictPlant")
+    fun predictPlant(
+        @Header("Authorization") token: String,
+        @Part plant_img: MultipartBody.Part? = null
+    ): Call<PlantPredictionResponse>
 }
