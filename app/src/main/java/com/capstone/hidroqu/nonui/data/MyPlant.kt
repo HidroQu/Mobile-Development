@@ -33,8 +33,7 @@ data class MyPlantResponse(
     val notes: String?,
     val created_at: String,
     val updated_at: String,
-    val plant: PlantResponse,
-    val descAlarmHome: String,
+    val plant: PlantResponse
 ) : Parcelable
 
 @Parcelize

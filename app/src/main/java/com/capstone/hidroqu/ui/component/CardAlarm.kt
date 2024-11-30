@@ -63,7 +63,7 @@ fun CardAlarm(
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Text(
-                text = listAlarmHome.descAlarmHome,
+                text = listAlarmHome.plant.name,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
