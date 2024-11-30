@@ -80,70 +80,64 @@ import androidx.core.content.ContextCompat
 fun formatDate(dateTime: String): String {
     return try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Menggunakan java.time untuk API 26 ke atas
             val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
             val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("id", "ID"))
             val date = LocalDate.parse(dateTime.substring(0, 10)) // Hanya ambil bagian tanggal
             date.format(outputFormatter) // Format ke dd/MM/yyyy
         } else {
-            // Menggunakan SimpleDateFormat untuk API di bawah 26
             val inputFormatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
             val outputFormatter = java.text.SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID"))
             val date = inputFormatter.parse(dateTime)
             outputFormatter.format(date!!)
         }
     } catch (e: Exception) {
-        "00/00/0000" // Jika format tidak valid
+        "00/00/0000"
     }
 }
 fun calculateHarvestDate(plantingDate: String, daysToAdd: Int): String {
     return try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Menggunakan java.time untuk API 26 ke atas
             val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
             val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale("id", "ID"))
             val date = LocalDate.parse(plantingDate.substring(0, 10)) // Hanya ambil bagian tanggal
             val harvestDate = date.plusDays(daysToAdd.toLong()).format(outputFormatter) // Tambah hari dan format
             harvestDate
         } else {
-            // Menggunakan SimpleDateFormat untuk API di bawah 26
             val inputFormatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
             val outputFormatter = java.text.SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID"))
             val date = inputFormatter.parse(plantingDate)
             val calendar = java.util.Calendar.getInstance()
             calendar.time = date
-            calendar.add(java.util.Calendar.DATE, daysToAdd) // Tambah hari
+            calendar.add(java.util.Calendar.DATE, daysToAdd)
             val harvestDate = outputFormatter.format(calendar.time)
             harvestDate
         }
     } catch (e: Exception) {
-        "00/00/0000" // Jika format tidak valid
+        "00/00/0000"
     }
 }
 
 fun formatDateWithMonthName(dateTime: String): String {
     return try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Menggunakan java.time untuk API 26 ke atas
             val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
             val outputFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale("id", "ID"))
-            val date = LocalDate.parse(dateTime.substring(0, 10)) // Hanya ambil bagian tanggal
-            date.format(outputFormatter) // Format ke dd MMMM yyyy
+            val date = LocalDate.parse(dateTime.substring(0, 10))
+            date.format(outputFormatter)
         } else {
-            // Menggunakan SimpleDateFormat untuk API di bawah 26
             val inputFormatter = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID"))
             val outputFormatter = java.text.SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
             val date = inputFormatter.parse(dateTime)
             outputFormatter.format(date!!)
         }
     } catch (e: Exception) {
-        "00/00/0000" // Jika format tidak valid
+        "00/00/0000"
     }
 }
 
 fun formatAndCalculateHarvestDate(plantingDate: String, daysToAdd: Int): Pair<String, String> {
-    val formattedDate = formatDate(plantingDate) // Memformat tanggal tanam
-    val harvestDate = calculateHarvestDate(plantingDate, daysToAdd) // Menghitung tanggal panen
+    val formattedDate = formatDate(plantingDate)
+    val harvestDate = calculateHarvestDate(plantingDate, daysToAdd)
     return formattedDate to harvestDate
 }
 
@@ -164,12 +158,10 @@ fun DetailMyPlantActivity(
     val context = LocalContext.current
     val notificationHelper = remember { HarvestNotificationHelper(context) }
 
-    // Fetch plant details once the composable is launched
     LaunchedEffect(plantId) {
         token?.let {
             viewModel.fetchMyPlantDetail(it, plantId)
         } ?: run {
-            // Handle the case when token is not available
         }
     }
         Scaffold(
@@ -240,14 +232,14 @@ fun DetailMyPlantContent(
             when (PackageManager.PERMISSION_GRANTED) {
                 ContextCompat.checkSelfPermission(
                     context,
-                    POST_NOTIFICATIONS // Gunakan POST_NOTIFICATIONS langsung
+                    POST_NOTIFICATIONS
                 ) -> {
                     Log.d("NotificationDebug", "Notification permission already granted")
                 }
                 else -> {
                     ActivityCompat.requestPermissions(
                         context as Activity,
-                        arrayOf(POST_NOTIFICATIONS), // Gunakan POST_NOTIFICATIONS langsung
+                        arrayOf(POST_NOTIFICATIONS),
                         123
                     )
                     Log.d("NotificationDebug", "Requesting notification permission")
@@ -256,17 +248,14 @@ fun DetailMyPlantContent(
         }
     }
 
-    // Menyimpan status Switch untuk setiap plantId
     var isNotificationEnabledMap by remember { mutableStateOf(mutableMapOf<Int, Boolean>()) }
 
-    // Menggunakan Flow untuk mendapatkan status notifikasi tanaman ini
     val isNotificationEnabled by plant?.id?.let { plantId ->
         userPreferences.getPlantNotificationEnabled(plantId).collectAsState(initial = false)
     } ?: remember { mutableStateOf(false) }
 
     var showPermissionDialog by remember { mutableStateOf(false) }
 
-    // Menginisialisasi status Switch sebagai false ketika pertama kali diload
     LaunchedEffect(isNotificationEnabled) {
         plant?.id?.let { plantId ->
             if (isNotificationEnabled) {
@@ -325,7 +314,6 @@ fun DetailMyPlantContent(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Image placeholder for the plant
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -344,13 +332,12 @@ fun DetailMyPlantContent(
                         model = plant?.plant?.icon_plant,
                         imageLoader = imageLoader
 
-                ), // Replace with actual plant image
+                ),
                 contentDescription = "Plant Image",
-                modifier = Modifier.size(100.dp) // Adjust size as needed
+                modifier = Modifier.size(100.dp)
             )
         }
 
-        // Plant Name and Latin Name
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -395,7 +382,6 @@ fun DetailMyPlantContent(
             }
         }
 
-        // Notes Section
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -416,7 +402,6 @@ fun DetailMyPlantContent(
             )
         }
 
-        // Plant Progress Section
         Column(
 
         ) {
@@ -462,7 +447,7 @@ fun DetailMyPlantContent(
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                        Spacer(modifier = Modifier.height(4.dp)) // Spacing between label and value
+                        Spacer(modifier = Modifier.height(4.dp))
 
                         Text(
                             text = formattedDate,
@@ -475,8 +460,8 @@ fun DetailMyPlantContent(
                             .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
                             .border(
                                 width = 1.dp,
-                                color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
-                                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
+                                color = MaterialTheme.colorScheme.outlineVariant,
+                                shape = MaterialTheme.shapes.medium
                             )
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                     ){
@@ -485,7 +470,7 @@ fun DetailMyPlantContent(
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                        Spacer(modifier = Modifier.height(4.dp)) // Spacing between label and value
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = harvestDate,
                             style = MaterialTheme.typography.bodyMedium,
@@ -517,7 +502,6 @@ fun DetailMyPlantContent(
                                 if (!notificationHelper.canScheduleExactAlarms()) {
                                     showPermissionDialog = true
                                 } else {
-                                    // Aktifkan notifikasi
                                     plant.plant?.name?.let { plantName ->
                                         scope.launch {
                                             val success = notificationHelper.scheduleHarvestReminders(
@@ -531,7 +515,6 @@ fun DetailMyPlantContent(
                                     }
                                 }
                             } else {
-                                // Nonaktifkan notifikasi
                                 scope.launch {
                                     notificationHelper.cancelHarvestReminders(
                                         calculateHarvestDate(plant.planting_date, daysToAdd)
@@ -588,7 +571,6 @@ fun DetailMyPlantContent(
 @Preview(showBackground = true)
 @Composable
 fun RiwayatKesehatanPreview() {
-    // Contoh data simulasi untuk riwayat kesehatan tanaman
 
     val navHostController = rememberNavController()
 

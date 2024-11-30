@@ -64,10 +64,8 @@ class HarvestNotificationHelper(private val context: Context) {
     fun scheduleHarvestReminders(plantName: String, harvestDateStr: String): Boolean {
         try {
             if (DEBUG) {
-                // Debug mode: Schedule notifications for the next few minutes
                 scheduleDebugNotifications(plantName)
             } else {
-                // Production mode: Normal harvest date notifications
                 scheduleProductionNotifications(plantName, harvestDateStr)
             }
             return true
@@ -78,8 +76,6 @@ class HarvestNotificationHelper(private val context: Context) {
     }
 
     private fun scheduleDebugNotifications(plantName: String) {
-        Log.d("NotificationDebug", "Scheduling debug notifications for $plantName")
-
         cancelHarvestReminders("debug")
 
         NOTIFICATION_MINUTES.forEach { minutesFromNow ->
@@ -106,8 +102,6 @@ class HarvestNotificationHelper(private val context: Context) {
                 notificationTime.timeInMillis,
                 pendingIntent
             )
-
-            Log.d("NotificationDebug", "Scheduled notification for $minutesFromNow minutes from now at ${notificationTime.time}")
         }
     }
 
@@ -146,8 +140,6 @@ class HarvestNotificationHelper(private val context: Context) {
                 notificationTime.timeInMillis,
                 pendingIntent
             )
-
-            Log.d("NotificationDebug", "Scheduled notification for $daysBeforeHarvest days before harvest at ${notificationTime.time}")
         }
     }
 
@@ -164,7 +156,6 @@ class HarvestNotificationHelper(private val context: Context) {
                 )
                 pendingIntent?.let {
                     alarmManager?.cancel(it)
-                    Log.d("NotificationDebug", "Cancelled notification for minute $minute")
                 }
             }
         } else {
@@ -182,7 +173,6 @@ class HarvestNotificationHelper(private val context: Context) {
                 )
                 pendingIntent?.let {
                     alarmManager?.cancel(it)
-                    Log.d("NotificationDebug", "Cancelled notification for $daysBeforeHarvest days before harvest")
                 }
             }
         }

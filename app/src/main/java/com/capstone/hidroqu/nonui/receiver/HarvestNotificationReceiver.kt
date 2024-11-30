@@ -11,11 +11,9 @@ import com.capstone.hidroqu.utils.HarvestNotificationHelper
 
 class HarvestNotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d("NotificationDebug", "BroadcastReceiver.onReceive started")
 
         val plantName = intent.getStringExtra("plantName")
         if (plantName == null) {
-            Log.e("NotificationDebug", "Plant name is null")
             return
         }
 
@@ -59,10 +57,7 @@ class HarvestNotificationReceiver : BroadcastReceiver() {
                 .build()
 
             notificationManager.notify(notificationId, notification)
-            Log.d("NotificationDebug", "Successfully showed notification: $notificationText")
-
         } catch (e: Exception) {
-            Log.e("NotificationDebug", "Failed to show notification: ${e.message}")
             e.printStackTrace()
         }
     }
