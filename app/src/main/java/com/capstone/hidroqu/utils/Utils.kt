@@ -22,7 +22,6 @@ fun createCustomTempFile(context: Context): File {
     return File.createTempFile(fileName, ".jpg", storageDir)
 }
 
-
 fun uriToFile(imageUri: Uri, context: Context): File {
     val myFile = createCustomTempFile(context)
     val inputStream = context.contentResolver.openInputStream(imageUri) as InputStream

@@ -1,13 +1,18 @@
 package com.capstone.hidroqu.ui.screen.home
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,9 +24,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,6 +39,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.SvgDecoder
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.component.CardAlarm
 import com.capstone.hidroqu.ui.component.CardArticle
@@ -197,6 +210,53 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
 }
 
 @Composable
+fun NoPlantList(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.surfaceDim,
+                shape = MaterialTheme.shapes.medium
+            ),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.onPrimary),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.panen),
+                contentDescription = "Artikel",
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.Center)
+                    .fillMaxWidth(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Jangan Lewatkan Waktu Panen, Setel Alarm Panenmu!",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        }
+    }
+}
+
+@SuppressLint("NewApi")
+@Composable
 fun AlarmSection(
     userPreferences: UserPreferences,
     plantsToHarvest: List<MyPlantResponse>,
@@ -218,30 +278,28 @@ fun AlarmSection(
             )
         }
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp) // Jarak antar elemen dalam daftar
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Log.d("AlarmSection", "Plants to harvest: $plantsToHarvest")
 
-            if (plantsToHarvest.isNotEmpty()) {
-                plantsToHarvest.forEach { plant ->
-                    val isNotificationEnabled by userPreferences.getPlantNotificationEnabled(plant.id)
-                        .collectAsState(initial = false)
+            val plantsWithNotification = plantsToHarvest.filter { plant ->
+                val isNotificationEnabled by userPreferences.getPlantNotificationEnabled(plant.id)
+                    .collectAsState(initial = false)
+                isNotificationEnabled
+            }
 
-                    if (isNotificationEnabled) {
-                        // Tampilkan card untuk tanaman yang notifikasinya aktif
-                        CardAlarm(plant) // Tampilkan card untuk tanaman yang siap dipanen
-                    }
+            // Menampilkan CardAlarm untuk setiap tanaman yang memiliki notifikasi yang aktif
+            if (plantsWithNotification.isNotEmpty()) {
+                plantsWithNotification.forEach { plant ->
+                    CardAlarm(plant)
                 }
             } else {
-                Text(
-                    text = "Tidak ada tanaman dengan status panen aktif.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                NoPlantList(modifier = modifier)
             }
         }
     }
 }
+
 
 @Composable
 fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifier, articles: List<ArticleDetailResponse>) {
@@ -301,6 +359,6 @@ fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifi
 fun HomeActivityPreview() {
     HidroQuTheme{
         val navController = rememberNavController()
-        HomeActivity(navController)
+        NoPlantList(modifier = Modifier)
     }
 }

@@ -167,50 +167,6 @@ class ProfileViewModel: ViewModel() {
                     confirmPassword?.toRequestBody("text/plain".toMediaTypeOrNull())
                 val method = RequestBody.create("text/plain".toMediaTypeOrNull(), "PUT")
 
-
-//                _isLoading.value = true
-//        // Konversi data menjadi RequestBody
-//        val nameRequest = name.toRequestBody("text/plain".toMediaTypeOrNull())
-//        val emailRequest = email.toRequestBody("text/plain".toMediaTypeOrNull())
-//        val bioRequest = bio.toRequestBody("text/plain".toMediaTypeOrNull())
-//
-//        val passwordRequest = password?.toRequestBody("text/plain".toMediaTypeOrNull())
-//        val passwordConfirmationRequest = confirmPassword?.toRequestBody("text/plain".toMediaTypeOrNull())
-//        val method = RequestBody.create("text/plain".toMediaTypeOrNull(), "PUT")
-//
-//        val photoPart: MultipartBody.Part? = photoUri?.let { uri ->
-//            try {
-//                val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg" // Deteksi MIME type
-//                val byteArray = if (uri.scheme == "http" || uri.scheme == "https") {
-//                    // Unduh file jika URI adalah URL
-//                    downloadFile(context, uri)?.readBytes()
-//                } else {
-//                    // Baca file lokal sebagai byte array
-//                    context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-//                }
-//
-//                // Validasi ukuran file (<= 2MB)
-//                if (byteArray != null && byteArray.size > 2 * 1024 * 1024) {
-//                    Toast.makeText(context, "Ukuran file terlalu besar", Toast.LENGTH_SHORT).show()
-//                    return@let null
-//                }
-//
-//                // Buat RequestBody dan MultipartBody.Part
-//                val requestFile = byteArray?.toRequestBody(mimeType.toMediaTypeOrNull())
-//                requestFile?.let {
-//                    MultipartBody.Part.createFormData(
-//                        "photo",
-//                        "filename.${mimeType.split("/").last()}",
-//                        it
-//                    )
-//                }
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                Toast.makeText(context, "Gagal membaca file", Toast.LENGTH_SHORT).show()
-//                null
-//            }
-//        }
-
                 Log.d(
                     "ProfileViewModel",
                     "Request: name=$name, email=$email, bio=$bio, password=$password, photoUri=$photoUri"
