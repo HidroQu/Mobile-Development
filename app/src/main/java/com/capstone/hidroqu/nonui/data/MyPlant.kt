@@ -104,6 +104,7 @@ data class DiagnosticHistory(
     val id: Int,
     val user_plant_id: Int,
     val diagnostic_id: Int,
+    val diagnostic_image: String,
     val diagnostic_date: String,
     val created_at: String,
     val updated_at: String,

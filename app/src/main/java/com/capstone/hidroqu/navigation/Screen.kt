@@ -22,8 +22,8 @@ sealed class Screen(val route: String) {
     object ResultScanTanam : Screen("ResultScanTanam/{photoUri}") {
         fun createRoute(photoUri: String) = "ResultScanTanam/$photoUri"
     }
-    object ChoosePlant : Screen("ChoosePlant/{diagnoseId}") {
-        fun createRoute(diagnoseId: Int) = "ChoosePlant/$diagnoseId"
+    object ChoosePlant : Screen("ChoosePlant/{diagnoseId}/{photoUri}") {
+        fun createRoute(diagnoseId: Int, photoUri: String) = "ChoosePlant/$diagnoseId/$photoUri"
     }
 
     //main

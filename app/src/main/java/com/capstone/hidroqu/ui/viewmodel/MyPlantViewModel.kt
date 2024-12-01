@@ -1,5 +1,7 @@
 package com.capstone.hidroqu.ui.viewmodel
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,14 +21,21 @@ import com.capstone.hidroqu.nonui.data.MyPlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.StorePlantRequest
+import com.capstone.hidroqu.utils.compressImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 class MyPlantViewModel : ViewModel() {
 
@@ -201,22 +210,43 @@ class MyPlantViewModel : ViewModel() {
         diagnoseId: Int,
         myPlantId: Int,
         diagnoseDate: String,
+        imageUri: Uri?,
+        context: Context,
         onSuccess: (BasicResponse) -> Unit,
     ) {
-        // Tambahkan log tambahan untuk debugging
         Log.d("StoreDiagnose", "Attempting to store diagnose with params:")
         Log.d("StoreDiagnose", "Token: $token")
         Log.d("StoreDiagnose", "MyPlantId: $myPlantId")
         Log.d("StoreDiagnose", "DiagnoseId: $diagnoseId")
         Log.d("StoreDiagnose", "DiagnoseDate: $diagnoseDate")
 
-        // Request to store plant
+        // Siapkan RequestBody untuk parameter lain
+        val userPlantIdBody = myPlantId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val diagnoseIdBody = diagnoseId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val diagnoseDateBody = diagnoseDate.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val imagePart: MultipartBody.Part? = imageUri?.let {
+            try {
+                // Konversi URI menjadi File dan lakukan kompresi
+                val originalFile = File(it.path ?: "")
+                val compressedFile = compressImage(originalFile, context)
+
+                // Siapkan RequestBody untuk file yang sudah dikompresi
+                val requestFile = compressedFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("diagnostic_image", compressedFile.name, requestFile)
+            } catch (e: Exception) {
+                Log.e("StoreDiagnose", "Error compressing image: ${e.message}")
+                null
+            }
+        }
+        // Request ke API
         apiService.StoreDiagnostic(
             token = "Bearer $token",
             userPlant = myPlantId,
-            userPlantId = myPlantId,
-            diagnosticId = diagnoseId,
-            diagnosticDate = diagnoseDate
+            userPlantId = userPlantIdBody,
+            diagnosticId = diagnoseIdBody,
+            diagnosticDate = diagnoseDateBody,
+            diagnostic_image = imagePart
         ).enqueue(object : Callback<BasicResponse> {
             override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
                 Log.d("StoreDiagnose", "Response code: ${response.code()}")
@@ -230,7 +260,6 @@ class MyPlantViewModel : ViewModel() {
                         onSuccess(it)
                     }
                 } else {
-                    // Log error details
                     val errorBody = response.errorBody()?.string()
                     Log.e("StoreDiagnose", "Error storing plant: ${response.message()}")
                     Log.e("StoreDiagnose", "Error body: $errorBody")
@@ -240,12 +269,11 @@ class MyPlantViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-                // Log network error
                 Log.e("StoreDiagnose", "Network error: ${t.message}")
 
                 _errorMessage.value = "Network error: ${t.message}"
             }
         })
-
     }
+
 }

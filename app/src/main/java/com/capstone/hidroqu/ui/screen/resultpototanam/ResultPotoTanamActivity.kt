@@ -34,6 +34,7 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.capstone.hidroqu.ui.screen.myplant.NoPlantList
 import com.capstone.hidroqu.ui.viewmodel.ScanPlantViewModel
+import java.net.URLEncoder
 
 @Composable
 fun ResultPotoTanamActivity(
@@ -88,7 +89,7 @@ fun ResultPotoTanamActivity(
         navHostController = navHostController,
         modifier = modifier,
         isLoading = isLoading,
-        diagnoseId = nutrientPrediction?.data?.diagnostic?.id ?: 0
+        diagnoseId = nutrientPrediction?.data?.diagnostic?.id ?: 0,
     )
 }
 
@@ -118,8 +119,9 @@ fun ResultPotoTanamActivityContent(
             ) {
                 Button(
                     onClick = {
+                        val encodedUri = URLEncoder.encode(photoUri.toString(), "UTF-8")
                         navHostController.navigate(
-                            Screen.ChoosePlant.createRoute(diagnoseId = diagnoseId)
+                            Screen.ChoosePlant.createRoute(diagnoseId = diagnoseId, photoUri = encodedUri)
                         )
                     },
                     modifier = Modifier

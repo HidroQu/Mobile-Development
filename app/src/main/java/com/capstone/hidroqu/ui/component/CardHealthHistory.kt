@@ -66,7 +66,7 @@ fun CardHealthHistory(
                     .build()
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = listHealthHistory.diagnostic.image_disease,
+                        model = listHealthHistory.diagnostic_image,
                         imageLoader = imageLoader
 
                     ),

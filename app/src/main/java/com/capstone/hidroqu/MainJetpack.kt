@@ -143,10 +143,15 @@ fun MainJetpack(
 
                 composable(
                     route = Screen.ChoosePlant.route,
-                    arguments = listOf(navArgument("diagnoseId") { type = NavType.IntType })
+                    arguments = listOf(
+                        navArgument("diagnoseId") { type = NavType.IntType },
+                        navArgument("photoUri") { type = NavType.StringType }
+                    )
+
                 ) { backStackEntry ->
                     val diagnoseId = backStackEntry.arguments?.getInt("diagnoseId")
-                    ChoosePlantActivity(diagnoseId = diagnoseId, navHostController = navController)
+                    val photoUri = backStackEntry.arguments?.getString("photoUri")
+                    ChoosePlantActivity(diagnoseId = diagnoseId, photoUri = photoUri, navHostController = navController)
                 }
 
                 ///artikel

@@ -137,14 +137,15 @@ fun DetailHistoryContent(
                 add(SvgDecoder.Factory())
             }
             .build()
-        Image(
-            painter = painterResource(R.drawable.ic_launcher_background), // Replace with actual plant image
-            contentDescription = "Plant Image",
+        AsyncImage(
+            model = history?.diagnostic_history?.diagnostic_image,
+            contentDescription = "Diagnostic Image",
             modifier = Modifier
                 .height(200.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(25.dp)),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            imageLoader = imageLoader // Gunakan custom ImageLoader untuk mendukung SVG
         )
 
         // Diagnosis Details

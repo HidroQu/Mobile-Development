@@ -94,14 +94,15 @@ interface HidroQuApiService {
         @Path("id") plantId: Int
     ): Call<MyPlantDetailWrapper>
 
-    @FormUrlEncoded
+    @Multipart
     @POST("api/plants/my-plants/{user_plant}/diagnostics")
     fun StoreDiagnostic(
         @Header("Authorization") token: String,
         @Path("user_plant") userPlant: Int,
-        @Field("user_plant_id") userPlantId: Int,
-        @Field("diagnostic_id") diagnosticId: Int,
-        @Field("diagnostic_date") diagnosticDate: String,
+        @Part("user_plant_id") userPlantId: RequestBody,
+        @Part("diagnostic_id") diagnosticId: RequestBody,
+        @Part("diagnostic_date") diagnosticDate: RequestBody,
+        @Part diagnostic_image: MultipartBody.Part? = null
     ): Call<BasicResponse>
 
     @GET("api/plants/my-plants/{id_plant}/diagnostics/{id_diagnostic}")

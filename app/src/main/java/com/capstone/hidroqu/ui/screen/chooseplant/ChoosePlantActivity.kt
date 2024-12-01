@@ -2,6 +2,7 @@ package com.capstone.hidroqu.ui.screen.chooseplant
 
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -48,18 +49,18 @@ import java.util.Locale
 @Composable
 fun ChoosePlantActivity(
     diagnoseId: Int?,
+    photoUri: String?,
     viewModel: MyPlantViewModel = viewModel(),
 //    scanViewModel: ScanPlantViewModel = viewModel(),
     context: Context = LocalContext.current,
     navHostController: NavHostController
 ) {
-
+    val imageUri = Uri.parse(photoUri)
     // Menangani state tanaman yang dipilih secara internal
     var selectedPlant by remember { mutableStateOf<MyPlantResponse?>(null) }
 
     val userPreferences = UserPreferences(context)
     val token by userPreferences.token.collectAsState(initial = null)
-    val plantDetail by viewModel.plantDetail.collectAsState()
     val myPlant by viewModel.myPlants.collectAsState(emptyList()) // Mengobservasi data tanaman
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState()
@@ -101,6 +102,8 @@ fun ChoosePlantActivity(
                                 myPlantId = plant.id,
                                 diagnoseId = diagnoseId!!,
                                 diagnoseDate = todayWithTime,
+                                imageUri = imageUri,
+                                context = context,
                                 onSuccess = {
                                     // Navigate through a sequence of routes
                                     navHostController.navigate(Screen.DetailMyPlant.createRoute(plant.id)) {
