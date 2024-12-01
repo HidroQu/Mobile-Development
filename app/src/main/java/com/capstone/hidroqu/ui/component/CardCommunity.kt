@@ -94,7 +94,7 @@ fun CardCommunity(
 
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = listCommunity.user.profile_image,
+                    model = listCommunity.user.photo,
                     imageLoader = imageLoader
                 ),
                 modifier = Modifier

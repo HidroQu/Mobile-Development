@@ -67,7 +67,7 @@ fun CardPostComment(
 
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = listComment.user.profile_image,
+                    model = listComment.user.photo,
                     imageLoader = imageLoader
                 ),
                 contentDescription = "Profil",
