@@ -20,7 +20,6 @@ fun createCustomTempFile(context: Context): File {
     return File.createTempFile(fileName, ".jpg", storageDir)
 }
 
-
 fun uriToFile(imageUri: Uri, context: Context): File {
     val myFile = createCustomTempFile(context)
     val inputStream = context.contentResolver.openInputStream(imageUri) as InputStream
@@ -56,8 +55,7 @@ fun compressImage(file: File, context: Context): File {
     return compressedFile
 }
 
-
 fun isFileSizeValid(file: File): Boolean {
-    val fileSizeInKb = file.length() / 2048
-    return fileSizeInKb <= 2048
+    val fileSizeInKb = file.length() / 1024
+    return fileSizeInKb <= 1024
 }

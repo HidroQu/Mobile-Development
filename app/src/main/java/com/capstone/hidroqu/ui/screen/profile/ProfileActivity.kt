@@ -3,7 +3,9 @@ package com.capstone.hidroqu.ui.screen.profile
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -140,7 +142,7 @@ fun ProfileActivity(
                         verticalArrangement = Arrangement.spacedBy(24.dp),
                     ) {
                         AsyncImage(
-                            model = userData?.photo, // URL gambar dari userData
+                            model = userData?.photo,
                             contentDescription = "Profile Icon",
                             modifier = Modifier
                                 .size(120.dp)
@@ -177,21 +179,71 @@ fun ProfileActivity(
                         )
 
                         // My Posts Section
-                        MyPostsSection(
-                            posts = displayedPosts,
-                            onLoadMore = { visiblePostsCount += 5 },
-                            isMoreAvailable = isMoreAvailable,
-                            onDetailClicked = { idPost ->
-                                navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)) {
-                                    popUpTo(Screen.Profile.route)
+                        if (myPosts.isEmpty()) {
+                            NoPostList(modifier = Modifier)
+                        } else {
+                            MyPostsSection(
+                                posts = displayedPosts,
+                                onLoadMore = { visiblePostsCount += 5 },
+                                isMoreAvailable = isMoreAvailable,
+                                onDetailClicked = { idPost ->
+                                    navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)) {
+                                        popUpTo(Screen.Profile.route)
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
         }
     )
+}
+
+@Composable
+fun NoPostList(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.surfaceDim,
+                shape = MaterialTheme.shapes.medium
+            ),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.onPrimary),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.pupuk),
+                contentDescription = "Artikel",
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.Center)
+                    .fillMaxWidth(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Anda belum memposting apapun",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        }
+    }
 }
 
 @Composable

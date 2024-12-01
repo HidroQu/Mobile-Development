@@ -74,6 +74,10 @@ import java.util.Locale
 import android.app.Activity
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.util.Log
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.capstone.hidroqu.utils.formatDate
@@ -194,8 +198,51 @@ fun DetailMyPlantActivity(
         )
     }
 
-
-
+@Composable
+fun NoHistoryList(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.surfaceDim,
+                shape = MaterialTheme.shapes.medium
+            ),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.onPrimary),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.pupuk),
+                contentDescription = "Artikel",
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.Center)
+                    .fillMaxWidth(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Tidak ada riwayat tanaman",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        }
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -533,35 +580,38 @@ fun DetailMyPlantContent(
             }
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-//                .padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.onPrimary)
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = "Riwayat kesehatan",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+        if (healthHistoryList.isEmpty()) {
+            NoHistoryList(modifier = Modifier.fillMaxWidth())
+        } else {
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.onPrimary)
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                healthHistoryList.forEach { healthHistory ->
-                    CardHealthHistory(
-                        listHealthHistory = healthHistory,
-                        onClick = {
-                            navHostController.navigate(
-                                Screen.HistoryMyPlant.createRoute(
-                                    plantId = plant?.id ?: 0,
-                                    healthId = healthHistory.id
+                Text(
+                    text = "Riwayat kesehatan",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    healthHistoryList.forEach { healthHistory ->
+                        CardHealthHistory(
+                            listHealthHistory = healthHistory,
+                            onClick = {
+                                navHostController.navigate(
+                                    Screen.HistoryMyPlant.createRoute(
+                                        plantId = plant?.id ?: 0,
+                                        healthId = healthHistory.id
+                                    )
                                 )
-                            )
-                        }
-                    )
+                            }
+                        )
+                    }
                 }
             }
         }

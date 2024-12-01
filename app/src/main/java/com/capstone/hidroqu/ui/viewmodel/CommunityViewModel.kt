@@ -113,7 +113,6 @@ class CommunityViewModel : ViewModel() {
         val contentRequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
 
         val imagePart: MultipartBody.Part? = imageUri?.let {
-            // Kompresi gambar sebelum diunggah
             val compressedImageFile = compressImage(context, it)
 
             compressedImageFile?.let { file ->

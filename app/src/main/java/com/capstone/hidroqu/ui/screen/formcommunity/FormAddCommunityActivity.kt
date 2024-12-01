@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
@@ -43,18 +45,23 @@ import com.capstone.hidroqu.navigation.TopBarButtonAction
 import com.capstone.hidroqu.nonui.data.PostData
 import com.capstone.hidroqu.nonui.data.UserData
 import com.capstone.hidroqu.nonui.data.UserPreferences
+import com.capstone.hidroqu.ui.screen.profile.ProfileInfo
 import com.capstone.hidroqu.utils.ListUserData
 import com.capstone.hidroqu.utils.dummyListUserData
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
+import com.capstone.hidroqu.ui.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormAddCommunityActivity(
     navHostController: NavHostController,
     context: Context = LocalContext.current,
+    profileViewModel: ProfileViewModel = viewModel(),
     viewModel: CommunityViewModel = viewModel(),
 ) {
+    val userData by profileViewModel.userData.collectAsState()
+
     val userPreferences = UserPreferences(context)
     val token by userPreferences.token.collectAsState(initial = null)
     val communityPosts by viewModel.communityPosts.collectAsState(emptyList())
@@ -78,10 +85,20 @@ fun FormAddCommunityActivity(
 
     LaunchedEffect(Unit) {
         token?.let {
+            profileViewModel.fetchUserProfile(it)
             viewModel.fetchAllCommunityPosts(it)
         } ?: Log.e("CommunityActivity", "Token is null. Redirect to login.")
     }
 
+    LaunchedEffect(token) {
+        token?.let {
+            profileViewModel.fetchUserProfile(it)
+        }?: run {
+            navHostController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Profile.route) { inclusive = true }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -96,15 +113,13 @@ fun FormAddCommunityActivity(
                                 token = token!!,
                                 title = postTittle,
                                 content = postText,
-                                imageUri = imageUris.firstOrNull(), // Handle the first selected image
+                                imageUri = imageUris.firstOrNull(),
                                 context = context,
                                 onSuccess = { response ->
-                                    // Handle success response
                                     Log.d("FormAddCommunityActivity", "Post added successfully: ${response.message}")
-                                    navHostController.popBackStack() // Navigate back or to the community main screen
+                                    navHostController.popBackStack()
                                 },
                                 onError = { error ->
-                                    // Display error message
                                     errorMessage = error
                                     Log.e("FormAddCommunityActivity", "Failed to add post: $error")
                                 }
@@ -128,7 +143,38 @@ fun FormAddCommunityActivity(
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                UserItem(userPreferences = userPreferences)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        AsyncImage(
+                            model = userData?.photo ?: "",
+                            contentDescription = "Profile Picture",
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(CircleShape)
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant,
+                                    shape = CircleShape
+                                )
+                        )
+                        Text(
+                            text = userData?.name ?: "Nama pengguna",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                }
 
                 TextField(
                     value = postTittle,
@@ -143,7 +189,11 @@ fun FormAddCommunityActivity(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(16.dp))
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(16.dp)
+                        )
                         .clip(RoundedCornerShape(16.dp)),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
@@ -166,7 +216,11 @@ fun FormAddCommunityActivity(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(150.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(16.dp))
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(16.dp)
+                        )
                         .clip(RoundedCornerShape(16.dp)),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
@@ -186,7 +240,11 @@ fun FormAddCommunityActivity(
                                 modifier = Modifier
                                     .size(250.dp)
                                     .clip(RoundedCornerShape(16.dp))
-                                    .border(1.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(16.dp))
+                                    .border(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.outline,
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
                                     .clickable {
                                         expandedImageUri = imageUris[index]
                                         isImageExpanded = true
@@ -286,43 +344,9 @@ fun FormAddCommunityActivity(
 
 @Composable
 fun UserItem(
-    userPreferences: UserPreferences = UserPreferences(LocalContext.current)
+    name: String
 ) {
-    // Collect user data from preferences
-    val userName by userPreferences.userName.collectAsState(initial = null)
-    val userEmail by userPreferences.userEmail.collectAsState(initial = null)
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Profile Image (you might want to fetch from userPreferences or API)
-        Image(
-            painter = rememberAsyncImagePainter(
-                model = userPreferences.userProfileImage,
-                placeholder = painterResource(R.drawable.ic_launcher_background),
-                error = painterResource(R.drawable.ic_launcher_background)
-            ),
-            contentDescription = "Profile Picture",
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                    shape = CircleShape
-                )
-        )
-
-        // User Name
-        Text(
-            text = userName ?: "Pengguna",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-    }
 }
 
 @Preview(showBackground = true)

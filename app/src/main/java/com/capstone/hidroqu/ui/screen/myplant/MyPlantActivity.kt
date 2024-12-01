@@ -57,7 +57,6 @@ fun MyPlantActivity(
             Log.d("MyPlantActivity", "Token: $it")
             viewModel.fetchMyPlants(it)
         } ?: run {
-            // Tangani kasus ketika token null, misalnya arahkan ke halaman login
             navHostController.navigate(Screen.Login.route) {
                 popUpTo(Screen.MyPlant.route) { inclusive = true }
             }
@@ -70,7 +69,7 @@ fun MyPlantActivity(
         },
         floatingActionButton = {
             AddButton(onClick = {
-                navHostController.navigate(Screen.AddPlant.route) // Pindah ke halaman AddPlant
+                navHostController.navigate(Screen.AddPlant.route)
             })
         }
     ) { paddingValues ->
@@ -88,9 +87,9 @@ fun MyPlantActivity(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                contentAlignment = Alignment.Center // Atur konten ke tengah
+                contentAlignment = Alignment.Center
             ) {
-                NoPlantList() // Panggil fungsi NoPlantList
+                NoPlantList()
             }
         }
         else {
@@ -133,7 +132,8 @@ fun NoPlantList(
 
     Column(
         modifier = modifier
-            .fillMaxSize(),
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
