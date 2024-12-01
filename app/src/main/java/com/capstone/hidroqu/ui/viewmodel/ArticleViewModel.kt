@@ -37,7 +37,7 @@ class ArticleViewModel : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
 
-    fun fetchAllArticles(token: String) {
+    fun fetchAllArticles(token: String, searchQuery: String? = null) {
         viewModelScope.launch {
             _isLoading.value = true
             val allArticles = mutableListOf<ArticleDetailResponse>()
@@ -46,11 +46,13 @@ class ArticleViewModel : ViewModel() {
                 var currentPage = 1
                 do {
                     val response = withContext(Dispatchers.IO) {
-                        apiService.getArticles("Bearer $token", currentPage).execute()
+                        apiService.getArticles("Bearer $token", currentPage, searchQuery).execute()
                     }
                     if (response.isSuccessful) {
                         response.body()?.data?.let { wrapper ->
-                            allArticles.addAll(wrapper.data)
+                            // Sort the articles on this page by ID in descending order
+                            val sortedPageArticles = wrapper.data.sortedByDescending { it.id }
+                            allArticles.addAll(sortedPageArticles)
                             currentPage = wrapper.currentPage + 1
                         } ?: break
                     } else {
@@ -59,7 +61,8 @@ class ArticleViewModel : ViewModel() {
                     }
                 } while (response.body()?.data?.nextPageUrl != null)
 
-                _articles.value = allArticles
+                // Final sort to ensure the most recent articles are at the top
+                _articles.value = allArticles.sortedByDescending { it.id }
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching articles: ${e.message}"
             } finally {

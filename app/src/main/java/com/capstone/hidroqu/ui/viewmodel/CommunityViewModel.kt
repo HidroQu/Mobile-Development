@@ -38,11 +38,35 @@ class CommunityViewModel : ViewModel() {
     private val _myPosts = MutableStateFlow<PostData?>(null)
     val myPosts: StateFlow<PostData?> get() = _myPosts
 
+    private val _userData = MutableStateFlow<User?>(null)
+    val userData: StateFlow<User?> get() = _userData
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
+
+    fun fetchUserProfile(token: String) {
+        _isLoading.value = true
+        apiService.getUserProfile("Bearer $token").enqueue(object : Callback<ProfileResponse> {
+            override fun onResponse(call: Call<ProfileResponse>, response: Response<ProfileResponse>) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    Log.d("ProfileViewModel", "Response: ${response.body()}")
+                    _userData.value = response.body()?.data
+                } else {
+                    Log.e("ProfileViewModel", "Error: ${response.errorBody()?.string()}")
+                    _errorMessage.value = "Failed to load profile: ${response.message()}"
+                }
+            }
+
+            override fun onFailure(call: Call<ProfileResponse>, t: Throwable) {
+                _isLoading.value = false
+                _errorMessage.value = "Error: ${t.message}"
+            }
+        })
+    }
 
     fun fetchCommunityDetail(token: String, communityId: Int) {
         _isLoading.value = true
@@ -159,7 +183,7 @@ class CommunityViewModel : ViewModel() {
         }
     }
 
-    fun fetchAllCommunityPosts(token: String) {
+    fun fetchAllCommunityPosts(token: String, searchQuery: String? = null) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
@@ -167,7 +191,7 @@ class CommunityViewModel : ViewModel() {
                 val allPosts = mutableListOf<PostData>()
                 do {
                     val response = withContext(Dispatchers.IO) {
-                        apiService.getCommunities("Bearer $token", currentPage).execute()
+                        apiService.getCommunities("Bearer $token", currentPage, searchQuery).execute()
                     }
                     if (response.isSuccessful) {
                         response.body()?.data?.let { wrapper ->

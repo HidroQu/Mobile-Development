@@ -17,6 +17,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -77,8 +79,10 @@ fun CardArticle(
             )
             Text(
                 text = article.content,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.outline
+                style = MaterialTheme.typography.labelMedium.copy(textAlign = TextAlign.Justify),
+                color = MaterialTheme.colorScheme.outline,
+                maxLines = 5,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

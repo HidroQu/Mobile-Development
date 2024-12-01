@@ -59,9 +59,9 @@ fun ArticleActivity(
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
 
-    LaunchedEffect(token) {
+    LaunchedEffect(token, searchQuery) {
         token?.let {
-            viewModel.fetchAllArticles(it)
+            viewModel.fetchAllArticles(it, searchQuery.ifEmpty { null })
         } ?: run {
             navHostController.navigate(Screen.Login.route) {
                 popUpTo(Screen.Community.route) { inclusive = true }
@@ -182,20 +182,13 @@ fun Article(
     searchQuery: String,
     modifier: Modifier = Modifier
 ) {
-    val filteredArticles = remember(searchQuery) {
-        articles.filter {
-            it.title.contains(searchQuery, ignoreCase = true) ||
-                    it.content.contains(searchQuery, ignoreCase = true)
-        }
-    }
-
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .verticalScroll(rememberScrollState())
             .padding(20.dp)
     ) {
-        filteredArticles.forEach { article ->
+        articles.forEach { article ->
             CardArticle(
                 article = article,
                 onClick = {

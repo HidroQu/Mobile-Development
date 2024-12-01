@@ -106,7 +106,8 @@ interface HidroQuApiService {
     @GET("api/communities")
     fun getCommunities(
         @Header("Authorization") token: String,
-        @Query("page") page: Int // Adding a page query parameter
+        @Query("page") page: Int, // Adding a page query parameter
+        @Query("search") searchQuery: String? = null
     ): Call<CommunityResponseWrapper>
 
     // Mendapatkan detail komunitas tertentu berdasarkan ID atau slug
@@ -147,7 +148,8 @@ interface HidroQuApiService {
     @GET("api/articles")
     fun getArticles(
         @Header("Authorization") token: String,
-        @Query("page") page: Int // Adding a page query parameter
+        @Query("page") page: Int, // Existing parameter
+        @Query("search") searchQuery: String? = null // New parameter for search
     ): Call<ArticleResponseWrapper>
 
     // Mendapatkan daftar komunitas

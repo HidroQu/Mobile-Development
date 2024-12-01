@@ -326,7 +326,6 @@ fun DetailPostCommunityContent(
                     painter = painterResource(R.drawable.ic_gallery),
                     contentDescription = "Galeri",
                     modifier = Modifier.clickable {
-                        // Navigasikan langsung ke halaman FormAddComment
                         navHostController.navigate(Screen.AddPostComment.createRoute(post?.id ?: 0)) {
                             popUpTo(Screen.Community.route) // Atur pop-up behavior sesuai kebutuhan
                         }
@@ -346,7 +345,7 @@ fun DetailPostCommunityContent(
                             }
                         },
 
-                    maxLines = 1,
+                    maxLines = 2,
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = MaterialTheme.colorScheme.onPrimary,
                         focusedIndicatorColor = Color.Transparent,
