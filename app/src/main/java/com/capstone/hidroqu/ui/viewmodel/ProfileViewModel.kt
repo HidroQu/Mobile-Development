@@ -95,7 +95,7 @@ class ProfileViewModel: ViewModel() {
                 } while (response.body()?.data?.next_page_url != null)
 
                 if (allmypost.isEmpty()) {
-                    _errorMessage.value = "Belum ada postingan"
+
                 } else {
                     val sortedPosts = allmypost.sortedByDescending { post ->
                         try {
