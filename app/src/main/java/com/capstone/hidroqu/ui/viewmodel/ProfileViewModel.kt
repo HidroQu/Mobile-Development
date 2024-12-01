@@ -14,6 +14,9 @@ import com.capstone.hidroqu.nonui.data.MyPostsResponseWrapper
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.ProfileResponse
 import com.capstone.hidroqu.nonui.data.User
+import com.capstone.hidroqu.utils.compressImageFile
+import com.capstone.hidroqu.utils.isFileSizeValid
+import com.capstone.hidroqu.utils.uriToFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -125,79 +128,134 @@ class ProfileViewModel: ViewModel() {
         confirmPassword: String?,
         onComplete: (Boolean, String) -> Unit
     ) {
-        _isLoading.value = true
-        // Konversi data menjadi RequestBody
-        val nameRequest = name.toRequestBody("text/plain".toMediaTypeOrNull())
-        val emailRequest = email.toRequestBody("text/plain".toMediaTypeOrNull())
-        val bioRequest = bio.toRequestBody("text/plain".toMediaTypeOrNull())
-
-        val passwordRequest = password?.toRequestBody("text/plain".toMediaTypeOrNull())
-        val passwordConfirmationRequest = confirmPassword?.toRequestBody("text/plain".toMediaTypeOrNull())
-        val method = RequestBody.create("text/plain".toMediaTypeOrNull(), "PUT")
-
-        val photoPart: MultipartBody.Part? = photoUri?.let { uri ->
+        viewModelScope.launch {
             try {
-                val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg" // Deteksi MIME type
-                val byteArray = if (uri.scheme == "http" || uri.scheme == "https") {
-                    // Unduh file jika URI adalah URL
-                    downloadFile(context, uri)?.readBytes()
-                } else {
-                    // Baca file lokal sebagai byte array
-                    context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                _isLoading.value = true
+
+                // Mengubah URI ke file sementara jika ada
+                var file = photoUri?.let { withContext(Dispatchers.IO) { uriToFile(it, context) } }
+
+                // Deteksi MIME type
+                val mimeType = photoUri?.let { context.contentResolver.getType(it) ?: "image/jpeg" }
+
+                // Memastikan ukuran file valid, jika tidak, melakukan kompresi
+                file?.let {
+                    if (!isFileSizeValid(it)) {
+                        file = withContext(Dispatchers.IO) { compressImageFile(it, context) }
+                    }
+
+                    // Jika ukuran file masih lebih besar dari 2 MB setelah kompresi
+                    if (!isFileSizeValid(file!!)) {
+                        _isLoading.value = false
+                        onComplete(false, "File size exceeds 2 MB even after compression.")
+                        return@launch
+                    }
                 }
 
-                // Validasi ukuran file (<= 2MB)
-                if (byteArray != null && byteArray.size > 2 * 1024 * 1024) {
-                    Toast.makeText(context, "Ukuran file terlalu besar", Toast.LENGTH_SHORT).show()
-                    return@let null
+                // Membuat MultipartBody.Part jika ada file
+                val photoPart = file?.let {
+                    val requestFile = it.asRequestBody(mimeType?.toMediaTypeOrNull())
+                    MultipartBody.Part.createFormData("photo", it.name, requestFile)
                 }
 
-                // Buat RequestBody dan MultipartBody.Part
-                val requestFile = byteArray?.toRequestBody(mimeType.toMediaTypeOrNull())
-                requestFile?.let {
-                    MultipartBody.Part.createFormData(
-                        "photo",
-                        "filename.${mimeType.split("/").last()}",
-                        it
-                    )
-                }
+                // Membuat RequestBody untuk parameter lainnya
+                val nameRequest = name.toRequestBody("text/plain".toMediaTypeOrNull())
+                val emailRequest = email.toRequestBody("text/plain".toMediaTypeOrNull())
+                val bioRequest = bio.toRequestBody("text/plain".toMediaTypeOrNull())
+                val passwordRequest = password?.toRequestBody("text/plain".toMediaTypeOrNull())
+                val passwordConfirmationRequest =
+                    confirmPassword?.toRequestBody("text/plain".toMediaTypeOrNull())
+                val method = RequestBody.create("text/plain".toMediaTypeOrNull(), "PUT")
+
+
+//                _isLoading.value = true
+//        // Konversi data menjadi RequestBody
+//        val nameRequest = name.toRequestBody("text/plain".toMediaTypeOrNull())
+//        val emailRequest = email.toRequestBody("text/plain".toMediaTypeOrNull())
+//        val bioRequest = bio.toRequestBody("text/plain".toMediaTypeOrNull())
+//
+//        val passwordRequest = password?.toRequestBody("text/plain".toMediaTypeOrNull())
+//        val passwordConfirmationRequest = confirmPassword?.toRequestBody("text/plain".toMediaTypeOrNull())
+//        val method = RequestBody.create("text/plain".toMediaTypeOrNull(), "PUT")
+//
+//        val photoPart: MultipartBody.Part? = photoUri?.let { uri ->
+//            try {
+//                val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg" // Deteksi MIME type
+//                val byteArray = if (uri.scheme == "http" || uri.scheme == "https") {
+//                    // Unduh file jika URI adalah URL
+//                    downloadFile(context, uri)?.readBytes()
+//                } else {
+//                    // Baca file lokal sebagai byte array
+//                    context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+//                }
+//
+//                // Validasi ukuran file (<= 2MB)
+//                if (byteArray != null && byteArray.size > 2 * 1024 * 1024) {
+//                    Toast.makeText(context, "Ukuran file terlalu besar", Toast.LENGTH_SHORT).show()
+//                    return@let null
+//                }
+//
+//                // Buat RequestBody dan MultipartBody.Part
+//                val requestFile = byteArray?.toRequestBody(mimeType.toMediaTypeOrNull())
+//                requestFile?.let {
+//                    MultipartBody.Part.createFormData(
+//                        "photo",
+//                        "filename.${mimeType.split("/").last()}",
+//                        it
+//                    )
+//                }
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                Toast.makeText(context, "Gagal membaca file", Toast.LENGTH_SHORT).show()
+//                null
+//            }
+//        }
+
+                Log.d(
+                    "ProfileViewModel",
+                    "Request: name=$name, email=$email, bio=$bio, password=$password, photoUri=$photoUri"
+                )
+                Log.d(
+                    "ProfileUpdate",
+                    "NameRequest: $nameRequest, EmailRequest: $emailRequest, BioRequest: $bioRequest, PasswordRequest: $passwordRequest, PhotoRequest: $photoPart"
+                )
+
+                apiService.updateProfile(
+                    token = "Bearer $token",
+                    name = nameRequest,
+                    email = emailRequest,
+                    bio = bioRequest,
+                    password = passwordRequest,
+                    passwordConfirmation = passwordConfirmationRequest,
+                    photo = photoPart,
+                    method = method
+                ).enqueue(object : Callback<BasicResponse> {
+                    override fun onResponse(
+                        call: Call<BasicResponse>,
+                        response: Response<BasicResponse>
+                    ) {
+                        _isLoading.value = false
+                        if (response.isSuccessful) {
+                            onComplete(true, "Profil berhasil diperbarui")
+                        } else {
+                            val errorBody = response.errorBody()?.string()
+                            Log.e("ProfileViewModel", "Update failed: $errorBody")
+                            onComplete(false, errorBody ?: "Gagal memperbarui profil")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+                        _isLoading.value = false
+                        Log.e("ProfileViewModel", "Network error: ${t.message}")
+                        onComplete(false, t.message ?: "Error tidak diketahui")
+                    }
+                })
             } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(context, "Gagal membaca file", Toast.LENGTH_SHORT).show()
-                null
+                _isLoading.value = false
+                Log.e("UpdateProfile", "Exception: ${e.message}")
+                onComplete(false, "Error updating profile: ${e.message}")
             }
         }
-
-        Log.d("ProfileViewModel", "Request: name=$name, email=$email, bio=$bio, password=$password, photoUri=$photoUri")
-        Log.d("ProfileUpdate", "NameRequest: $nameRequest, EmailRequest: $emailRequest, BioRequest: $bioRequest, PasswordRequest: $passwordRequest, PhotoRequest: $photoPart")
-
-        apiService.updateProfile(
-            token = "Bearer $token",
-            name = nameRequest,
-            email = emailRequest,
-            bio = bioRequest,
-            password = passwordRequest,
-            passwordConfirmation = passwordConfirmationRequest,
-            photo = photoPart,
-            method = method
-        ).enqueue(object : Callback<BasicResponse> {
-            override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
-                _isLoading.value = false
-                if (response.isSuccessful) {
-                    onComplete(true, "Profil berhasil diperbarui")
-                } else {
-                    val errorBody = response.errorBody()?.string()
-                    Log.e("ProfileViewModel", "Update failed: $errorBody")
-                    onComplete(false, errorBody ?: "Gagal memperbarui profil")
-                }
-            }
-
-            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-                _isLoading.value = false
-                Log.e("ProfileViewModel", "Network error: ${t.message}")
-                onComplete(false, t.message ?: "Error tidak diketahui")
-            }
-        })
     }
 
     // Fungsi untuk mengunduh file jika URI adalah URL

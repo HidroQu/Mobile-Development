@@ -22,6 +22,7 @@ import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.StorePlantRequest
 import com.capstone.hidroqu.utils.compressImage
+import com.capstone.hidroqu.utils.compressImageFile
 import com.capstone.hidroqu.utils.isFileSizeValid
 import com.capstone.hidroqu.utils.uriToFile
 import kotlinx.coroutines.Dispatchers
@@ -225,7 +226,7 @@ class MyPlantViewModel : ViewModel() {
 
                 // Memastikan ukuran file valid, jika tidak, melakukan kompresi
                 if (!isFileSizeValid(file)) {
-                    file = withContext(Dispatchers.IO) { compressImage(file, context) }
+                    file = withContext(Dispatchers.IO) { compressImageFile(file, context) }
                 }
 
                 // Jika ukuran file masih lebih besar dari 1 MB setelah kompresi

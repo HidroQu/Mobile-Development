@@ -2,10 +2,12 @@ package com.capstone.hidroqu.utils
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -33,7 +35,7 @@ fun uriToFile(imageUri: Uri, context: Context): File {
     return myFile
 }
 
-fun compressImage(file: File, context: Context): File {
+fun compressImageFile(file: File, context: Context): File {
     val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, Uri.fromFile(file))
     var compressedFile = File(context.cacheDir, "compressed_${file.name}")
 
@@ -56,8 +58,40 @@ fun compressImage(file: File, context: Context): File {
     return compressedFile
 }
 
+fun compressImage(context: Context, imageUri: Uri): File? {
+    try {
+        val inputStream = context.contentResolver.openInputStream(imageUri)
+        val originalBitmap = BitmapFactory.decodeStream(inputStream)
+
+        val resizedBitmap = Bitmap.createScaledBitmap(
+            originalBitmap,
+            originalBitmap.width / 2,
+            originalBitmap.height / 2,
+            true
+        )
+
+        val maxFileSize = 1 * 1024 * 1024
+        var quality = 80
+        var compressedFile: File
+
+        do {
+            val baos = ByteArrayOutputStream()
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
+            val compressedBytes = baos.toByteArray()
+
+            compressedFile = File(context.cacheDir, "compressed_image.jpg")
+            compressedFile.writeBytes(compressedBytes)
+
+            quality -= 10
+        } while (compressedFile.length() > maxFileSize && quality > 10)
+
+        return compressedFile
+    } catch (e: Exception) {
+        return null
+    }
+}
 
 fun isFileSizeValid(file: File): Boolean {
-    val fileSizeInKb = file.length() / 2048
-    return fileSizeInKb <= 2048
+    val fileSizeInKb = file.length() / 1024
+    return fileSizeInKb <= 1024
 }

@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.capstone.hidroqu.nonui.api.HidroQuApiConfig
 import com.capstone.hidroqu.nonui.api.HidroQuApiService
 import com.capstone.hidroqu.nonui.data.*
+import com.capstone.hidroqu.utils.compressImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -150,38 +151,7 @@ class CommunityViewModel : ViewModel() {
         }
     }
 
-    private fun compressImage(context: Context, imageUri: Uri): File? {
-        try {
-            val inputStream = context.contentResolver.openInputStream(imageUri)
-            val originalBitmap = BitmapFactory.decodeStream(inputStream)
 
-            val resizedBitmap = Bitmap.createScaledBitmap(
-                originalBitmap,
-                originalBitmap.width / 2,
-                originalBitmap.height / 2,
-                true
-            )
-
-            val maxFileSize = 1 * 1024 * 1024
-            var quality = 80
-            var compressedFile: File
-
-            do {
-                val baos = ByteArrayOutputStream()
-                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
-                val compressedBytes = baos.toByteArray()
-
-                compressedFile = File(context.cacheDir, "compressed_image.jpg")
-                compressedFile.writeBytes(compressedBytes)
-
-                quality -= 10
-            } while (compressedFile.length() > maxFileSize && quality > 10)
-
-            return compressedFile
-        } catch (e: Exception) {
-            return null
-        }
-    }
 
     fun fetchAllCommunityPosts(token: String, searchQuery: String? = null) {
         viewModelScope.launch {
@@ -226,17 +196,12 @@ class CommunityViewModel : ViewModel() {
         val contentRequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
 
         val imagePart: MultipartBody.Part? = imageUri?.let {
-            try {
-                val inputStream = context.contentResolver.openInputStream(it)
-                val byteArray = inputStream?.readBytes()
-                inputStream?.close()
-                val requestFile = byteArray?.toRequestBody("image/jpeg".toMediaTypeOrNull())
-                val multipart = requestFile?.let { it1 ->
-                    MultipartBody.Part.createFormData("image", "filename.jpg", it1)
-                }
-                multipart
-            } catch (e: Exception) {
-                null
+            // Kompresi gambar sebelum diunggah
+            val compressedImageFile = compressImage(context, it)
+
+            compressedImageFile?.let { file ->
+                val requestFile = file.readBytes().toRequestBody("image/jpeg".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("image", "filename.jpg", requestFile)
             }
         }
 
