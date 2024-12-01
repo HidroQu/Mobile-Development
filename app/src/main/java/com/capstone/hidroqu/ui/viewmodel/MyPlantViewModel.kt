@@ -22,6 +22,8 @@ import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.PlantResponseWrapper
 import com.capstone.hidroqu.nonui.data.StorePlantRequest
 import com.capstone.hidroqu.utils.compressImage
+import com.capstone.hidroqu.utils.isFileSizeValid
+import com.capstone.hidroqu.utils.uriToFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -214,66 +216,84 @@ class MyPlantViewModel : ViewModel() {
         context: Context,
         onSuccess: (BasicResponse) -> Unit,
     ) {
-        Log.d("StoreDiagnose", "Attempting to store diagnose with params:")
-        Log.d("StoreDiagnose", "Token: $token")
-        Log.d("StoreDiagnose", "MyPlantId: $myPlantId")
-        Log.d("StoreDiagnose", "DiagnoseId: $diagnoseId")
-        Log.d("StoreDiagnose", "DiagnoseDate: $diagnoseDate")
-
-        // Siapkan RequestBody untuk parameter lain
-        val userPlantIdBody = myPlantId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-        val diagnoseIdBody = diagnoseId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-        val diagnoseDateBody = diagnoseDate.toRequestBody("text/plain".toMediaTypeOrNull())
-
-        val imagePart: MultipartBody.Part? = imageUri?.let {
+        viewModelScope.launch {
             try {
-                // Konversi URI menjadi File dan lakukan kompresi
-                val originalFile = File(it.path ?: "")
-                val compressedFile = compressImage(originalFile, context)
+                _isLoading.value = true
 
-                // Siapkan RequestBody untuk file yang sudah dikompresi
-                val requestFile = compressedFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("diagnostic_image", compressedFile.name, requestFile)
+                // Mengubah URI ke file sementara
+                var file = withContext(Dispatchers.IO) { uriToFile(imageUri!!, context) }
+
+                // Memastikan ukuran file valid, jika tidak, melakukan kompresi
+                if (!isFileSizeValid(file)) {
+                    file = withContext(Dispatchers.IO) { compressImage(file, context) }
+                }
+
+                // Jika ukuran file masih lebih besar dari 1 MB setelah kompresi
+                if (!isFileSizeValid(file)) {
+                    _isLoading.value = false
+                    _errorMessage.value = "File size exceeds 1 MB even after compression."
+                    return@launch
+                }
+
+                // Mengonversi file ke RequestBody untuk upload
+                val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val body =
+                    MultipartBody.Part.createFormData("diagnostic_image", file.name, requestFile)
+
+                // Membuat RequestBody untuk parameter lain
+                val userPlantIdBody =
+                    myPlantId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val diagnoseIdBody =
+                    diagnoseId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val diagnoseDateBody = diagnoseDate.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                // Mengirim request ke API untuk menyimpan diagnosis
+                apiService.StoreDiagnostic(
+                    token = "Bearer $token",
+                    userPlant = myPlantId,
+                    userPlantId = userPlantIdBody,
+                    diagnosticId = diagnoseIdBody,
+                    diagnosticDate = diagnoseDateBody,
+                    diagnostic_image = body
+                ).enqueue(object : Callback<BasicResponse> {
+                    override fun onResponse(
+                        call: Call<BasicResponse>,
+                        response: Response<BasicResponse>
+                    ) {
+                        Log.d("StoreDiagnose", "Response code: ${response.code()}")
+                        if (response.isSuccessful) {
+                            val responseBody = response.body()
+                            Log.d("StoreDiagnose", "Response body: $responseBody")
+
+                            responseBody?.let {
+                                Log.d("StoreDiagnose", "Diagnose stored successfully")
+                                onSuccess(it)
+                            }
+                        } else {
+                            val errorBody = response.errorBody()?.string()
+                            Log.e("StoreDiagnose", "Error storing plant: ${response.message()}")
+                            Log.e("StoreDiagnose", "Error body: $errorBody")
+
+                            _errorMessage.value = "Error storing plant: ${response.message()}"
+                        }
+                    }
+
+                    override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+                        Log.e("StoreDiagnose", "Network error: ${t.message}")
+                        _errorMessage.value = "Network error: ${t.message}"
+                    }
+                })
+
+                // Menampilkan status success pada UI
+                withContext(Dispatchers.Main) {
+                    _isLoading.value = false
+                }
             } catch (e: Exception) {
-                Log.e("StoreDiagnose", "Error compressing image: ${e.message}")
-                null
+                _isLoading.value = false
+                _errorMessage.value = "Error storing diagnose: ${e.message}"
+                Log.e("StoreDiagnose", "Exception: ${e.message}")
             }
         }
-        // Request ke API
-        apiService.StoreDiagnostic(
-            token = "Bearer $token",
-            userPlant = myPlantId,
-            userPlantId = userPlantIdBody,
-            diagnosticId = diagnoseIdBody,
-            diagnosticDate = diagnoseDateBody,
-            diagnostic_image = imagePart
-        ).enqueue(object : Callback<BasicResponse> {
-            override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
-                Log.d("StoreDiagnose", "Response code: ${response.code()}")
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    Log.d("StoreDiagnose", "Response body: $responseBody")
 
-                    responseBody?.let {
-                        Log.d("StoreDiagnose", "Diagnose stored successfully")
-
-                        onSuccess(it)
-                    }
-                } else {
-                    val errorBody = response.errorBody()?.string()
-                    Log.e("StoreDiagnose", "Error storing plant: ${response.message()}")
-                    Log.e("StoreDiagnose", "Error body: $errorBody")
-
-                    _errorMessage.value = "Error storing plant: ${response.message()}"
-                }
-            }
-
-            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-                Log.e("StoreDiagnose", "Network error: ${t.message}")
-
-                _errorMessage.value = "Network error: ${t.message}"
-            }
-        })
     }
-
 }
