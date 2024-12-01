@@ -40,7 +40,7 @@ fun CardHealthHistory(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val formattedDate = formatDateWithMonthName(listHealthHistory.diagnosis_date)
+    val formattedDate = formatDateWithMonthName(listHealthHistory.diagnostic_date)
         Row(
             modifier = Modifier
                 .clickable { onClick() }

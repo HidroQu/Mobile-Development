@@ -141,8 +141,12 @@ fun MainJetpack(
                     ResultScanTanamActivity(photoUri = photoUri, navHostController = navController)
                 }
 
-                composable(Screen.ChoosePlant.route) {
-                    ChoosePlantActivity(navHostController = navController)
+                composable(
+                    route = Screen.ChoosePlant.route,
+                    arguments = listOf(navArgument("diagnoseId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val diagnoseId = backStackEntry.arguments?.getInt("diagnoseId")
+                    ChoosePlantActivity(diagnoseId = diagnoseId, navHostController = navController)
                 }
 
                 ///artikel

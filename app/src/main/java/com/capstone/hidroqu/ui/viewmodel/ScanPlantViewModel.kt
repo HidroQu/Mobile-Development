@@ -7,9 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capstone.hidroqu.nonui.api.HidroQuApiPredictConfig
 import com.capstone.hidroqu.nonui.api.HidroQuApiService
+import com.capstone.hidroqu.nonui.data.BasicResponse
 import com.capstone.hidroqu.nonui.data.DiagnosticInfo
 import com.capstone.hidroqu.nonui.data.NutrientPredictionResponse
 import com.capstone.hidroqu.nonui.data.PlantPredictionResponse
+import com.capstone.hidroqu.nonui.data.StorePlantRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -129,4 +131,6 @@ class ScanPlantViewModel: ViewModel(){
             }
         })
     }
+
+
 }
