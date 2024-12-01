@@ -22,7 +22,9 @@ sealed class Screen(val route: String) {
     object ResultScanTanam : Screen("ResultScanTanam/{photoUri}") {
         fun createRoute(photoUri: String) = "ResultScanTanam/$photoUri"
     }
-    object ChoosePlant : Screen("chooseplant")
+    object ChoosePlant : Screen("ChoosePlant/{diagnoseId}") {
+        fun createRoute(diagnoseId: Int) = "ChoosePlant/$diagnoseId"
+    }
 
     //main
     object Home : Screen("home")

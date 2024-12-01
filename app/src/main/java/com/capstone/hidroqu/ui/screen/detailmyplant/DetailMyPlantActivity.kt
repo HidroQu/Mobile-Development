@@ -91,7 +91,9 @@ fun calculateHarvestDate(plantingDate: String, daysToAdd: Int): String {
             val outputFormatter = java.text.SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID"))
             val date = inputFormatter.parse(plantingDate)
             val calendar = java.util.Calendar.getInstance()
-            calendar.time = date
+            if (date != null) {
+                calendar.time = date
+            }
             calendar.add(java.util.Calendar.DATE, daysToAdd)
             val harvestDate = outputFormatter.format(calendar.time)
             harvestDate
@@ -313,8 +315,8 @@ fun DetailMyPlantContent(
                 .build()
             Image(
                 painter = rememberAsyncImagePainter(
-                        model = plant?.plant?.icon_plant,
-                        imageLoader = imageLoader
+                    model = plant?.plant?.icon_plant,
+                    imageLoader = imageLoader
 
                 ),
                 contentDescription = "Plant Image",
@@ -389,17 +391,17 @@ fun DetailMyPlantContent(
         Column(
 
         ) {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                     .background(MaterialTheme.colorScheme.onPrimary)
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
-            ){
-                Column (
+            ) {
+                Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
-                ){
+                ) {
                     Text(
                         text = "Progress tanaman",
                         style = MaterialTheme.typography.labelLarge,
@@ -416,16 +418,19 @@ fun DetailMyPlantContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    Column (
+                    Column(
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
+                            .background(
+                                MaterialTheme.colorScheme.onPrimary,
+                                shape = MaterialTheme.shapes.medium
+                            )
                             .border(
                                 width = 1.dp,
                                 color = MaterialTheme.colorScheme.outlineVariant,
                                 shape = MaterialTheme.shapes.medium
                             )
                             .padding(horizontal = 16.dp, vertical = 12.dp)
-                    ){
+                    ) {
                         Text(
                             text = "Tanggal menanam",
                             style = MaterialTheme.typography.labelLarge,
@@ -441,14 +446,17 @@ fun DetailMyPlantContent(
                     }
                     Column(
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
+                            .background(
+                                MaterialTheme.colorScheme.onPrimary,
+                                shape = MaterialTheme.shapes.medium
+                            )
                             .border(
                                 width = 1.dp,
                                 color = MaterialTheme.colorScheme.outlineVariant,
                                 shape = MaterialTheme.shapes.medium
                             )
                             .padding(horizontal = 16.dp, vertical = 12.dp)
-                    ){
+                    ) {
                         Text(
                             text = "Prediksi panen",
                             style = MaterialTheme.typography.labelLarge,
@@ -488,12 +496,19 @@ fun DetailMyPlantContent(
                                 } else {
                                     plant.plant?.name?.let { plantName ->
                                         scope.launch {
-                                            val success = notificationHelper.scheduleHarvestReminders(
-                                                plantName,
-                                                calculateHarvestDate(plant.planting_date, daysToAdd)
-                                            )
+                                            val success =
+                                                notificationHelper.scheduleHarvestReminders(
+                                                    plantName,
+                                                    calculateHarvestDate(
+                                                        plant.planting_date,
+                                                        daysToAdd
+                                                    )
+                                                )
                                             if (success) {
-                                                userPreferences.savePlantNotificationEnabled(plantId, true)
+                                                userPreferences.savePlantNotificationEnabled(
+                                                    plantId,
+                                                    true
+                                                )
                                             }
                                         }
                                     }
@@ -516,37 +531,38 @@ fun DetailMyPlantContent(
                     )
                 )
             }
-            }
         }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.onPrimary)
-            .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Text(
-            text = "Riwayat kesehatan",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
+
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier
+                .fillMaxSize()
+//                .padding(horizontal = 16.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.onPrimary)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            healthHistoryList.forEach { healthHistory ->
-                CardHealthHistory(
-                    listHealthHistory = healthHistory,
-                    onClick = {
-                        navHostController.navigate(
-                            Screen.HistoryMyPlant.createRoute(
-                                plantId = plant?.id ?: 0,
-                                healthId = healthHistory.id
+            Text(
+                text = "Riwayat kesehatan",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                healthHistoryList.forEach { healthHistory ->
+                    CardHealthHistory(
+                        listHealthHistory = healthHistory,
+                        onClick = {
+                            navHostController.navigate(
+                                Screen.HistoryMyPlant.createRoute(
+                                    plantId = plant?.id ?: 0,
+                                    healthId = healthHistory.id
+                                )
                             )
-                        )
-                    }
-                )
+                        }
+                    )
+                }
             }
         }
     }

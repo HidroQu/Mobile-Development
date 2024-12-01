@@ -104,7 +104,7 @@ data class DiagnosticHistory(
     val id: Int,
     val user_plant_id: Int,
     val diagnostic_id: Int,
-    val diagnosis_date: String,
+    val diagnostic_date: String,
     val created_at: String,
     val updated_at: String,
     val diagnostic: DiagnosticResponse
@@ -114,21 +114,23 @@ data class DiagnosticHistory(
 data class DiagnosticResponse(
     val id: Int,
     val disease_name: String,
-    val image_disease: String, // Ubah ke List<String>
+    val image_disease: List<String>, // Ubah ke List<String>
     val indication: String,
     val cause: String,
     val solution: String,
     val created_at: String,
     val updated_at: String
-) : Parcelable {
-    fun getParsedImageDisease(): List<String> {
-        return try {
-            Gson().fromJson(image_disease, Array<String>::class.java).toList()
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-}
+) : Parcelable
+
+//{
+//    fun getParsedImageDisease(): List<String> {
+//        return try {
+//            Gson().fromJson(image_disease, Array<String>::class.java).toList()
+//        } catch (e: Exception) {
+//            emptyList()
+//        }
+//    }
+//}
 
 // NutrientPredictionResponse and related classes
 @Parcelize

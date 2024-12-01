@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
@@ -60,7 +61,7 @@ fun HistoryMyPlantActivity(
     val plantDiagnostic by viewModel.plantDiagnostic.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
-    val formattedDate = formatDateWithMonthName(plantDiagnostic?.diagnostic_history?.diagnosis_date ?: "00/00/0000")
+    val formattedDate = formatDateWithMonthName(plantDiagnostic?.diagnostic_history?.diagnostic_date ?: "00/00/0000")
     
     // Fetch plant details once the composable is launched
     LaunchedEffect(plantId, healthId) {
@@ -168,13 +169,10 @@ fun DetailHistoryContent(
                 // Menampilkan gambar terkait dalam LazyRow
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(
-                        history?.diagnostic_history?.diagnostic?.getParsedImageDisease() ?: listOf()
+                        history?.diagnostic_history?.diagnostic?.image_disease ?: listOf()
                     ) { photoUrl ->
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = photoUrl, // Gunakan URL gambar yang diterima langsung dari API
-                                imageLoader = imageLoader
-                            ),
+                        AsyncImage(
+                            model = photoUrl,
                             contentDescription = "Related Photo",
                             modifier = Modifier
                                 .widthIn(min = 150.dp)

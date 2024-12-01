@@ -196,4 +196,56 @@ class MyPlantViewModel : ViewModel() {
             }
         })
     }
+    fun storeDiagnose(
+        token: String,
+        diagnoseId: Int,
+        myPlantId: Int,
+        diagnoseDate: String,
+        onSuccess: (BasicResponse) -> Unit,
+    ) {
+        // Tambahkan log tambahan untuk debugging
+        Log.d("StoreDiagnose", "Attempting to store diagnose with params:")
+        Log.d("StoreDiagnose", "Token: $token")
+        Log.d("StoreDiagnose", "MyPlantId: $myPlantId")
+        Log.d("StoreDiagnose", "DiagnoseId: $diagnoseId")
+        Log.d("StoreDiagnose", "DiagnoseDate: $diagnoseDate")
+
+        // Request to store plant
+        apiService.StoreDiagnostic(
+            token = "Bearer $token",
+            userPlant = myPlantId,
+            userPlantId = myPlantId,
+            diagnosticId = diagnoseId,
+            diagnosticDate = diagnoseDate
+        ).enqueue(object : Callback<BasicResponse> {
+            override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
+                Log.d("StoreDiagnose", "Response code: ${response.code()}")
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    Log.d("StoreDiagnose", "Response body: $responseBody")
+
+                    responseBody?.let {
+                        Log.d("StoreDiagnose", "Diagnose stored successfully")
+
+                        onSuccess(it)
+                    }
+                } else {
+                    // Log error details
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("StoreDiagnose", "Error storing plant: ${response.message()}")
+                    Log.e("StoreDiagnose", "Error body: $errorBody")
+
+                    _errorMessage.value = "Error storing plant: ${response.message()}"
+                }
+            }
+
+            override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+                // Log network error
+                Log.e("StoreDiagnose", "Network error: ${t.message}")
+
+                _errorMessage.value = "Network error: ${t.message}"
+            }
+        })
+
+    }
 }

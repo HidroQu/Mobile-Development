@@ -2,6 +2,8 @@ package com.capstone.hidroqu.ui.screen.chooseplant
 
 import android.app.Application
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -29,6 +31,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
+import com.capstone.hidroqu.nonui.data.BasicResponse
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
@@ -36,11 +39,17 @@ import com.capstone.hidroqu.ui.component.CardAddPlant
 import com.capstone.hidroqu.ui.component.CardChoosePlant
 import com.capstone.hidroqu.ui.screen.addplant.AddPlantActivity
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
+import com.capstone.hidroqu.ui.viewmodel.ScanPlantViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
 fun ChoosePlantActivity(
+    diagnoseId: Int?,
     viewModel: MyPlantViewModel = viewModel(),
+//    scanViewModel: ScanPlantViewModel = viewModel(),
     context: Context = LocalContext.current,
     navHostController: NavHostController
 ) {
@@ -50,6 +59,7 @@ fun ChoosePlantActivity(
 
     val userPreferences = UserPreferences(context)
     val token by userPreferences.token.collectAsState(initial = null)
+    val plantDetail by viewModel.plantDetail.collectAsState()
     val myPlant by viewModel.myPlants.collectAsState(emptyList()) // Mengobservasi data tanaman
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState()
@@ -78,8 +88,29 @@ fun ChoosePlantActivity(
                 Button(
                     onClick = {
                         selectedPlant?.let { plant ->
-                            navHostController.navigate(
-                                Screen.FormAddPlant.createRoute(plantId = plant.id)
+                            val currentDate = Date()
+                            Log.d("Current Date", currentDate.toString())
+                            val todayWithTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID")).format(currentDate)
+                            Log.d("Formatted Date", todayWithTime)
+                            Log.d(
+                                "ChoosePlantActivity",
+                                "Token: $token, PlantId: ${plant.id}, Diagnose ID: $diagnoseId, Date: $todayWithTime"
+                            )
+                            viewModel.storeDiagnose(
+                                token = token!!,
+                                myPlantId = plant.id,
+                                diagnoseId = diagnoseId!!,
+                                diagnoseDate = todayWithTime,
+                                onSuccess = {
+                                    // Navigate through a sequence of routes
+                                    navHostController.navigate(Screen.DetailMyPlant.createRoute(plant.id)) {
+                                        // Clear the back stack up to this point
+                                        popUpTo(Screen.MyPlant.route)
+
+                                        // After navigating to detail my plant, navigate to history
+                                        launchSingleTop = true
+                                    }
+                                },
                             )
                         }
                     },

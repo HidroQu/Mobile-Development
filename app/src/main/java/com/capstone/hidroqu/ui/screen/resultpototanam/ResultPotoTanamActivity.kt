@@ -87,7 +87,8 @@ fun ResultPotoTanamActivity(
         solution = nutrientPrediction?.data?.diagnostic?.solution ?: "",
         navHostController = navHostController,
         modifier = modifier,
-        isLoading = isLoading
+        isLoading = isLoading,
+        diagnoseId = nutrientPrediction?.data?.diagnostic?.id ?: 0
     )
 }
 
@@ -102,6 +103,7 @@ fun ResultPotoTanamActivityContent(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
     isLoading: Boolean,
+    diagnoseId: Int
 ) {
     Scaffold(
         topBar = {
@@ -116,7 +118,9 @@ fun ResultPotoTanamActivityContent(
             ) {
                 Button(
                     onClick = {
-                        navHostController.navigate(Screen.ChoosePlant.route)
+                        navHostController.navigate(
+                            Screen.ChoosePlant.createRoute(diagnoseId = diagnoseId)
+                        )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
