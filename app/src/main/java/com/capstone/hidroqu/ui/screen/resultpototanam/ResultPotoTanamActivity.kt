@@ -80,6 +80,7 @@ fun ResultPotoTanamActivity(
 
     // Display the content with the diagnosis
     ResultPotoTanamActivityContent(
+        id = nutrientPrediction?.data?.diagnostic?.id ?: 0,
         photoUri = uri,
         issue = nutrientPrediction?.data?.diagnostic?.name_disease ?: "",
         symptoms = nutrientPrediction?.data?.diagnostic?.indication ?: "",
@@ -95,6 +96,7 @@ fun ResultPotoTanamActivity(
 
 @Composable
 fun ResultPotoTanamActivityContent(
+    id: Int,
     photoUri: Uri?,
     issue: String,
     symptoms: String,
@@ -124,6 +126,7 @@ fun ResultPotoTanamActivityContent(
                             Screen.ChoosePlant.createRoute(diagnoseId = diagnoseId, photoUri = encodedUri)
                         )
                     },
+                    enabled = id != 0,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp),

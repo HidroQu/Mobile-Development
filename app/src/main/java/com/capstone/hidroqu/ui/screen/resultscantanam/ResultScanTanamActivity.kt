@@ -97,7 +97,7 @@ fun ResultScanTanamActivity(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp),
-                    enabled = true, // Always enabled
+                    enabled = plantPrediction?.data?.plant?.id != null,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
