@@ -237,7 +237,8 @@ fun DetailPostCommunityContent(
                                         width = 2.dp,
                                         color = MaterialTheme.colorScheme.outlineVariant,
                                         shape = CircleShape
-                                    )
+                                    ),
+                                contentScale = ContentScale.Crop
                             )
                         }
 
@@ -287,7 +288,6 @@ fun DetailPostCommunityContent(
                 // Comments Section
                 Column(
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                         .padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
@@ -305,7 +305,7 @@ fun DetailPostCommunityContent(
                         )
                     }
                     listComment.forEach { comment ->
-                        CardPostComment(listComment = comment)
+                        CardPostComment(listComment = comment, post = post)
                     }
                 }
             }

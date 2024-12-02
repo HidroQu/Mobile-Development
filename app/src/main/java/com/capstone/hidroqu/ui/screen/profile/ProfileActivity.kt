@@ -148,8 +148,8 @@ fun ProfileActivity(
                                 .size(120.dp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.primary),
-                            placeholder = painterResource(id = R.drawable.ic_launcher_background), // Placeholder jika gambar belum dimuat
-                            error = painterResource(id = R.drawable.ic_launcher_background), // Gambar default jika terjadi kesalahan
+                            placeholder = painterResource(id = R.drawable.ic_launcher_foreground), // Placeholder jika gambar belum dimuat
+                            error = painterResource(id = R.drawable.ic_launcher_foreground), // Gambar default jika terjadi kesalahan
                             contentScale = ContentScale.Crop // Sesuaikan gambar dengan crop
                         )
 

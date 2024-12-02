@@ -92,7 +92,8 @@ fun CardMyPost(
                         color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
                         shape = CircleShape // Bentuk border bulat
                     ),
-                contentDescription = "Gambar Profil"
+                contentDescription = "Gambar Profil",
+                contentScale = ContentScale.Crop
             )
             Column {
                 Text(

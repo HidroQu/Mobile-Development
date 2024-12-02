@@ -105,6 +105,7 @@ fun CardCommunity(
                         color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
                         shape = CircleShape // Bentuk border bulat
                     ),
+                contentScale = ContentScale.Crop,
                 contentDescription = "Gambar Profil"
             )
             Column {

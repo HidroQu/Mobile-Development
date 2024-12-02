@@ -26,18 +26,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.nonui.data.Comment
+import com.capstone.hidroqu.nonui.data.CommunityDetailResponse
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.utils.formatDate
 
 @Composable
 fun CardPostComment(
     listComment: Comment,
+    post: CommunityDetailResponse?,
     modifier: Modifier = Modifier,
 ) {
     val isImageExpanded = remember { mutableStateOf(false) }
@@ -48,81 +52,106 @@ fun CardPostComment(
         Modifier.height(190.dp)
     }
 
-    Column(
+    Row(
         modifier = modifier
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        Row(
-            modifier = modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val imageLoader = ImageLoader.Builder(LocalContext.current)
-                .components {
-                    add(SvgDecoder.Factory())
-                }
-                .build()
-
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = listComment.user.photo,
-                    imageLoader = imageLoader
-                ),
-                contentDescription = "Profil",
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = CircleShape
-                    )
-            )
-            Column {
-                Text(
-                    text = listComment.user.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = formatDate(listComment.created_at),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
+        val imageLoader = ImageLoader.Builder(LocalContext.current)
+            .components {
+                add(SvgDecoder.Factory())
             }
-        }
+            .build()
 
-        Text(
-            text = listComment.content,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-
-        if (!listComment.image.isNullOrEmpty()) {
-            val imageLoader = ImageLoader.Builder(LocalContext.current)
-                .components {
-                    add(SvgDecoder.Factory())
-                }
-                .build()
-
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = listComment.image,
-                    imageLoader = imageLoader
+        Image(
+            painter = rememberAsyncImagePainter(
+                model = listComment.user.photo,
+                imageLoader = imageLoader
+            ),
+            contentDescription = "Profil",
+            modifier = Modifier
+                .size(50.dp)
+                .clip(CircleShape)
+                .border(
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                    shape = CircleShape
                 ),
-                contentDescription = "Image Post",
-                modifier = imageModifier
-                    .fillMaxWidth()
-                    .clickable {
-                        isImageExpanded.value = !isImageExpanded.value
-                    },
-                contentScale = ContentScale.Crop
-            )
+            contentScale = ContentScale.Crop
+        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ){
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
+                    Text(
+                        text = listComment.user.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = formatDate(listComment.created_at),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+                Row {
+                    Text(
+                        text = "Membalas ",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                    Text(
+                        text = "@${post?.user?.name}",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = Bold,
+                        ),
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = listComment.content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+
+                if (!listComment.image.isNullOrEmpty()) {
+                    val imageLoader = ImageLoader.Builder(LocalContext.current)
+                        .components {
+                            add(SvgDecoder.Factory())
+                        }
+                        .build()
+
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = listComment.image,
+                            imageLoader = imageLoader
+                        ),
+                        contentDescription = "Image Post",
+                        modifier = imageModifier
+                            .fillMaxWidth()
+                            .clickable {
+                                isImageExpanded.value = !isImageExpanded.value
+                            },
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
         }
     }
 }
+
 
 @Preview
 @Composable
