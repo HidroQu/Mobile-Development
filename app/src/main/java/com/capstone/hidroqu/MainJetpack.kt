@@ -26,6 +26,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.capstone.hidroqu.navigation.BottomBar
 import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.navigation.authGraph
+import com.capstone.hidroqu.navigation.communityGraph
+import com.capstone.hidroqu.navigation.homeGraph
+import com.capstone.hidroqu.navigation.myPlantGraph
+import com.capstone.hidroqu.navigation.profileGraph
 import com.capstone.hidroqu.ui.screen.addplant.AddPlantActivity
 import com.capstone.hidroqu.ui.screen.article.ArticleActivity
 import com.capstone.hidroqu.ui.screen.camera.CameraPermissionScreen
@@ -84,8 +89,13 @@ fun MainJetpack(
 
         Scaffold(
             bottomBar = {
-                if (currentRoute == Screen.Home.route || currentRoute == Screen.MyPlant.route || currentRoute == Screen.Community.route || currentRoute == Screen.Profile.route) {
-                        BottomBar(navHostController = navController)
+                if (
+                    currentRoute == Screen.Home.route ||
+                    currentRoute == Screen.MyPlant.route ||
+                    currentRoute == Screen.Community.route ||
+                    currentRoute == Screen.Profile.route
+                ) {
+                    BottomBar(navHostController = navController)
                 }
             }
         ) { innerPadding ->
@@ -94,176 +104,17 @@ fun MainJetpack(
                 startDestination = Screen.Splash.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                //auth
                 composable(Screen.Splash.route) {
                     SplashScreen(navHostController = navController)
                 }
-                composable(Screen.Login.route) {
-                    LoginActivity(navHostController = navController)
-                }
-                composable(Screen.Register.route) {
-                    RegisterActivity(navHostController = navController)
-                }
-                composable(Screen.ForgotPassword.route) {
-                    ForgotPasswordActivity(navHostController = navController)
-                }
-                composable(Screen.ResetPassword.route) {
-                    ResetPasswordActivity(navHostController = navController)
-                }
-                //home
-                composable(Screen.Home.route) {
-                    HomeActivity(navHostController = navController)
-                }
-                ////camera
-                composable(Screen.CameraScanTanam.route) {
-                    CameraPermissionScreen("Scan Tanam", navController)
-                }
-                composable(Screen.CameraPotoTanam.route) {
-                    CameraPermissionScreen("Poto Tanam", navController)
-                }
-                /////detail kamera
-
-                composable(
-                    route = Screen.ResultPotoTanam.route,
-                    arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val photoUri = backStackEntry.arguments?.getString("photoUri")
-                    ResultPotoTanamActivity(photoUri = photoUri, navHostController = navController)
-                }
-
-
-
-                composable(
-                    route = Screen.ResultScanTanam.route,
-                    arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val photoUri = backStackEntry.arguments?.getString("photoUri")
-                    ResultScanTanamActivity(photoUri = photoUri, navHostController = navController)
-                }
-
-                composable(
-                    route = Screen.ChoosePlant.route,
-                    arguments = listOf(
-                        navArgument("diagnoseId") { type = NavType.IntType },
-                        navArgument("photoUri") { type = NavType.StringType }
-                    )
-
-                ) { backStackEntry ->
-                    val diagnoseId = backStackEntry.arguments?.getInt("diagnoseId")
-                    val photoUri = backStackEntry.arguments?.getString("photoUri")
-                    ChoosePlantActivity(diagnoseId = diagnoseId, photoUri = photoUri, navHostController = navController)
-                }
-
-                ///artikel
-                composable(Screen.Article.route) {
-                    ArticleActivity(navHostController = navController)
-                }
-                composable(
-                    route = Screen.DetailArticle.route,
-                    arguments = listOf(navArgument("articleId") { type = NavType.StringType })
-                ) {
-                    val id = it.arguments?.getString("articleId") ?: ""
-                    val articleId = id.toIntOrNull() ?: 0 // Use `toIntOrNull()` to avoid errors if `id` is empty or invalid.
-
-                    DetailArticleScreen(
-                        navHostController = navController,
-                        articleId = articleId // Pass the `articleId` here
-                    )
-                }
-                //tanamanku
-                composable(Screen.MyPlant.route) {
-                    // Panggil MyPlantActivity di sini
-                    MyPlantActivity(
-                        navHostController = navController
-                    )
-                }
-                ////add plant
-                composable(Screen.AddPlant.route) {
-                    AddPlantActivity(
-                        navHostController = navController,
-                    )
-                }
-                ////form add plant
-                composable(
-                    route = Screen.FormAddPlant.route,
-                    arguments = listOf(navArgument("plantId") { type = NavType.IntType })
-                ) { backStackEntry ->
-                    val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
-                    FormAddPlantActivity(plantId =  plantId, navHostController = navController)
-                }
-                /////detailmyplant
-                composable(
-                    route = Screen.DetailMyPlant.route,
-                    arguments = listOf(navArgument("plantId") { type = NavType.IntType })
-                ) { backStackEntry ->
-                    val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
-                    DetailMyPlantActivity(
-                        plantId = plantId,
-                        navHostController = navController
-                    )
-                }
-
-                ////history riwayat sakit
-                composable(
-                    route = Screen.HistoryMyPlant.route,
-                    arguments = listOf(
-                        navArgument("plantId") { type = NavType.IntType },
-                        navArgument("healthId") { type = NavType.IntType }
-                    )
-                ) { backStackEntry ->
-                    val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0  // Default to 0 if null
-                    val healthId = backStackEntry.arguments?.getInt("healthId") ?: 0  // Default to 0 if null
-
-                    HistoryMyPlantActivity(navHostController = navController, plantId = plantId, healthId = healthId)
-                }
-                //komunitas
-                composable(Screen.Community.route) {
-                    CommunityActivity(
-                        navHostController = navController,
-                        onAddClicked = {
-                            navController.navigate(Screen.AddPostCommunity.route)
-                        }
-                    )
-                }
-                ////add post komunitas
-                composable(Screen.AddPostCommunity.route) {
-                    FormAddCommunityActivity(navHostController = navController)
-                }
-
-                ////detail komunitas
-                composable(
-                    route = Screen.DetailCommunity.route,
-                    arguments = listOf(navArgument("idPost") { type = NavType.IntType })
-                ) { backStackEntry ->
-                    val idPost = backStackEntry.arguments?.getInt("idPost") ?: 0
-                    DetailPostCommunityActivity(
-                        navHostController = navController,
-                        idPost = idPost
-                    )
-                }
-
-                composable(
-                    route = Screen.AddPostComment.route,
-                    arguments = listOf(navArgument("postId") { type = NavType.IntType })
-                ) { backStackEntry ->
-                    val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-                    FormAddComment(
-                        navHostController = navController,
-                        postId = postId
-                    )
-                }
-
-
-                //profil
-                composable(Screen.Profile.route){
-                    ProfileActivity(navHostController = navController, themeViewModel = themeViewModel)
-                }
-                ////edit profil
-                composable(Screen.EditProfile.route) {
-                    EditProfileActivity(
-                        navHostController = navController
-                    )
-                }
+                authGraph(navController)
+                homeGraph(navController)
+                myPlantGraph(navController)
+                communityGraph(navController)
+                profileGraph(
+                    navController = navController,
+                    themeViewModel = themeViewModel
+                )
             }
         }
 

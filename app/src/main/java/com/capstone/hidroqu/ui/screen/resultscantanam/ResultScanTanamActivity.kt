@@ -58,11 +58,15 @@ fun ResultScanTanamActivity(
                 }
             } else {
                 Log.e("ResultPotoTanamActivity", "URI is null, navigating to home...")
-                navHostController.navigate(Screen.Home.route)
+                navHostController.navigate(Screen.HomeRoute.route){
+                    popUpTo(Screen.ResultScanTanam.route) { inclusive = true }
+                }
             }
         } ?: run {
             Log.e("ResultPotoTanamActivity", "Token is null, navigating to home...")
-            navHostController.navigate(Screen.Home.route)
+            navHostController.navigate(Screen.HomeRoute.route){
+                popUpTo(Screen.ResultScanTanam.route) { inclusive = true }
+            }
         }
     }
 
@@ -70,7 +74,9 @@ fun ResultScanTanamActivity(
     LaunchedEffect(errorMessage) {
         if (errorMessage?.isNotEmpty() == true) {
             Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-            navHostController.navigate(Screen.Home.route)  // Navigate to Home if error occurs
+            navHostController.navigate(Screen.HomeRoute.route){
+                popUpTo(Screen.ResultScanTanam.route) { inclusive = true }
+            }
         }
     }
 
@@ -91,7 +97,9 @@ fun ResultScanTanamActivity(
                         plantId?.let {
                             navHostController.navigate(
                                 Screen.FormAddPlant.createRoute(plantId = it)
-                            )
+                            ) {
+                                popUpTo(Screen.ResultScanTanam.route) { inclusive = true }
+                            }
                         }
                     },
                     modifier = Modifier

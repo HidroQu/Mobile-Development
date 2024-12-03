@@ -105,13 +105,9 @@ fun ChoosePlantActivity(
                                 imageUri = imageUri,
                                 context = context,
                                 onSuccess = {
-                                    // Navigate through a sequence of routes
                                     navHostController.navigate(Screen.DetailMyPlant.createRoute(plant.id)) {
                                         // Clear the back stack up to this point
-                                        popUpTo(Screen.MyPlant.route)
-
-                                        // After navigating to detail my plant, navigate to history
-                                        launchSingleTop = true
+                                        popUpTo(Screen.ChoosePlant.route) {inclusive = true}
                                     }
                                 },
                             )

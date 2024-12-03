@@ -125,7 +125,7 @@ fun LoginActivity(
                                     passwordValue,
                                     context = context,
                                     onSuccess = { loginResponse ->
-                                        navHostController.navigate(Screen.Home.route) {
+                                        navHostController.navigate(Screen.HomeRoute.route) {
                                             popUpTo(Screen.Login.route) { inclusive = true }
                                         }
 
@@ -219,7 +219,9 @@ fun RegisterButton(
     navHostController: NavHostController
 ) {
     TextButton(
-        onClick = { navHostController.navigate(Screen.Register.route) }
+        onClick = {
+            navHostController.navigate(Screen.Register.route)
+        }
     ) {
         Text(
             text = "Belum punya akun? Daftar.",
@@ -264,7 +266,7 @@ fun GoogleButton(
 ) {
     TextButton(
         onClick = {
-            navHostController.navigate(Screen.Home.route) {
+            navHostController.navigate(Screen.HomeRoute.route) {
                 popUpTo(Screen.Login.route) { inclusive = true }
             }
         },
@@ -295,7 +297,6 @@ fun GoogleButton(
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

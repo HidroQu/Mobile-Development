@@ -64,7 +64,7 @@ fun ArticleActivity(
             viewModel.fetchAllArticles(it, searchQuery.ifEmpty { null })
         } ?: run {
             navHostController.navigate(Screen.Login.route) {
-                popUpTo(Screen.Community.route) { inclusive = true }
+                popUpTo(Screen.Article.route) { inclusive = true }
             }
         }
     }
@@ -193,7 +193,6 @@ fun Article(
                 article = article,
                 onClick = {
                     navHostController.navigate("DetailArticle/${article.id}") {
-                        popUpTo("Artikel") { saveState = true }
                         launchSingleTop = true
                         restoreState = true
                     }

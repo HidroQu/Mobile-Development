@@ -76,7 +76,7 @@ fun HomeActivity(
     LaunchedEffect(token) {
         if (token == null) {
             navHostController.navigate(Screen.Login.route) {
-                popUpTo(Screen.Home.route) { inclusive = true }
+                popUpTo(Screen.HomeRoute.route) { inclusive = true }
             }
         }
     }
@@ -86,9 +86,7 @@ fun HomeActivity(
             articleViewModel.fetchAllArticles(it)
             myPlantViewModel.fetchMyPlants(it)
         } ?: run {
-            navHostController.navigate(Screen.DetailArticle.route) {
-                popUpTo(Screen.Home.route) { inclusive = true }
-            }
+            navHostController.navigate(Screen.DetailArticle.route)
         }
     }
 
@@ -203,7 +201,12 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
             colorText = MaterialTheme.colorScheme.onSecondaryContainer,
             onClick = {
                 // Navigasi ke halaman hasil (Result) setelah mengklik card kedua
-                navController.navigate(Screen.CameraScanTanam.route)
+                navController.navigate(Screen.CameraScanTanam.route){
+                    popUpTo(Screen.Home.route)
+                    { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                }
             }
         )
     }
@@ -341,9 +344,6 @@ fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifi
                     article = article,
                     onClick = {
                         navController.navigate(Screen.DetailArticle.createRoute(article.id)) {
-                            popUpTo(Screen.Home.route) { // Bersihkan halaman Home dari stack
-                                saveState = true
-                            }
                             launchSingleTop = true
                             restoreState = true
                         }

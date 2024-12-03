@@ -101,9 +101,9 @@ fun FormAddPlantActivity(
                                 plantingDate = plantingDateForServer,
                                 notes = notes,
                                 onSuccess = { response ->
-                                    Log.d("StorePlant", "Response: ${response.message}")
-                                    navHostController.navigate(Screen.MyPlant.route) {
-                                        popUpTo(Screen.Home.route) { inclusive = false }
+                                    navHostController.navigate(Screen.MyPlantRoute.route)
+                                    {
+                                        popUpTo(Screen.MyPlantRoute.route) { inclusive = true }
                                     }
                                     message = "Tanaman berhasil ditambahkan!"
                                 }

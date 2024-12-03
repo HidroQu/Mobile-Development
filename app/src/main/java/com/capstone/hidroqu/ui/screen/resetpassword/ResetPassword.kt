@@ -172,25 +172,6 @@ fun ResetPasswordForm(
     )
 }
 
-@Composable
-fun LoginRedirectButton(
-    navController: NavHostController
-) {
-    TextButton(
-        onClick = { navController.navigate(Screen.Login.route) }
-    ) {
-        Text(
-            text = "Sudah punya akun? Masuk.",
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.primary
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun ResetPasswordActivityPreview() {

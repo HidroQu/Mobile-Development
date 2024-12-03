@@ -147,7 +147,7 @@ fun LoginRedirectButton(
     navController: NavHostController
 ) {
     TextButton(
-        onClick = { navController.navigate(Screen.Login.route) }
+        onClick = { navController.navigate(Screen.Login.route)}
     ) {
         Text(
             text = "Kembali ke halaman masuk..",
