@@ -30,6 +30,10 @@ sealed class Screen(val route: String) {
     object ResultScanTanam : Screen("ResultScanTanam/{photoUri}") {
         fun createRoute(photoUri: String) = "ResultScanTanam/$photoUri"
     }
+    object FormAddPlantScanTanam : Screen("FormTanaman/{plantId}") {
+        fun createRoute(plantId: Int) = "FormTanaman/$plantId"
+    }
+
     //artikel
     object Article : Screen("article")
     object DetailArticle : Screen("DetailArticle/{articleId}") {

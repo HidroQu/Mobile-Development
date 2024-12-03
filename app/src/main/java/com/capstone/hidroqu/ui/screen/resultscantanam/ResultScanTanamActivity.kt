@@ -96,7 +96,7 @@ fun ResultScanTanamActivity(
                         val plantId = plantPrediction?.data?.plant?.id
                         plantId?.let {
                             navHostController.navigate(
-                                Screen.FormAddPlant.createRoute(plantId = it)
+                                Screen.FormAddPlantScanTanam.createRoute(plantId = it)
                             )
                         }
                     },

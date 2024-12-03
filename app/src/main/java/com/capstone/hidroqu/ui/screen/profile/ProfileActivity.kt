@@ -70,8 +70,8 @@ fun ProfileActivity(
             profileViewModel.getMyPost(it) // Fetch user's posts
         } ?: run {
             // If token is null, navigate to login screen
-            navHostController.navigate(Screen.Login.route) {
-                popUpTo(Screen.Profile.route) { inclusive = true }
+            navHostController.navigate(Screen.AuthRoute.route) {
+                popUpTo(Screen.ProfileRoute.route) { inclusive = true }
             }
         }
     }
@@ -100,8 +100,8 @@ fun ProfileActivity(
                 navHostController = navHostController,
                 onActionClick = {
                     authViewModel.logoutUser() // Panggil fungsi logout
-                    navHostController.navigate(Screen.Login.route) { // Arahkan ke halaman login
-                        popUpTo(Screen.Profile.route) { inclusive = true } // Bersihkan stack
+                    navHostController.navigate(Screen.AuthRoute.route) { // Arahkan ke halaman login
+                        popUpTo(Screen.ProfileRoute.route) { inclusive = true } // Bersihkan stack
                     }
                 },
                 actionIcon = Icons.Default.ExitToApp )
@@ -187,9 +187,7 @@ fun ProfileActivity(
                                 onLoadMore = { visiblePostsCount += 5 },
                                 isMoreAvailable = isMoreAvailable,
                                 onDetailClicked = { idPost ->
-                                    navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)) {
-                                        popUpTo(Screen.Profile.route)
-                                    }
+                                    navHostController.navigate(Screen.DetailCommunity.createRoute(idPost))
                                 }
                             )
                         }

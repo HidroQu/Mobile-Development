@@ -29,17 +29,6 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController){
         }
         potoTanamGraph(navController)
         scanTanamGraph(navController)
-        ////camera
-//        composable(Screen.CameraScanTanam.route) {
-//            CameraPermissionScreen("Scan Tanam", navController)
-//        }
-//        composable(
-//            route = Screen.ResultScanTanam.route,
-//            arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
-//        ) { backStackEntry ->
-//            val photoUri = backStackEntry.arguments?.getString("photoUri")
-//            ResultScanTanamActivity(photoUri = photoUri, navHostController = navController)
-//        }
         ///artikel
         composable(Screen.Article.route) {
             ArticleActivity(navHostController = navController)

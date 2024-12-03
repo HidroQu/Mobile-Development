@@ -82,8 +82,8 @@ fun CommunityActivity(
         token?.let {
             viewModel.fetchAllCommunityPosts(it, searchQuery.ifEmpty { null })
         } ?: run {
-            navHostController.navigate(Screen.Login.route) {
-                popUpTo(Screen.Community.route) { inclusive = true }
+            navHostController.navigate(Screen.AuthRoute.route) {
+                popUpTo(Screen.CommunityRoute.route) { inclusive = true }
             }
         }
     }
@@ -135,9 +135,7 @@ fun CommunityActivity(
                             searchQuery = searchQuery,
                             posts = communityPosts,
                             onDetailClicked = { idPost ->
-                                navHostController.navigate(Screen.DetailCommunity.createRoute(idPost)) {
-                                    popUpTo(Screen.Community.route)
-                                }
+                                navHostController.navigate(Screen.DetailCommunity.createRoute(idPost))
                             }
                         )
                     }
