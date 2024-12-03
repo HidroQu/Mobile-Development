@@ -58,7 +58,7 @@ fun MyPlantActivity(
             viewModel.fetchMyPlants(it)
         } ?: run {
             navHostController.navigate(Screen.Login.route) {
-                popUpTo(Screen.MyPlant.route) { inclusive = true }
+                popUpTo(Screen.MyPlantRoute.route) { inclusive = true }
             }
             Log.e("MyPlantActivity", "Token tidak ditemukan")
         }
@@ -69,7 +69,7 @@ fun MyPlantActivity(
         },
         floatingActionButton = {
             AddButton(onClick = {
-                navHostController.navigate(Screen.AddPlant.route)
+                navHostController.navigate(Screen.AddPlant.route){}
             })
         }
     ) { paddingValues ->
@@ -102,9 +102,7 @@ fun MyPlantActivity(
                 MyPlantList(
                     plants = myPlants,
                     onDetailClicked = { plantId ->
-                        navHostController.navigate(Screen.DetailMyPlant.createRoute(plantId)) {
-                            popUpTo(Screen.MyPlant.route)
-                        }
+                        navHostController.navigate(Screen.DetailMyPlant.createRoute(plantId))
                     }
                 )
             }

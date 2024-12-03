@@ -94,7 +94,7 @@ fun FormAddCommunityActivity(
         token?.let {
             profileViewModel.fetchUserProfile(it)
         }?: run {
-            navHostController.navigate(Screen.Login.route) {
+            navHostController.navigate(Screen.AuthRoute.route) {
                 popUpTo(Screen.Profile.route) { inclusive = true }
             }
         }

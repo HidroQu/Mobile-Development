@@ -1,4 +1,4 @@
-package com.capstone.hidroqu.ui.screen.formaddplant
+package com.capstone.hidroqu.ui.screen.formaddplantscantanam
 
 import android.content.Context
 import android.os.Build
@@ -49,7 +49,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun FormAddPlantActivity(
+fun FormAddPlantScanTanam(
     plantId: Int,
     viewModel: MyPlantViewModel = viewModel(),
     context: Context = LocalContext.current,
@@ -103,7 +103,7 @@ fun FormAddPlantActivity(
                                 onSuccess = { response ->
                                     navHostController.navigate(Screen.MyPlantRoute.route)
                                     {
-                                        popUpTo(Screen.MyPlantRoute.route) { inclusive = true }
+                                        popUpTo(Screen.ScanTanamRoute.route) { inclusive = true }
                                     }
                                     message = "Tanaman berhasil ditambahkan!"
                                 }
@@ -115,7 +115,7 @@ fun FormAddPlantActivity(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp),
-                    enabled = plant != null && plantingDateForServer != "" ,
+                    enabled = plant != null,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (plant != null)
                             MaterialTheme.colorScheme.primary
@@ -356,6 +356,6 @@ fun DatePickerField(
 fun PreviewFormAddPlantActivity() {
     val navHostController = rememberNavController()
     HidroQuTheme {
-        FormAddPlantActivity(1, navHostController = navHostController)
+        FormAddPlantScanTanam(1, navHostController = navHostController)
     }
 }

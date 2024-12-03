@@ -34,12 +34,12 @@ fun SplashScreen(
         delay(700L)
 
         if (isUserLoggedIn) {
-            navHostController.navigate(Screen.Home.route) {
-                popUpTo(0)
+            navHostController.navigate(Screen.HomeRoute.route) {
+                popUpTo(Screen.Splash.route) { inclusive = true }
             }
         } else {
             navHostController.navigate(Screen.Login.route) {
-                popUpTo(0)
+                popUpTo(Screen.Splash.route) { inclusive = true }
             }
         }
     }

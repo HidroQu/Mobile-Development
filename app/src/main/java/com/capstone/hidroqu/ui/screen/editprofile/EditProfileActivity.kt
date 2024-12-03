@@ -84,8 +84,8 @@ fun EditProfileActivity(
         token?.let {
             profileViewModel.fetchUserProfile(it)
         } ?: run {
-            navHostController.navigate(Screen.Login.route) {
-                popUpTo(Screen.Profile.route) { inclusive = true }
+            navHostController.navigate(Screen.AuthRoute.route) {
+                popUpTo(Screen.ProfileRoute.route) { inclusive = true }
             }
         }
     }

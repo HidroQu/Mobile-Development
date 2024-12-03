@@ -343,9 +343,7 @@ fun DetailPostCommunityContent(
                     painter = painterResource(R.drawable.ic_gallery),
                     contentDescription = "Galeri",
                     modifier = Modifier.clickable {
-                        navHostController.navigate(Screen.AddPostComment.createRoute(post?.id ?: 0)) {
-                            popUpTo(Screen.Community.route) // Atur pop-up behavior sesuai kebutuhan
-                        }
+                        navHostController.navigate(Screen.AddPostComment.createRoute(post?.id ?: 0))
                     },
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -357,9 +355,7 @@ fun DetailPostCommunityContent(
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            navHostController.navigate(Screen.AddPostComment.createRoute(post?.id ?: 0)) {
-                                popUpTo(Screen.Community.route) // Opsional: Atur popUpTo jika perlu
-                            }
+                            navHostController.navigate(Screen.AddPostComment.createRoute(post?.id ?: 0))
                         },
 
                     maxLines = 2,
