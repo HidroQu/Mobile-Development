@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,7 +32,8 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun CardAlarm(
     listAlarmHome: MyPlantResponse,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     // Parse the planting date
     val plantingDate = LocalDate.parse(
@@ -54,6 +56,7 @@ fun CardAlarm(
 
     Row(
         modifier = modifier
+            .clickable(onClick = onClick)
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
             .border(

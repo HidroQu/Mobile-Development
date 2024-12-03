@@ -51,6 +51,7 @@ import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.nonui.data.ArticleDetailResponse
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
+import com.capstone.hidroqu.ui.component.CardMyPlant
 import com.capstone.hidroqu.ui.viewmodel.ArticleViewModel
 import com.capstone.hidroqu.ui.viewmodel.HomeViewModel
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
@@ -102,7 +103,12 @@ fun HomeActivity(
         ) {
             TopHome(viewModel = viewModel)
             CameraSection(navHostController)
-            AlarmSection(userPreferences = userPreferences, plantsToHarvest = plantsToHarvest)
+            AlarmSection(
+                userPreferences = userPreferences,
+                plantsToHarvest = plantsToHarvest,
+                onDetailClicked = { plantId ->
+                    navHostController.navigate(Screen.DetailMyPlant.createRoute(plantId))
+                })
             ArticleSection(navHostController, articles = articles)
         }
     }
@@ -264,7 +270,8 @@ fun NoPlantList(
 fun AlarmSection(
     userPreferences: UserPreferences,
     plantsToHarvest: List<MyPlantResponse>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDetailClicked: (Int) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -295,7 +302,12 @@ fun AlarmSection(
             // Menampilkan CardAlarm untuk setiap tanaman yang memiliki notifikasi yang aktif
             if (plantsWithNotification.isNotEmpty()) {
                 plantsWithNotification.forEach { plant ->
-                    CardAlarm(plant)
+                    CardAlarm(
+                        listAlarmHome = plant,
+                        onClick = {
+                            onDetailClicked(plant.id)
+                        }
+                    )
                 }
             } else {
                 NoPlantList(modifier = modifier)
