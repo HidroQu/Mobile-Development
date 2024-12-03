@@ -119,7 +119,7 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
 
     LaunchedEffect(Unit) {
         showTooltip = true
-        kotlinx.coroutines.delay(5000) // Tooltip muncul selama 5 detik
+        kotlinx.coroutines.delay(3000) // Tooltip muncul selama 5 detik
         showTooltip = false
     }
 
@@ -194,12 +194,12 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
 
     val animatedTooltipOffset by animateDpAsState(
         targetValue = if (showTooltip) 28.dp else 0.dp, // Tooltip muncul atau hilang
-        animationSpec = tween(durationMillis = 3000, easing = LinearOutSlowInEasing), label = ""
+        animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing), label = ""
     )
 
     val animatedTooltipOpacity by animateFloatAsState(
         targetValue = if (showTooltip) 1f else 0f, // Tooltip opacity
-        animationSpec = tween(durationMillis = 2000, easing = LinearOutSlowInEasing), label = ""
+        animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing), label = ""
     )
     LaunchedEffect(Unit) {
         animationProgress = 1f
@@ -322,7 +322,7 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                     Column(
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f), // Transparansi background
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
                                 shape = MaterialTheme.shapes.medium
                             )
                             .padding(24.dp)
