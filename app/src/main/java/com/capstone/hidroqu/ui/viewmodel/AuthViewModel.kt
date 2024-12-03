@@ -27,7 +27,8 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
-    private val authService = HidroQuApiConfig.retrofit.create(HidroQuApiService::class.java)
+    private val apiService: HidroQuApiService =
+        HidroQuApiConfig.getApiService()
     private val userPreferences = UserPreferences(application)
 
     private val _isLoading = mutableStateOf(false)
@@ -48,7 +49,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         val request = RegisterRequest(name, email, password, passwordConfirmation)
         viewModelScope.launch {
-            authService.register(request).enqueue(object : Callback<AuthResponse> {
+            apiService.register(request).enqueue(object : Callback<AuthResponse> {
                 override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
                     if (response.isSuccessful) {
                         response.body()?.let {
@@ -76,7 +77,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         val request = LoginRequest(email, password)
         _isLoading.value = true
         viewModelScope.launch {
-            authService.login(request).enqueue(object : Callback<LoginResponse> {
+            apiService.login(request).enqueue(object : Callback<LoginResponse> {
                 override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                     _isLoading.value = false
                     if (response.isSuccessful) {
@@ -119,7 +120,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     fun forgotPassword(email: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         val request = ForgotPasswordRequest(email)
         viewModelScope.launch {
-            authService.forgotPassword(request).enqueue(object : Callback<BasicResponse> {
+            apiService.forgotPassword(request).enqueue(object : Callback<BasicResponse> {
                 override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
                     if (response.isSuccessful) {
                         response.body()?.message?.let { onSuccess(it) }
@@ -144,7 +145,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         val request = ResetPasswordRequest(token, email, password)
         viewModelScope.launch {
-            authService.resetPassword(request).enqueue(object : Callback<BasicResponse> {
+            apiService.resetPassword(request).enqueue(object : Callback<BasicResponse> {
                 override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
                     if (response.isSuccessful) {
                         response.body()?.message?.let { onSuccess(it) }

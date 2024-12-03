@@ -231,7 +231,9 @@ fun DetailPostCommunityContent(
                             Image(
                                 painter = rememberAsyncImagePainter(
                                     model = post.user.photo,
-                                    imageLoader = imageLoader
+                                    imageLoader = imageLoader,
+                                    placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
+                                    error = painterResource(id = R.drawable.ic_launcher_foreground),
                                 ),
                                 contentDescription = "User Profile Image",
                                 modifier = Modifier

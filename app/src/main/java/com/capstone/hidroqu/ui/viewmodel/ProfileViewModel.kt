@@ -36,7 +36,9 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class ProfileViewModel: ViewModel() {
-    private val apiService: HidroQuApiService = HidroQuApiConfig.retrofit.create(HidroQuApiService::class.java)
+    private val apiService: HidroQuApiService =
+        HidroQuApiConfig.getApiService()
+
     private val _userData = MutableStateFlow<User?>(null)
     val userData: StateFlow<User?> get() = _userData
 
@@ -132,18 +134,12 @@ class ProfileViewModel: ViewModel() {
             try {
                 _isLoading.value = true
 
-                // Mengubah URI ke file sementara jika ada
-                var file: File? = null
-
-                if (photoUri != null) {
-                    file = if (photoUri.scheme == "http" || photoUri.scheme == "https") {
-                        withContext(Dispatchers.IO) {
-                            downloadFile(context, photoUri)
-                        }
+                // Membuat MultipartBody.Part untuk file jika ada photoUri
+                val photoPart: MultipartBody.Part? = if (photoUri != null) {
+                    var file = if (photoUri.scheme == "http" || photoUri.scheme == "https") {
+                        withContext(Dispatchers.IO) { downloadFile(context, photoUri) }
                     } else {
-                        withContext(Dispatchers.IO) {
-                            uriToFile(photoUri, context)
-                        }
+                        withContext(Dispatchers.IO) { uriToFile(photoUri, context) }
                     }
 
                     if (file == null) {
@@ -152,61 +148,57 @@ class ProfileViewModel: ViewModel() {
                         return@launch
                     }
 
-                    // Deteksi MIME type
                     val mimeType = context.contentResolver.getType(photoUri) ?: "image/jpeg"
-
-                    // Memastikan ukuran file valid, jika tidak, melakukan kompresi
                     if (!isFileSizeValid(file)) {
-                        file = withContext(Dispatchers.IO) { compressImageFile(file!!, context) }
+                        val compressedFile = withContext(Dispatchers.IO) { compressImageFile(file!!, context) }
+                        if (!isFileSizeValid(compressedFile)) {
+                            _isLoading.value = false
+                            onComplete(false, "File size exceeds 2 MB even after compression.")
+                            return@launch
+                        }
+                        file = compressedFile
                     }
 
-                    // Jika ukuran file masih lebih besar dari 2 MB setelah kompresi
-                    if (!isFileSizeValid(file)) {
-                        _isLoading.value = false
-                        onComplete(false, "File size exceeds 2 MB even after compression.")
-                        return@launch
-                    }
-
-                    // Membuat MultipartBody.Part untuk file
                     val requestFile = file.asRequestBody(mimeType.toMediaTypeOrNull())
-                    val photoPart = MultipartBody.Part.createFormData("photo", file.name, requestFile)
-
-                    // Membuat RequestBody untuk parameter lainnya
-                    val nameRequest = name.toRequestBody("text/plain".toMediaTypeOrNull())
-                    val emailRequest = email.toRequestBody("text/plain".toMediaTypeOrNull())
-                    val bioRequest = bio.toRequestBody("text/plain".toMediaTypeOrNull())
-                    val passwordRequest = password?.toRequestBody("text/plain".toMediaTypeOrNull())
-                    val passwordConfirmationRequest =
-                        confirmPassword?.toRequestBody("text/plain".toMediaTypeOrNull())
-                    val method = "PUT".toRequestBody("text/plain".toMediaTypeOrNull())
-
-                    // Mengirim permintaan API
-                    apiService.updateProfile(
-                        token = "Bearer $token",
-                        name = nameRequest,
-                        email = emailRequest,
-                        bio = bioRequest,
-                        password = passwordRequest,
-                        passwordConfirmation = passwordConfirmationRequest,
-                        photo = photoPart,
-                        method = method
-                    ).enqueue(object : Callback<BasicResponse> {
-                        override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
-                            _isLoading.value = false
-                            if (response.isSuccessful) {
-                                onComplete(true, "Profil berhasil diperbarui")
-                            } else {
-                                val errorBody = response.errorBody()?.string()
-                                onComplete(false, errorBody ?: "Gagal memperbarui profil")
-                            }
-                        }
-
-                        override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-                            _isLoading.value = false
-                            onComplete(false, t.message ?: "Error tidak diketahui")
-                        }
-                    })
+                    MultipartBody.Part.createFormData("photo", file.name, requestFile)
+                } else {
+                    null
                 }
+                // Membuat RequestBody untuk parameter lainnya
+                val nameRequest = name.toRequestBody("text/plain".toMediaTypeOrNull())
+                val emailRequest = email.toRequestBody("text/plain".toMediaTypeOrNull())
+                val bioRequest = bio.toRequestBody("text/plain".toMediaTypeOrNull())
+                val passwordRequest = password?.toRequestBody("text/plain".toMediaTypeOrNull())
+                val passwordConfirmationRequest =
+                    confirmPassword?.toRequestBody("text/plain".toMediaTypeOrNull())
+                val method = "PUT".toRequestBody("text/plain".toMediaTypeOrNull())
+
+                // Mengirim permintaan API
+                apiService.updateProfile(
+                    token = "Bearer $token",
+                    name = nameRequest,
+                    email = emailRequest,
+                    bio = bioRequest,
+                    password = passwordRequest,
+                    passwordConfirmation = passwordConfirmationRequest,
+                    photo = photoPart,
+                    method = method
+                ).enqueue(object : Callback<BasicResponse> {
+                    override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
+                        _isLoading.value = false
+                        if (response.isSuccessful) {
+                            onComplete(true, "Profil berhasil diperbarui")
+                        } else {
+                            val errorBody = response.errorBody()?.string()
+                            onComplete(false, errorBody ?: "Gagal memperbarui profil")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
+                        _isLoading.value = false
+                        onComplete(false, t.message ?: "Error tidak diketahui")
+                    }
+                })
             } catch (e: Exception) {
                 _isLoading.value = false
                 onComplete(false, "Error updating profile: ${e.message}")

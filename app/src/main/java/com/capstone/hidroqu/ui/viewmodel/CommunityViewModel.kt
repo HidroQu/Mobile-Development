@@ -28,7 +28,7 @@ import java.io.File
 class CommunityViewModel : ViewModel() {
 
     private val apiService: HidroQuApiService =
-        HidroQuApiConfig.retrofit.create(HidroQuApiService::class.java)
+        HidroQuApiConfig.getApiService()
 
     private val _communityPosts = MutableStateFlow<List<PostData>>(emptyList())
     val communityPosts: StateFlow<List<PostData>> get() = _communityPosts

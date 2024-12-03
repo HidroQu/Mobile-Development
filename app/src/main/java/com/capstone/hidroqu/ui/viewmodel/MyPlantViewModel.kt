@@ -42,7 +42,8 @@ import java.io.File
 
 class MyPlantViewModel : ViewModel() {
 
-    private val apiService: HidroQuApiService = HidroQuApiConfig.retrofit.create(HidroQuApiService::class.java)
+    private val apiService: HidroQuApiService =
+        HidroQuApiConfig.getApiService()
 
     private val _myPlants = MutableStateFlow<List<MyPlantResponse>>(emptyList())
     val myPlants: StateFlow<List<MyPlantResponse>> get() = _myPlants

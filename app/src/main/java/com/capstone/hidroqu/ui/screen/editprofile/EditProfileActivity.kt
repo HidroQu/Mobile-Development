@@ -270,9 +270,9 @@ fun EditForm(
                         .size(120.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary),
-                    placeholder = painterResource(id = R.drawable.ic_launcher_foreground), // Placeholder saat gambar dimuat
-                    error = painterResource(id = R.drawable.ic_launcher_foreground), // Gambar default jika gagal dimuat
-                    contentScale = ContentScale.Crop // Sesuaikan ukuran gambar dengan crop
+                    placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
+                    error = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentScale = ContentScale.Crop
                 )
             } ?: Icon(
                 painter = painterResource(id = R.drawable.ic_launcher_foreground),

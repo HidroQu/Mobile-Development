@@ -24,7 +24,8 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class ScanPlantViewModel: ViewModel(){
-    private val apiService = HidroQuApiPredictConfig.retrofit.create(HidroQuApiService::class.java)
+    private val apiService : HidroQuApiService =
+        HidroQuApiPredictConfig.getApiService()
 
     private val _plantPrediction = MutableStateFlow<PlantPredictionResponse?>(null)
     val plantPrediction: StateFlow<PlantPredictionResponse?> get() = _plantPrediction
