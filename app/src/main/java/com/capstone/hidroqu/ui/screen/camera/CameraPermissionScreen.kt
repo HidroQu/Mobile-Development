@@ -115,13 +115,7 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
     var cameraControl: CameraControl? by remember { mutableStateOf(null) }
     var cameraInfo: CameraInfo? by remember { mutableStateOf(null) }
     var cameraProvider: ProcessCameraProvider? by remember { mutableStateOf(null) }
-    var showTooltip by remember { mutableStateOf(true) } // Tooltip visibilitas
-
-    LaunchedEffect(Unit) {
-        showTooltip = true
-        kotlinx.coroutines.delay(3000) // Tooltip muncul selama 5 detik
-        showTooltip = false
-    }
+    val showTooltip by remember { mutableStateOf(true) } // Tooltip visibilitas
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -192,15 +186,6 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
         animationSpec = tween(durationMillis = 2000, easing = LinearOutSlowInEasing), label = ""
     ).value }
 
-    val animatedTooltipOffset by animateDpAsState(
-        targetValue = if (showTooltip) 28.dp else 0.dp, // Tooltip muncul atau hilang
-        animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing), label = ""
-    )
-
-    val animatedTooltipOpacity by animateFloatAsState(
-        targetValue = if (showTooltip) 1f else 0f, // Tooltip opacity
-        animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing), label = ""
-    )
     LaunchedEffect(Unit) {
         animationProgress = 1f
     }
@@ -274,21 +259,19 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
             if (showTooltip && cameraMode == "Poto Tanam") {
                 Box(
                     modifier = Modifier
-                        .clickable { showTooltip = false }
                         .fillMaxSize()
-                        .padding(animatedTooltipOffset),
+                        .padding(28.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
                                 shape = MaterialTheme.shapes.medium
                             )
                             .padding(24.dp)
-                            .widthIn(max = 300.dp)
-                            .heightIn(max = 250.dp)
-                            .graphicsLayer { alpha = animatedTooltipOpacity },
+                            .widthIn(max = 250.dp)
+                            .heightIn(max = 250.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -298,8 +281,7 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                             contentDescription = "Leaf Guidance",
                             modifier = Modifier
                                 .size(100.dp)
-                                .clip(MaterialTheme.shapes.medium)
-                                .border(2.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+                                .graphicsLayer(alpha = 0.7f)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
@@ -307,28 +289,28 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .graphicsLayer(alpha = 0.7f)
                         )
                     }
                 }
             } else if (showTooltip && cameraMode == "Scan Tanam") {
                 Box(
                     modifier = Modifier
-                        .clickable { showTooltip = false }
                         .fillMaxSize()
-                        .padding(animatedTooltipOffset),
+                        .padding(28.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f), // Transparansi background
                                 shape = MaterialTheme.shapes.medium
                             )
                             .padding(24.dp)
-                            .widthIn(max = 300.dp)
-                            .heightIn(max = 250.dp)
-                            .graphicsLayer { alpha = animatedTooltipOpacity },
+                            .widthIn(max = 250.dp)
+                            .heightIn(max = 250.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -338,8 +320,7 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                             contentDescription = "Leaf Guidance",
                             modifier = Modifier
                                 .size(100.dp)
-                                .clip(MaterialTheme.shapes.medium)
-                                .border(2.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.medium)
+                                .graphicsLayer(alpha = 0.7f)
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -348,7 +329,9 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .graphicsLayer(alpha = 0.7f)
                         )
                     }
                 }
