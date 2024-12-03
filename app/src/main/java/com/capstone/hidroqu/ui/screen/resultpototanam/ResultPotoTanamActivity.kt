@@ -61,7 +61,8 @@ fun ResultPotoTanamActivity(
                 }
             } else {
                 Log.e("ResultPotoTanamActivity", "URI is null, navigating to home...")
-                navHostController.navigate(Screen.HomeRoute.route){
+                navHostController.navigate(Screen.HomeRoute.route)
+                {
                     popUpTo(Screen.ResultPotoTanam.route) { inclusive = true }
                 }
             }
@@ -78,7 +79,8 @@ fun ResultPotoTanamActivity(
     LaunchedEffect(errorMessage) {
         if (errorMessage?.isNotEmpty() == true) {
             Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-            navHostController.navigate(Screen.HomeRoute.route){
+            navHostController.navigate(Screen.HomeRoute.route)
+            {
                 popUpTo(Screen.ResultPotoTanam.route) { inclusive = true }
             }
         }
@@ -128,9 +130,10 @@ fun ResultPotoTanamActivityContent(
                         val encodedUri = URLEncoder.encode(photoUri.toString(), "UTF-8")
                         navHostController.navigate(
                             Screen.ChoosePlant.createRoute(diagnoseId = diagnoseId, photoUri = encodedUri)
-                        ){
-                            popUpTo(Screen.ResultPotoTanam.route) {inclusive = true}
-                        }
+                        )
+//                        {
+//                            popUpTo(Screen.ResultPotoTanam.route) {inclusive = true}
+//                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()

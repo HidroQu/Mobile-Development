@@ -17,15 +17,18 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object CameraPotoTanam : Screen("camerapototanam")
     object CameraScanTanam : Screen("camerascantanam")
-
+    //pototanam
+    object PotoTanamRoute : Screen("pototanamroute")
     object ResultPotoTanam : Screen("ResultPotoTanam/{photoUri}") {
         fun createRoute(photoUri: String) = "ResultPotoTanam/$photoUri"
     }
-    object ResultScanTanam : Screen("ResultScanTanam/{photoUri}") {
-        fun createRoute(photoUri: String) = "ResultScanTanam/$photoUri"
-    }
     object ChoosePlant : Screen("ChoosePlant/{diagnoseId}/{photoUri}") {
         fun createRoute(diagnoseId: Int, photoUri: String) = "ChoosePlant/$diagnoseId/$photoUri"
+    }
+    //scantanam
+    object ScanTanamRoute : Screen("scantanamroute")
+    object ResultScanTanam : Screen("ResultScanTanam/{photoUri}") {
+        fun createRoute(photoUri: String) = "ResultScanTanam/$photoUri"
     }
     //artikel
     object Article : Screen("article")

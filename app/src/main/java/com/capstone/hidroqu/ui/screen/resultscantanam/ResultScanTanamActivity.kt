@@ -97,9 +97,7 @@ fun ResultScanTanamActivity(
                         plantId?.let {
                             navHostController.navigate(
                                 Screen.FormAddPlant.createRoute(plantId = it)
-                            ) {
-                                popUpTo(Screen.ResultScanTanam.route) { inclusive = true }
-                            }
+                            )
                         }
                     },
                     modifier = Modifier

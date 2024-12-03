@@ -187,7 +187,7 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
             colorText = MaterialTheme.colorScheme.onTertiaryContainer,
             onClick = {
                 // Buka CameraPotoTanamActivity
-                navController.navigate(Screen.CameraPotoTanam.route)
+                navController.navigate(Screen.PotoTanamRoute.route)
             }
         )
         CardCamera(
@@ -201,12 +201,7 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
             colorText = MaterialTheme.colorScheme.onSecondaryContainer,
             onClick = {
                 // Navigasi ke halaman hasil (Result) setelah mengklik card kedua
-                navController.navigate(Screen.CameraScanTanam.route){
-                    popUpTo(Screen.Home.route)
-                    { saveState = true }
-                    launchSingleTop = true
-                    restoreState = true
-                }
+                navController.navigate(Screen.ScanTanamRoute.route)
             }
         )
     }

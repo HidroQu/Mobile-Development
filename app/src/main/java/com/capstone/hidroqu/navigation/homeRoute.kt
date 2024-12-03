@@ -27,40 +27,19 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController){
         composable(Screen.Home.route) {
             HomeActivity(navHostController = navController)
         }
+        potoTanamGraph(navController)
+        scanTanamGraph(navController)
         ////camera
-        composable(Screen.CameraScanTanam.route) {
-            CameraPermissionScreen("Scan Tanam", navController)
-        }
-        composable(Screen.CameraPotoTanam.route) {
-            CameraPermissionScreen("Poto Tanam", navController)
-        }
-        /////detail kamera
-        composable(
-            route = Screen.ResultPotoTanam.route,
-            arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val photoUri = backStackEntry.arguments?.getString("photoUri")
-            ResultPotoTanamActivity(photoUri = photoUri, navHostController = navController)
-        }
-        composable(
-            route = Screen.ResultScanTanam.route,
-            arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val photoUri = backStackEntry.arguments?.getString("photoUri")
-            ResultScanTanamActivity(photoUri = photoUri, navHostController = navController)
-        }
-        composable(
-            route = Screen.ChoosePlant.route,
-            arguments = listOf(
-                navArgument("diagnoseId") { type = NavType.IntType },
-                navArgument("photoUri") { type = NavType.StringType }
-            )
-
-        ) { backStackEntry ->
-            val diagnoseId = backStackEntry.arguments?.getInt("diagnoseId")
-            val photoUri = backStackEntry.arguments?.getString("photoUri")
-            ChoosePlantActivity(diagnoseId = diagnoseId, photoUri = photoUri, navHostController = navController)
-        }
+//        composable(Screen.CameraScanTanam.route) {
+//            CameraPermissionScreen("Scan Tanam", navController)
+//        }
+//        composable(
+//            route = Screen.ResultScanTanam.route,
+//            arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
+//        ) { backStackEntry ->
+//            val photoUri = backStackEntry.arguments?.getString("photoUri")
+//            ResultScanTanamActivity(photoUri = photoUri, navHostController = navController)
+//        }
         ///artikel
         composable(Screen.Article.route) {
             ArticleActivity(navHostController = navController)

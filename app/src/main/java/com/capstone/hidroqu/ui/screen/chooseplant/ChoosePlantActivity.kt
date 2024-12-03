@@ -107,7 +107,7 @@ fun ChoosePlantActivity(
                                 onSuccess = {
                                     navHostController.navigate(Screen.DetailMyPlant.createRoute(plant.id)) {
                                         // Clear the back stack up to this point
-                                        popUpTo(Screen.ChoosePlant.route) {inclusive = true}
+                                        popUpTo(Screen.PotoTanamRoute.route) {inclusive = true}
                                     }
                                 },
                             )

@@ -103,7 +103,7 @@ fun FormAddPlantActivity(
                                 onSuccess = { response ->
                                     navHostController.navigate(Screen.MyPlantRoute.route)
                                     {
-                                        popUpTo(Screen.MyPlantRoute.route) { inclusive = true }
+                                        popUpTo(Screen.ScanTanamRoute.route) { inclusive = true }
                                     }
                                     message = "Tanaman berhasil ditambahkan!"
                                 }
