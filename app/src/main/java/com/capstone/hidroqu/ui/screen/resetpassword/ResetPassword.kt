@@ -25,6 +25,8 @@ import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
+import android.widget.Toast
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -101,14 +103,16 @@ fun ResetPasswordActivity(
                             password = newPassword,
                             onSuccess = {
                                 serverResponse = it
+                                // Tampilkan Toast untuk sukses
+                                Toast.makeText(context, "Kata sandi berhasil diatur ulang.", Toast.LENGTH_SHORT).show()
                                 navHostController.navigate(Screen.Login.route) {
                                     popUpTo(Screen.ResetPassword.route) { inclusive = true }
                                 }
-                                message = "Kata sandi berhasil diatur ulang."
                             },
                             onError = {
                                 serverResponse = it
-                                message = "Gagal mengatur ulang kata sandi."
+                                // Tampilkan Toast untuk error
+                                Toast.makeText(context, "Gagal mengatur ulang kata sandi.", Toast.LENGTH_SHORT).show()
                             }
                         )
                     }
@@ -139,6 +143,7 @@ fun ResetPasswordActivity(
         }
     }
 }
+
 
 @Composable
 fun ResetPasswordForm(

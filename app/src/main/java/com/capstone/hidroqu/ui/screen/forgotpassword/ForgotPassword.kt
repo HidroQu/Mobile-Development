@@ -2,6 +2,7 @@ package com.capstone.hidroqu.ui.screen.forgetpassword
 
 import android.annotation.SuppressLint
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,8 +32,9 @@ fun ForgotPasswordActivity(
 ) {
     var emailValue by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf<String?>(null) }
-    var message by remember { mutableStateOf("") }
     var isSuccess by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current // Get the context here
 
     // Fungsi validasi terpisah
     fun validateForm(): Boolean {
@@ -66,26 +68,21 @@ fun ForgotPasswordActivity(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Menampilkan message dengan warna sesuai kondisi
-                Text(
-                    text = message,
-                    color = if (isSuccess) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                )
-
                 Spacer(modifier = Modifier.height(32.dp))
 
                 ForgotPasswordButton(
                     navController = navHostController,
                     onForget = {
                         if (validateForm()) {
+                            // Pass context to onSuccess and onError
                             viewModel.forgotPassword(
                                 emailValue,
                                 onSuccess = {
-                                    message = "Tautan berhasil dikirim ke email Anda!!"
+                                    Toast.makeText(context, "Tautan berhasil dikirim ke email Anda!!", Toast.LENGTH_SHORT).show()
                                     isSuccess = true
                                 },
                                 onError = { error ->
-                                    message = "Oops! Sepertinya ada kesalahan dengan email Anda. Silakan periksa dan coba lagi."
+                                    Toast.makeText(context, "Oops! Sepertinya ada kesalahan dengan email Anda. Silakan periksa dan coba lagi.", Toast.LENGTH_SHORT).show()
                                     isSuccess = false
                                 }
                             )
@@ -98,6 +95,7 @@ fun ForgotPasswordActivity(
         }
     }
 }
+
 
 
 

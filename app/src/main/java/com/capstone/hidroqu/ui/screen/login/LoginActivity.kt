@@ -2,6 +2,7 @@ package com.capstone.hidroqu.ui.screen.login
 
 import android.annotation.SuppressLint
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -21,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import com.capstone.hidroqu.R
@@ -108,13 +110,6 @@ fun LoginActivity(
                     ForgotPasswordButton(navHostController = navHostController)
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    Text(
-                        text = message,
-                        color = if (isSuccess) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     // Login Button
                     LoginButton(
                         navHostController = navHostController,
@@ -128,13 +123,13 @@ fun LoginActivity(
                                         navHostController.navigate(Screen.HomeRoute.route) {
                                             popUpTo(Screen.Login.route) { inclusive = true }
                                         }
-
-                                        message = "Login Successful!"
                                         isSuccess = true
+
+                                        Toast.makeText(context, "Halo:D", Toast.LENGTH_SHORT).show()
                                     },
                                     onError = {
-                                        message = "Kesalahan! Akun Anda tidak ditemukan."
                                         isSuccess = false
+                                        Toast.makeText(context, "Kesalahan! Akun Anda tidak ditemukan;-;", Toast.LENGTH_SHORT).show()
                                     }
                                 )
                             }
@@ -166,6 +161,13 @@ fun LoginForm(
     emailError: String?,
     passwordError: String?
 ) {
+    var showPassword by remember { mutableStateOf(false) }
+    var passwordLengthError by remember { mutableStateOf<String?>(null) }
+
+    // Validasi panjang password
+    LaunchedEffect(password) {
+        passwordLengthError = if (password.length < 8) "Password harus lebih dari 8 karakter" else null
+    }
     TextFieldForm(
         modifier = Modifier.fillMaxWidth(),
         value = email,
@@ -181,10 +183,19 @@ fun LoginForm(
         value = password,
         onValueChange = onPasswordChanged,
         label = "Kata Sandi",
-        visualTransformation = PasswordVisualTransformation(),
+        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        isError = passwordError != null,
-        errorMessage = passwordError
+        isError = passwordError != null || passwordLengthError != null,
+        errorMessage = passwordError ?: passwordLengthError,
+        trailingIcon = {
+            // Menambahkan ikon mata untuk toggle password visibility
+            IconButton(onClick = { showPassword = !showPassword }) {
+                Icon(
+                    painter = painterResource(id = if (showPassword) R.drawable.ic_visibility else R.drawable.ic_visibility_off),
+                    contentDescription = if (showPassword) "Sembunyikan Kata Sandi" else "Tampilkan Kata Sandi"
+                )
+            }
+        }
     )
 }
 
@@ -266,9 +277,9 @@ fun GoogleButton(
 ) {
     TextButton(
         onClick = {
-            navHostController.navigate(Screen.HomeRoute.route) {
-                popUpTo(Screen.Login.route) { inclusive = true }
-            }
+//            navHostController.navigate(Screen.HomeRoute.route) {
+//                popUpTo(Screen.Login.route) { inclusive = true }
+//            }
         },
         modifier = Modifier
             .fillMaxWidth()

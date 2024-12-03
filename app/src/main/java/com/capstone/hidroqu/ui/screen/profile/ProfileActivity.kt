@@ -216,13 +216,13 @@ fun NoPostList(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
+                .padding(top = 32.dp)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.pupuk),
-                contentDescription = "Artikel",
+                contentDescription = "no post",
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(70.dp)
                     .align(Alignment.Center)
                     .fillMaxWidth(),
                 contentScale = ContentScale.Crop
@@ -324,7 +324,6 @@ fun MyPostsSection(
     modifier: Modifier = Modifier,
     onDetailClicked: (Int) -> Unit
 ) {
-    // Sort posts immediately when received
     val sortedPosts = remember(posts) {
         posts.sortedByDescending {
             try {

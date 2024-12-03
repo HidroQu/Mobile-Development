@@ -11,19 +11,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 
-/**
- * Custom TextField komponen yang dapat digunakan kembali
- * @param value nilai text yang ditampilkan
- * @param onValueChange callback ketika nilai berubah
- * @param label label untuk text field
- * @param modifier modifier untuk styling
- * @param visualTransformation transformasi visual untuk input (contoh: password)
- * @param keyboardOptions opsi keyboard
- * @param isError menampilkan status error
- * @param errorMessage pesan error yang ditampilkan
- * @param leadingIcon icon di depan text field (optional)
- * @param trailingIcon icon di belakang text field (optional)
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldForm(
@@ -38,6 +25,7 @@ fun TextFieldForm(
     labelTextStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
     singleLine: Boolean = true,  // Tambahkan parameter untuk singleLine
     maxLines: Int = 1,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     Column {
         OutlinedTextField(
@@ -65,7 +53,8 @@ fun TextFieldForm(
             isError = isError,
             supportingText = if (isError && !errorMessage.isNullOrEmpty()) {
                 { Text(text = errorMessage, color = MaterialTheme.colorScheme.error) }
-            } else null
+            } else null,
+            trailingIcon = trailingIcon
         )
     }
 }

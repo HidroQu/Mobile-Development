@@ -209,7 +209,7 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
                 // Navigasi ke halaman hasil (Result) setelah mengklik card kedua
                 navController.navigate(Screen.ScanTanamRoute.route)
                 {
-                    popUpTo(Screen.HomeRoute.route)
+                    popUpTo(Screen.Home.route)
                     { saveState = true }
                     launchSingleTop = true
                     restoreState = true
