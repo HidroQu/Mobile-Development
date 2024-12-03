@@ -23,8 +23,7 @@ import retrofit2.Response
 
 class ArticleViewModel : ViewModel() {
     private val apiService: HidroQuApiService =
-        HidroQuApiConfig.retrofit.create(HidroQuApiService::class.java)
-
+        HidroQuApiConfig.getApiService()
     private val _articles = MutableStateFlow<List<ArticleDetailResponse>>(emptyList())
     val articles: StateFlow<List<ArticleDetailResponse>> get() = _articles
 

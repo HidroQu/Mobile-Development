@@ -106,6 +106,8 @@ class HarvestNotificationHelper(private val context: Context) {
     }
 
     private fun scheduleProductionNotifications(plantName: String, harvestDateStr: String) {
+        cancelHarvestReminders(harvestDateStr)
+
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("id", "ID"))
         val harvestDate = dateFormat.parse(harvestDateStr) ?: return
         val harvestCalendar = Calendar.getInstance().apply {
@@ -118,28 +120,29 @@ class HarvestNotificationHelper(private val context: Context) {
         NOTIFICATION_DAYS.forEach { daysBeforeHarvest ->
             val notificationTime = Calendar.getInstance().apply {
                 time = harvestCalendar.time
-                add(Calendar.DAY_OF_YEAR, -daysBeforeHarvest)
+                add(Calendar.DAY_OF_YEAR, - daysBeforeHarvest)
             }
+            if (notificationTime.after(Calendar.getInstance())) {
+                val intent = Intent(context, HarvestNotificationReceiver::class.java).apply {
+                    putExtra("plantName", plantName)
+                    putExtra("daysBeforeHarvest", daysBeforeHarvest)
+                    putExtra("notificationId", generateNotificationId(harvestDateStr, daysBeforeHarvest))
+                    putExtra("isDebug", false)
+                }
 
-            val intent = Intent(context, HarvestNotificationReceiver::class.java).apply {
-                putExtra("plantName", plantName)
-                putExtra("daysBeforeHarvest", daysBeforeHarvest)
-                putExtra("notificationId", generateNotificationId(harvestDateStr, daysBeforeHarvest))
-                putExtra("isDebug", false)
+                val pendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    generateNotificationId(harvestDateStr, daysBeforeHarvest),
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                alarmManager?.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    notificationTime.timeInMillis,
+                    pendingIntent
+                )
             }
-
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                generateNotificationId(harvestDateStr, daysBeforeHarvest),
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-            alarmManager?.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                notificationTime.timeInMillis,
-                pendingIntent
-            )
         }
     }
 

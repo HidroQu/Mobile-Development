@@ -130,7 +130,6 @@ fun ProfileActivity(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(20.dp)
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.Start
@@ -138,7 +137,9 @@ fun ProfileActivity(
                     // Profile Header
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(24.dp),
                     ) {
                         AsyncImage(
