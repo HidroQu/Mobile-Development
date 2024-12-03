@@ -115,7 +115,7 @@ fun FormAddPlantActivity(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp),
-                    enabled = plant != null,
+                    enabled = plant != null && plantingDateForServer != "" ,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (plant != null)
                             MaterialTheme.colorScheme.primary

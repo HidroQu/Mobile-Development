@@ -165,7 +165,8 @@ fun FormAddCommunityActivity(
                                     width = 2.dp,
                                     color = MaterialTheme.colorScheme.outlineVariant,
                                     shape = CircleShape
-                                )
+                                ),
+                            contentScale = ContentScale.Crop
                         )
                         Text(
                             text = userData?.name ?: "Nama pengguna",
@@ -255,7 +256,8 @@ fun FormAddCommunityActivity(
                                     contentDescription = "Selected Image $index",
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .clip(RoundedCornerShape(16.dp))
+                                        .clip(RoundedCornerShape(16.dp)),
+                                    contentScale = ContentScale.Crop
                                 )
 
                                 IconButton(

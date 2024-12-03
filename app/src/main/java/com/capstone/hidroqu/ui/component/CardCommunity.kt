@@ -41,6 +41,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.nonui.data.PostData
+import com.capstone.hidroqu.ui.screen.detailmyplant.formatDateWithMonthName
 import com.capstone.hidroqu.utils.ListCommunity
 import com.capstone.hidroqu.utils.dummyListCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -81,10 +82,10 @@ fun CardCommunity(
     ) {
         // Row untuk informasi pengguna
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
             val imageLoader = ImageLoader.Builder(LocalContext.current)
                 .components {
@@ -95,7 +96,9 @@ fun CardCommunity(
             Image(
                 painter = rememberAsyncImagePainter(
                     model = listCommunity.user.photo,
-                    imageLoader = imageLoader
+                    imageLoader = imageLoader,
+                    error = painterResource(id = R.drawable.ic_launcher_foreground),
+                    placeholder = painterResource(id = R.drawable.ic_launcher_foreground)
                 ),
                 modifier = Modifier
                     .size(50.dp) // Ukuran gambar
@@ -108,57 +111,66 @@ fun CardCommunity(
                 contentScale = ContentScale.Crop,
                 contentDescription = "Gambar Profil"
             )
-            Column {
-                Text(
-                    text = listCommunity.user.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = formatDate(listCommunity.created_at),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            }
-        }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = listCommunity.user.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = formatDateWithMonthName(listCommunity.created_at),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
 
-        // Tampilkan judul dan konten
-        Text(
-            text = listCommunity.title,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-
-        Text(
-            text = listCommunity.content,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-
-        // Periksa apakah gambar tersedia
-        if (!listCommunity.image.isNullOrEmpty()) {
-            val imageLoader = ImageLoader.Builder(LocalContext.current)
-                .components {
-                    add(SvgDecoder.Factory())
                 }
-                .build()
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Tampilkan judul dan konten
+                    Text(
+                        text = listCommunity.title,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = listCommunity.content,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
 
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = listCommunity.image,
-                    imageLoader = imageLoader
-                ),
-                contentDescription = "Image Post",
-                modifier = imageModifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .clickable {
-                        // Toggle the image expanded state when clicked
-                        isImageExpanded.value = !isImageExpanded.value
-                    },
-                contentScale = ContentScale.Crop
-            )
+                    // Periksa apakah gambar tersedia
+                    if (!listCommunity.image.isNullOrEmpty()) {
+                        val imageLoader = ImageLoader.Builder(LocalContext.current)
+                            .components {
+                                add(SvgDecoder.Factory())
+                            }
+                            .build()
+
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = listCommunity.image,
+                                imageLoader = imageLoader
+                            ),
+                            contentDescription = "Image Post",
+                            modifier = imageModifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .clickable {
+                                    // Toggle the image expanded state when clicked
+                                    isImageExpanded.value = !isImageExpanded.value
+                                },
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+            }
         }
 
         // Bagian untuk komentar

@@ -14,13 +14,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -209,13 +212,14 @@ fun DetailPostCommunityContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.onPrimary)
-                        .padding(20.dp),
+                        .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.Top
                     ) {
                         val imageLoader = ImageLoader.Builder(LocalContext.current)
                             .components {
@@ -241,47 +245,60 @@ fun DetailPostCommunityContent(
                                 contentScale = ContentScale.Crop
                             )
                         }
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = post?.user?.name ?: "Username",
+                                        modifier = Modifier.weight(1f),
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = formatDate(post?.created_at ?: "00/00/0000"),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        modifier = Modifier.wrapContentWidth(Alignment.End),
+                                        color = MaterialTheme.colorScheme.outline
+                                    )
+                                }
+                                Text(
+                                    text = post?.title ?: "Lorem ipsum",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                            // Post Content
+                            Text(
+                                text = post?.content ?: "Lorem ipsum",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
 
-                        Column {
-                            Text(
-                                text = post?.user?.name ?: "Username",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                text = formatDate(post?.created_at ?: "00/00/0000"),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.outline
-                            )
+                            // Only display the image if it's available
+                            if (!post?.image.isNullOrEmpty()) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(post?.image),
+                                    contentDescription = "Post Image",
+                                    modifier = imageModifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            // Toggle the image expanded state when clicked
+                                            isImageExpanded.value = !isImageExpanded.value
+                                        },
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         }
-                    }
-                    Text(
-                        text = post?.title ?: "Lorem ipsum",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-
-                    // Post Content
-                    Text(
-                        text = post?.content ?: "Lorem ipsum",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-
-                    // Only display the image if it's available
-                    if (!post?.image.isNullOrEmpty()) {
-                        Image(
-                            painter = rememberAsyncImagePainter(post?.image),
-                            contentDescription = "Post Image",
-                            modifier = imageModifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    // Toggle the image expanded state when clicked
-                                    isImageExpanded.value = !isImageExpanded.value
-                                },
-                            contentScale = ContentScale.Crop
-                        )
                     }
                 }
 
