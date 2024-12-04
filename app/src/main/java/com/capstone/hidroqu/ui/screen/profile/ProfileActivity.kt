@@ -220,10 +220,10 @@ fun NoPostList(
                 .padding(top = 32.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.pupuk),
+                painter = painterResource(id = R.drawable.no_post),
                 contentDescription = "no post",
                 modifier = Modifier
-                    .size(70.dp)
+                    .size(50.dp)
                     .align(Alignment.Center)
                     .fillMaxWidth(),
                 contentScale = ContentScale.Crop

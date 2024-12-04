@@ -175,8 +175,8 @@ fun ResetPasswordForm(
         onValueChange = onNewPasswordChanged,
         label = "Kata Sandi Baru",
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        isError = newPasswordError != null,
-        errorMessage = newPasswordError,
+        isError = newPassword.isNotEmpty() && newPassword.length < 8,
+        errorMessage = if (newPassword.isNotEmpty() && newPassword.length < 8) "Password minimal 8 karakter" else null,
         visualTransformation = PasswordVisualTransformation()
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -186,12 +186,15 @@ fun ResetPasswordForm(
         onValueChange = onConfirmPasswordChanged,
         label = "Konfirmasi Kata Sandi",
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        isError = newConfirmPasswordError != null,
-        errorMessage = newConfirmPasswordError,
+        isError = confirmPassword.isNotEmpty() && (confirmPassword != newPassword || confirmPassword.length < 8),
+        errorMessage = when {
+            confirmPassword.isNotEmpty() && confirmPassword.length < 8 -> "Password minimal 8 karakter"
+            confirmPassword.isNotEmpty() && confirmPassword != newPassword -> "Kata sandi tidak cocok"
+            else -> null
+        },
         visualTransformation = PasswordVisualTransformation()
     )
 }
-
 
 @Preview(showBackground = true)
 @Composable

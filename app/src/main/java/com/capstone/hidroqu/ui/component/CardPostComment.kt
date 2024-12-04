@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -31,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
@@ -48,6 +50,7 @@ fun CardPostComment(
     modifier: Modifier = Modifier,
 ) {
     val isImageExpanded = remember { mutableStateOf(false) }
+    val isContentExpanded = remember { mutableStateOf(false) }
 
     val imageModifier = if (isImageExpanded.value) {
         Modifier.wrapContentHeight()
@@ -130,8 +133,20 @@ fun CardPostComment(
                 Text(
                     text = listComment.content,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    maxLines = if (isContentExpanded.value) Int.MAX_VALUE else 15,
+                    overflow = TextOverflow.Ellipsis
                 )
+                if (listComment.content.length > 150) {
+                    Text(
+                        text = if (isContentExpanded.value) "Tampilkan lebih sedikit" else "Lihat lainnya",
+                        modifier = Modifier
+                            .clickable { isContentExpanded.value = !isContentExpanded.value }
+                            .padding(top = 8.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
 
                 if (!listComment.image.isNullOrEmpty()) {
                     val imageLoader = ImageLoader.Builder(LocalContext.current)

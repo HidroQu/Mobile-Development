@@ -46,12 +46,11 @@ fun RegisterActivity(
     var passwordError by remember { mutableStateOf<String?>(null) }
     var passwordConfirmationError by remember { mutableStateOf<String?>(null) }
     var passwordLengthError by remember { mutableStateOf<String?>(null) }
-    var showPassword by remember { mutableStateOf(false) }
+    var showPassword by remember { mutableStateOf(false) } // To toggle visibility for password
     var showPasswordConfirmation by remember { mutableStateOf(false) } // To toggle visibility for confirmation password
     var message by remember { mutableStateOf("") }
     var isSuccess by remember { mutableStateOf(false) }
-
-    // State to track whether the password field has been touched
+    var isPasswordConfirmationTouched by remember { mutableStateOf(false) }
     var isPasswordTouched by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -60,14 +59,18 @@ fun RegisterActivity(
     // Fungsi validasi terpisah
     fun validateForm(): Boolean {
         nameError = if (nameValue.isBlank()) "Nama tidak boleh kosong" else null
-        emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue)
-                .matches()
-        ) "Format email tidak valid" else null
-        passwordError = if (passwordValue.isBlank()) "Password tidak boleh kosong" else null
-        passwordConfirmationError =
-            if (passwordConfirmationValue.isBlank() || passwordConfirmationValue != passwordValue) {
-                "Konfirmasi password tidak sesuai"
-            } else null
+        emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()) "Format email tidak valid" else null
+        passwordError = when {
+            passwordValue.isBlank() -> "Password tidak boleh kosong"
+            passwordValue.length < 8 -> "Password minimal 8 karakter"
+            else -> null
+        }
+        passwordConfirmationError = when {
+            passwordConfirmationValue.isBlank() -> "Konfirmasi password tidak boleh kosong"
+            passwordConfirmationValue.length < 8 -> "Konfirmasi password minimal 8 karakter" // Tambahkan validasi panjang
+            passwordConfirmationValue != passwordValue -> "Konfirmasi password tidak sesuai"
+            else -> null
+        }
         return nameError == null && emailError == null && passwordError == null && passwordConfirmationError == null
     }
 
@@ -76,6 +79,16 @@ fun RegisterActivity(
             passwordLengthError = if (passwordValue.length < 8) {
                 "Password minimal 8 karakter"
             } else null
+        }
+    }
+
+    LaunchedEffect(passwordConfirmationValue) {
+        if (isPasswordConfirmationTouched) {
+            passwordConfirmationError = when {
+                passwordConfirmationValue.length < 8 -> "Konfirmasi password minimal 8 karakter"
+                passwordConfirmationValue != passwordValue -> "Konfirmasi password tidak sesuai"
+                else -> null
+            }
         }
     }
 
@@ -127,6 +140,7 @@ fun RegisterActivity(
                         onPasswordConfirmationChanged = {
                             passwordConfirmationValue = it
                             passwordConfirmationError = null
+                            isPasswordConfirmationTouched = true
                         },
                         nameError = nameError,
                         emailError = emailError,

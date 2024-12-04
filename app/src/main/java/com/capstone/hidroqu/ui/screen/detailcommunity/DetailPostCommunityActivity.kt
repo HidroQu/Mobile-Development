@@ -53,6 +53,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -184,6 +185,7 @@ fun DetailPostCommunityContent(
     val commentText = remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    val isContentExpanded = remember { mutableStateOf(false) }
 
     val pickImages = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
         if (uris.size > 1) {
@@ -283,8 +285,21 @@ fun DetailPostCommunityContent(
                             Text(
                                 text = post?.content ?: "Lorem ipsum",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                maxLines = if (isContentExpanded.value) Int.MAX_VALUE else 15,
+                                overflow = TextOverflow.Ellipsis
                             )
+                            if ((post?.content ?: "").length > 150) {
+                                Text(
+                                    text = if (isContentExpanded.value) "Tampilkan lebih sedikit" else "Lihat lainnya",
+                                    modifier = Modifier
+                                        .clickable { isContentExpanded.value = !isContentExpanded.value }
+                                        .padding(top = 8.dp),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+
 
                             // Only display the image if it's available
                             if (!post?.image.isNullOrEmpty()) {
