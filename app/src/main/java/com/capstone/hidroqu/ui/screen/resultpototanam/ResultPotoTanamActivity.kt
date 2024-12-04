@@ -189,6 +189,7 @@ fun ResultPotoTanamActivityContent(
                 ) {
                     // Diagnosis Result
                     Column(
+                        modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
@@ -236,6 +237,7 @@ fun ResultPotoTanamActivityContent(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = modifier
+                                .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer)
                                 .padding(16.dp)
@@ -257,6 +259,7 @@ fun ResultPotoTanamActivityContent(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = modifier
+                                .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer)
                                 .padding(16.dp)
@@ -278,6 +281,7 @@ fun ResultPotoTanamActivityContent(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = modifier
+                                .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer)
                                 .padding(16.dp)

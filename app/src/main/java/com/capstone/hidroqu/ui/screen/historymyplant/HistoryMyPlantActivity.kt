@@ -219,7 +219,25 @@ fun DetailHistoryContent(
                     style = MaterialTheme.typography.labelLarge
                 )
                 Text(
-                    text = history?.diagnostic_history?.diagnostic?.cause ?: "Cause",
+                    text = history?.diagnostic_history?.diagnostic?.cause ?: "Penyebab",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(16.dp)
+                )
+            }
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "Solusi",
+                    style = MaterialTheme.typography.labelLarge
+                )
+                Text(
+                    text = history?.diagnostic_history?.diagnostic?.solution ?: "Solusi",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
                         .fillMaxWidth()
