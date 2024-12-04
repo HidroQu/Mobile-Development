@@ -150,13 +150,13 @@ fun CardCommunity(
                         text = listCommunity.content,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        maxLines = if (isContentExpanded.value) Int.MAX_VALUE else 15,
+                        maxLines = if (isContentExpanded.value) Int.MAX_VALUE else 10,
                         overflow = TextOverflow.Ellipsis
                     )
 
                     if (listCommunity.content.length > 150) {
                         Text(
-                            text = if (isContentExpanded.value) "Tampilkan lebih sedikit" else "Lihat lainnya",
+                            text = if (isContentExpanded.value) "Tampilkan lebih sedikit" else "Tampilkan lebih banyak",
                             modifier = Modifier
                                 .clickable { isContentExpanded.value = !isContentExpanded.value }
                                 .padding(top = 8.dp),

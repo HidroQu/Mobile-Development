@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -46,6 +47,7 @@ fun CardOtherPost(
     onClick: () -> Unit,
 ) {
     val isImageExpanded = remember { mutableStateOf(false) }
+    val isContentExpanded = remember { mutableStateOf(false) }
 
     val imageModifier = if (isImageExpanded.value) {
         Modifier.wrapContentHeight()
@@ -128,8 +130,20 @@ fun CardOtherPost(
                     Text(
                         text = listCommunity.content,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        maxLines = if (isContentExpanded.value) Int.MAX_VALUE else 10,
+                        overflow = TextOverflow.Ellipsis
                     )
+                    if (listCommunity.content.length > 150) {
+                        Text(
+                            text = if (isContentExpanded.value) "Tampilkan lebih sedikit" else "Tampilkan lebih banyak",
+                            modifier = Modifier
+                                .clickable { isContentExpanded.value = !isContentExpanded.value }
+                                .padding(top = 8.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
 
                     // Periksa apakah gambar tersedia
                     if (!listCommunity.image.isNullOrEmpty()) {
