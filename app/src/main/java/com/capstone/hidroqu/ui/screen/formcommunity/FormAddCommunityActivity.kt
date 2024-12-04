@@ -157,6 +157,8 @@ fun FormAddCommunityActivity(
                     ) {
                         AsyncImage(
                             model = userData?.photo ?: "",
+                            error = painterResource(id = R.drawable.ic_launcher_foreground),
+                            placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
                             contentDescription = "Profile Picture",
                             modifier = Modifier
                                 .size(50.dp)
