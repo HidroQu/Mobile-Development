@@ -12,6 +12,7 @@ import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
 import com.capstone.hidroqu.ui.screen.formaddcomment.FormAddComment
 import com.capstone.hidroqu.ui.screen.formcommunity.FormAddCommunityActivity
 import com.capstone.hidroqu.ui.screen.login.LoginActivity
+import com.capstone.hidroqu.ui.screen.profileother.ProfileOtherActivity
 import com.capstone.hidroqu.ui.screen.register.RegisterActivity
 import com.capstone.hidroqu.ui.screen.resetpassword.ResetPasswordActivity
 
@@ -45,6 +46,18 @@ fun NavGraphBuilder.communityGraph(navController: NavHostController){
                 idPost = idPost
             )
         }
+
+        composable(
+            route = Screen.ProfileOther.route,
+            arguments = listOf(navArgument("idPost") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val idPost = backStackEntry.arguments?.getInt("idPost") ?: 0
+            ProfileOtherActivity(
+                navHostController = navController,
+                idPost = idPost
+            )
+        }
+
 
         composable(
             route = Screen.AddPostComment.route,

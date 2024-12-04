@@ -136,7 +136,8 @@ fun CommunityActivity(
                             posts = communityPosts,
                             onDetailClicked = { idPost ->
                                 navHostController.navigate(Screen.DetailCommunity.createRoute(idPost))
-                            }
+                            },
+                            navHostController = navHostController,
                         )
                     }
                 }
@@ -259,7 +260,8 @@ fun PostList(
     searchQuery: String,
     posts: List<PostData>,
     modifier: Modifier = Modifier,
-    onDetailClicked: (Int) -> Unit
+    onDetailClicked: (Int) -> Unit,
+    navHostController: NavHostController,
 ) {
     val sortedPosts = posts.sortedWith(compareByDescending<PostData> { it.id })
 
@@ -273,7 +275,8 @@ fun PostList(
                 listCommunity = post,
                 onClick = {
                     onDetailClicked(post.id)
-                }
+                },
+                navHostController = navHostController
             )
         }
     }
