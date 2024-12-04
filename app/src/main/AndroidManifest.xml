@@ -49,9 +49,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="168.138.164.252"
+                    android:host="hidroqu-api-1031788214835.asia-southeast2.run.app"
                     android:pathPattern="/api/auth/reset-password.*"
-                    android:scheme="http" />
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <receiver
