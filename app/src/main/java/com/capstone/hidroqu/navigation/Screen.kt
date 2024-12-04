@@ -62,6 +62,9 @@ sealed class Screen(val route: String) {
     object DetailCommunity : Screen("DetailCommunity/{idPost}") {
         fun createRoute(idPost: Int) = "DetailCommunity/$idPost"
     }
+    object ProfileOther : Screen("ProfilOther/{idPost}") {
+        fun createRoute(idPost: Int) = "ProfilOther/$idPost"
+    }
 
     object AddPostCommunity : Screen("addpostcommunity")
     object AddPostComment : Screen("AddComment/{postId}") {

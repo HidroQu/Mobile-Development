@@ -160,7 +160,8 @@ fun DetailPostCommunityActivity(
                         token = token,
                         viewModel = viewModel,
                         isSubmittingComment = isSubmittingComment,
-                        commentSubmissionError = commentSubmissionError
+                        commentSubmissionError = commentSubmissionError,
+                        idPost = idPost
                     )
                 }
             }
@@ -176,6 +177,7 @@ fun DetailPostCommunityContent(
     context: Context = LocalContext.current,
     navHostController: NavHostController,
     token: String?,
+    idPost: Int,
     viewModel: CommunityViewModel,
     isSubmittingComment: MutableState<Boolean>,
     commentSubmissionError: MutableState<String?>
@@ -237,6 +239,9 @@ fun DetailPostCommunityContent(
                                 ),
                                 contentDescription = "User Profile Image",
                                 modifier = Modifier
+                                    .clickable {
+                                        navHostController.navigate(Screen.ProfileOther.createRoute(idPost))
+                                    }
                                     .size(50.dp)
                                     .clip(CircleShape)
                                     .border(
@@ -324,7 +329,7 @@ fun DetailPostCommunityContent(
                         )
                     }
                     listComment.forEach { comment ->
-                        CardPostComment(listComment = comment, post = post)
+                        CardPostComment(listComment = comment, post = post, navHostController = navHostController)
                     }
                 }
             }

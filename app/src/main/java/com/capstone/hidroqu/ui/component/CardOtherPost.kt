@@ -1,6 +1,5 @@
 package com.capstone.hidroqu.ui.component
 
-import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,8 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,33 +30,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
-import com.capstone.hidroqu.navigation.Screen
+import com.capstone.hidroqu.nonui.data.MyPostData
 import com.capstone.hidroqu.nonui.data.PostData
-import com.capstone.hidroqu.ui.screen.detailmyplant.formatDateWithMonthName
-import com.capstone.hidroqu.utils.ListCommunity
-import com.capstone.hidroqu.utils.dummyListCommunity
-import com.capstone.hidroqu.ui.theme.HidroQuTheme
-import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
-import com.capstone.hidroqu.ui.viewmodel.ProfileViewModel
 import com.capstone.hidroqu.utils.formatDate
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 @Composable
-fun CardCommunity(
+fun CardOtherPost(
     listCommunity: PostData,
     modifier: Modifier = Modifier,
-    navHostController: NavHostController,
     onClick: () -> Unit,
 ) {
     val isImageExpanded = remember { mutableStateOf(false) }
@@ -104,9 +87,6 @@ fun CardCommunity(
                     placeholder = painterResource(id = R.drawable.ic_launcher_foreground)
                 ),
                 modifier = Modifier
-                    .clickable {
-                        navHostController.navigate(Screen.ProfileOther.createRoute(listCommunity.id))
-                    }
                     .size(50.dp) // Ukuran gambar
                     .clip(CircleShape) // Membuat gambar menjadi bulat
                     .border(
@@ -114,8 +94,8 @@ fun CardCommunity(
                         color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
                         shape = CircleShape // Bentuk border bulat
                     ),
-                contentScale = ContentScale.Crop,
-                contentDescription = "Gambar Profil"
+                contentDescription = "Gambar Profil",
+                contentScale = ContentScale.Crop
             )
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -129,11 +109,10 @@ fun CardCommunity(
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = formatDateWithMonthName(listCommunity.created_at),
+                        text = formatDate(listCommunity.created_at),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
-
                 }
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -145,6 +124,7 @@ fun CardCommunity(
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
+
                     Text(
                         text = listCommunity.content,
                         style = MaterialTheme.typography.bodyMedium,
@@ -179,6 +159,8 @@ fun CardCommunity(
             }
         }
 
+
+
         // Bagian untuk komentar
         Row(
             modifier = Modifier
@@ -200,21 +182,5 @@ fun CardCommunity(
                 color = MaterialTheme.colorScheme.outline
             )
         }
-    }
-}
-
-
-@Preview
-@Composable
-private fun CardCommunityPreview() {
-    HidroQuTheme {
-//        dummyListCommunity.forEach { post ->
-//            CardCommunity (
-//                listCommunity = post,
-//                onClick = {
-//                    // Handle onClick here
-//                }
-//            )
-//        }
     }
 }

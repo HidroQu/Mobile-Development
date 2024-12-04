@@ -33,9 +33,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
+import com.capstone.hidroqu.R
+import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.nonui.data.Comment
 import com.capstone.hidroqu.nonui.data.CommunityDetailResponse
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
@@ -45,6 +48,7 @@ import com.capstone.hidroqu.utils.formatDate
 fun CardPostComment(
     listComment: Comment,
     post: CommunityDetailResponse?,
+    navHostController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
     val isImageExpanded = remember { mutableStateOf(false) }
@@ -70,10 +74,15 @@ fun CardPostComment(
         Image(
             painter = rememberAsyncImagePainter(
                 model = listComment.user.photo,
-                imageLoader = imageLoader
+                imageLoader = imageLoader,
+                placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
+                error = painterResource(id = R.drawable.ic_launcher_foreground),
             ),
             contentDescription = "Profil",
             modifier = Modifier
+                .clickable {
+                    navHostController.navigate(Screen.ProfileOther.createRoute(post?.id ?: 0))
+                }
                 .size(50.dp)
                 .clip(CircleShape)
                 .border(
