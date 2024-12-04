@@ -2,6 +2,7 @@ package com.capstone.hidroqu.ui.screen.resetpassword
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Patterns
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,7 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 import android.widget.Toast
+import androidx.compose.ui.Alignment
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnrememberedMutableState")
@@ -39,9 +41,17 @@ fun ResetPasswordActivity(
     val intent = (context as? ComponentActivity)?.intent
     val uri: Uri? = intent?.data
 
-    // Menangkap token dan email dari URI
+    // Capture token and email from URI
     var token by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var newPasswordError by remember { mutableStateOf<String?>(null) }
+    var confirmPasswordError by remember { mutableStateOf<String?>(null) }
+    var serverResponse by remember { mutableStateOf<String?>(null) }
+
+    // Get loading state from ViewModel
+    val isLoading by viewModel.isLoading
 
     LaunchedEffect(uri) {
         if (uri != null) {
@@ -50,15 +60,13 @@ fun ResetPasswordActivity(
         }
     }
 
-    var newPassword by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var newPasswordError by remember { mutableStateOf<String?>(null) }
-    var confirmPasswordError by remember { mutableStateOf<String?>(null) }
-    var serverResponse by remember { mutableStateOf<String?>(null) }
-    var message by remember { mutableStateOf("") }
+    LaunchedEffect(newPassword) {
+        newPasswordError = if (newPassword.length < 8) {
+            "Password minimal 8 karakter"
+        } else null
+    }
 
     fun validateForm(): Boolean {
-        newPasswordError = if (newPassword.isBlank()) "Kata sandi baru tidak boleh kosong" else null
         confirmPasswordError = if (confirmPassword != newPassword) "Kata sandi tidak cocok" else null
         return newPasswordError == null && confirmPasswordError == null
     }
@@ -69,81 +77,88 @@ fun ResetPasswordActivity(
         },
         modifier = modifier
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Text("Email: $email")
-            Text("Token: $token")
-
-            ResetPasswordForm(
-                newPassword = newPassword,
-                confirmPassword = confirmPassword,
-                onNewPasswordChanged = {
-                    newPassword = it
-                    newPasswordError = null
-                },
-                onConfirmPasswordChanged = {
-                    confirmPassword = it
-                    confirmPasswordError = null
-                },
-                newPasswordError = newPasswordError,
-                newConfirmPasswordError = confirmPasswordError
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = {
-                    if (validateForm()) {
-                        viewModel.resetPassword(
-                            token = token,
-                            email = email,
-                            password = newPassword,
-                            onSuccess = {
-                                serverResponse = it
-                                // Tampilkan Toast untuk sukses
-                                Toast.makeText(context, "Kata sandi berhasil diatur ulang.", Toast.LENGTH_SHORT).show()
-                                navHostController.navigate(Screen.Login.route) {
-                                    popUpTo(Screen.ResetPassword.route) { inclusive = true }
-                                }
-                            },
-                            onError = {
-                                serverResponse = it
-                                // Tampilkan Toast untuk error
-                                Toast.makeText(context, "Gagal mengatur ulang kata sandi.", Toast.LENGTH_SHORT).show()
-                            }
-                        )
-                    }
-                },
-                shape = RoundedCornerShape(100.dp),
+        if (isLoading) {
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Atur Ulang Kata Sandi",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
+                CircularProgressIndicator()
             }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                Text("Email: $email")
+                Text("Token: $token")
 
-            serverResponse?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 16.dp)
+                ResetPasswordForm(
+                    newPassword = newPassword,
+                    confirmPassword = confirmPassword,
+                    onNewPasswordChanged = {
+                        newPassword = it
+                    },
+                    onConfirmPasswordChanged = {
+                        confirmPassword = it
+                        confirmPasswordError = null // Reset error when text changes
+                    },
+                    newPasswordError = newPasswordError,
+                    newConfirmPasswordError = confirmPasswordError
                 )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(
+                    onClick = {
+                        if (validateForm()) {
+                            viewModel.resetPassword(
+                                token = token,
+                                email = email,
+                                password = newPassword,
+                                onSuccess = {
+                                    serverResponse = it
+                                    Toast.makeText(context, "Kata sandi berhasil diatur ulang.", Toast.LENGTH_SHORT).show()
+                                    navHostController.navigate(Screen.Login.route) {
+                                        popUpTo(Screen.ResetPassword.route) { inclusive = true }
+                                    }
+                                },
+                                onError = {
+                                    serverResponse = it
+                                    Toast.makeText(context, "Gagal mengatur ulang kata sandi.", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(100.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(
+                        text = "Atur Ulang Kata Sandi",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+
+                serverResponse?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                }
             }
         }
     }
 }
-
 
 @Composable
 fun ResetPasswordForm(
@@ -176,6 +191,7 @@ fun ResetPasswordForm(
         visualTransformation = PasswordVisualTransformation()
     )
 }
+
 
 @Preview(showBackground = true)
 @Composable

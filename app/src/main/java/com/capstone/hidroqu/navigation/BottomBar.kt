@@ -28,26 +28,29 @@ fun BottomBar(
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Daftar item navigasi
     val navigationItems = listOf(
         NavigationItem(
             title = "Home",
             icon = R.drawable.home,
+            iconFilled = R.drawable.home_active,
             screen = Screen.Home
         ),
         NavigationItem(
             title = "Tanamanku",
             icon = R.drawable.tanamanku,
+            iconFilled = R.drawable.tanamanku_active,
             screen = Screen.MyPlant
         ),
         NavigationItem(
             title = "Komunitas",
             icon = R.drawable.komunitas,
+            iconFilled = R.drawable.komunitas_active,
             screen = Screen.Community
         ),
         NavigationItem(
             title = "Profil",
             icon = R.drawable.profil,
+            iconFilled = R.drawable.profile_active,
             screen = Screen.Profile
         )
     )
@@ -61,7 +64,9 @@ fun BottomBar(
             NavigationBarItem(
                 icon = {
                     Icon(
-                        painter = painterResource(id = it.icon),
+                        painter = painterResource(
+                            id = if (currentRoute == it.screen.route) it.iconFilled else it.icon
+                        ),
                         contentDescription = it.title
                     )
                 },

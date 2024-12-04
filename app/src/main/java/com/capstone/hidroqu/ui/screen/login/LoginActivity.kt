@@ -54,6 +54,7 @@ fun LoginActivity(
     }
 
     val context = LocalContext.current // <-- Use it here inside @Composable function
+    val isLoading by viewModel.isLoading // Observe the loading state
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -110,7 +111,8 @@ fun LoginActivity(
                     ForgotPasswordButton(navHostController = navHostController)
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Login Button
+                    // Loading Indicator
+                        // Login Button
                     LoginButton(
                         navHostController = navHostController,
                         onLogin = {
@@ -148,9 +150,16 @@ fun LoginActivity(
                 }
             }
         }
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(50.dp),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
-
 
 @Composable
 fun LoginForm(
@@ -163,11 +172,13 @@ fun LoginForm(
 ) {
     var showPassword by remember { mutableStateOf(false) }
     var passwordLengthError by remember { mutableStateOf<String?>(null) }
+    var isTyping by remember { mutableStateOf(false) }
 
-    // Validasi panjang password
     LaunchedEffect(password) {
-        passwordLengthError = if (password.length < 8) "Password harus lebih dari 8 karakter" else null
+        isTyping = password.isNotEmpty()
+        passwordLengthError = if (isTyping && password.length < 8) "Password harus lebih dari 8 karakter" else null
     }
+
     TextFieldForm(
         modifier = Modifier.fillMaxWidth(),
         value = email,
@@ -185,7 +196,7 @@ fun LoginForm(
         label = "Kata Sandi",
         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        isError = passwordError != null || passwordLengthError != null,
+        isError = passwordError != null || (isTyping && passwordLengthError != null),
         errorMessage = passwordError ?: passwordLengthError,
         trailingIcon = {
             // Menambahkan ikon mata untuk toggle password visibility
@@ -198,6 +209,7 @@ fun LoginForm(
         }
     )
 }
+
 
 
 @Composable

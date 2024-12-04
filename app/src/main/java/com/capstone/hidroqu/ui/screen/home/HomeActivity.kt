@@ -206,7 +206,6 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
             borderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
             colorText = MaterialTheme.colorScheme.onSecondaryContainer,
             onClick = {
-                // Navigasi ke halaman hasil (Result) setelah mengklik card kedua
                 navController.navigate(Screen.ScanTanamRoute.route)
                 {
                     popUpTo(Screen.Home.route)
@@ -243,7 +242,7 @@ fun NoPlantList(
                 painter = painterResource(id = R.drawable.panen),
                 contentDescription = "Artikel",
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(80.dp)
                     .align(Alignment.Center)
                     .fillMaxWidth(),
                 contentScale = ContentScale.Crop

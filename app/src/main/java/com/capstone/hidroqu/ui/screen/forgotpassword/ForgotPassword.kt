@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -33,10 +34,9 @@ fun ForgotPasswordActivity(
     var emailValue by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf<String?>(null) }
     var isSuccess by remember { mutableStateOf(false) }
+    val isLoading by viewModel.isLoading // Observe loading state from ViewModel
+    val context = LocalContext.current
 
-    val context = LocalContext.current // Get the context here
-
-    // Fungsi validasi terpisah
     fun validateForm(): Boolean {
         emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()) "Format email tidak valid" else null
         return emailError == null
@@ -48,56 +48,70 @@ fun ForgotPasswordActivity(
         },
         modifier = modifier
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Column(
+        if (isLoading) {
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(20.dp)
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
             ) {
-                ForgotPasswordForm(
-                    email = emailValue,
-                    onEmailChanged = {
-                        emailValue = it
-                        emailError = null // Reset error saat teks berubah
-                    },
-                    emailError = emailError,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                ForgotPasswordButton(
-                    navController = navHostController,
-                    onForget = {
-                        if (validateForm()) {
-                            // Pass context to onSuccess and onError
-                            viewModel.forgotPassword(
-                                emailValue,
-                                onSuccess = {
-                                    Toast.makeText(context, "Tautan berhasil dikirim ke email Anda!!", Toast.LENGTH_SHORT).show()
-                                    isSuccess = true
-                                },
-                                onError = { error ->
-                                    Toast.makeText(context, "Oops! Sepertinya ada kesalahan dengan email Anda. Silakan periksa dan coba lagi.", Toast.LENGTH_SHORT).show()
-                                    isSuccess = false
-                                }
-                            )
+                CircularProgressIndicator()
+            }
+        }else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                // Konten utama
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp)
+                ) {
+                    ForgotPasswordForm(
+                        email = emailValue,
+                        onEmailChanged = {
+                            emailValue = it
+                            emailError = null // Reset error saat teks berubah
+                        },
+                        emailError = emailError,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ForgotPasswordButton(
+                        navController = navHostController,
+                        onForget = {
+                            if (validateForm()) {
+                                viewModel.forgotPassword(
+                                    emailValue,
+                                    onSuccess = {
+                                        Toast.makeText(context, "Tautan berhasil dikirim ke email Anda!", Toast.LENGTH_SHORT).show()
+                                        isSuccess = true
+                                    },
+                                    onError = {
+                                        Toast.makeText(context, "Terjadi kesalahan. Silakan coba lagi.", Toast.LENGTH_SHORT).show()
+                                        isSuccess = false
+                                    }
+                                )
+                            }
                         }
-                    }
-                )
+                    )
+                    LoginRedirectButton(navController = navHostController)
+                }
 
-                LoginRedirectButton(navController = navHostController)
+                // Indikator loading di tengah layar
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(50.dp),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
 }
-
-
-
 
 @Composable
 fun ForgotPasswordForm(

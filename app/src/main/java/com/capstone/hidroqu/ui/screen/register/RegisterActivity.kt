@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,29 +45,38 @@ fun RegisterActivity(
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
     var passwordConfirmationError by remember { mutableStateOf<String?>(null) }
-    var passwordLengthError by remember { mutableStateOf<String?>(null) } // New state for password length error
-    var showPassword by remember { mutableStateOf(false) } // To toggle visibility
+    var passwordLengthError by remember { mutableStateOf<String?>(null) }
+    var showPassword by remember { mutableStateOf(false) }
+    var showPasswordConfirmation by remember { mutableStateOf(false) } // To toggle visibility for confirmation password
     var message by remember { mutableStateOf("") }
     var isSuccess by remember { mutableStateOf(false) }
 
+    // State to track whether the password field has been touched
+    var isPasswordTouched by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
+    val isLoading by viewModel.isLoading
 
     // Fungsi validasi terpisah
     fun validateForm(): Boolean {
         nameError = if (nameValue.isBlank()) "Nama tidak boleh kosong" else null
-        emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()) "Format email tidak valid" else null
+        emailError = if (!Patterns.EMAIL_ADDRESS.matcher(emailValue)
+                .matches()
+        ) "Format email tidak valid" else null
         passwordError = if (passwordValue.isBlank()) "Password tidak boleh kosong" else null
-        passwordConfirmationError = if (passwordConfirmationValue.isBlank() || passwordConfirmationValue != passwordValue) {
-            "Konfirmasi password tidak sesuai"
-        } else null
+        passwordConfirmationError =
+            if (passwordConfirmationValue.isBlank() || passwordConfirmationValue != passwordValue) {
+                "Konfirmasi password tidak sesuai"
+            } else null
         return nameError == null && emailError == null && passwordError == null && passwordConfirmationError == null
     }
 
-    // Automatic password length check
     LaunchedEffect(passwordValue) {
-        passwordLengthError = if (passwordValue.length < 8) {
-            "Password minimal 8 karakter"
-        } else null
+        if (isPasswordTouched) {
+            passwordLengthError = if (passwordValue.length < 8) {
+                "Password minimal 8 karakter"
+            } else null
+        }
     }
 
     Scaffold(
@@ -74,77 +85,101 @@ fun RegisterActivity(
         },
         modifier = modifier
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(20.dp)
+                    .padding(paddingValues)
             ) {
-                RegisterForm(
-                    name = nameValue,
-                    email = emailValue,
-                    password = passwordValue,
-                    passwordConfirmation = passwordConfirmationValue,
-                    onNameChanged = {
-                        nameValue = it
-                        nameError = null
-                    },
-                    onEmailChanged = {
-                        emailValue = it
-                        emailError = null
-                    },
-                    onPasswordChanged = {
-                        passwordValue = it
-                        passwordError = null
-                    },
-                    onPasswordConfirmationChanged = {
-                        passwordConfirmationValue = it
-                        passwordConfirmationError = null
-                    },
-                    nameError = nameError,
-                    emailError = emailError,
-                    passwordError = passwordError,
-                    passwordConfirmationError = passwordConfirmationError,
-                    passwordLengthError = passwordLengthError, // Pass the password length error
-                    showPassword = showPassword, // Pass the showPassword state
-                    onShowPasswordChanged = { showPassword = it }
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-                RegisterButton(
-                    navController = navHostController,
-                    onRegister = {
-                        if (validateForm()) {
-                            viewModel.registerUser(
-                                nameValue,
-                                emailValue,
-                                passwordValue,
-                                passwordConfirmationValue,
-                                onSuccess = {
-                                    navHostController.navigate(Screen.Login.route) {
-                                        popUpTo(Screen.Register.route) { inclusive = true }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp)
+                ) {
+                    // Show loading spinner when isLoading is true
+                    RegisterForm(
+                        name = nameValue,
+                        email = emailValue,
+                        password = passwordValue,
+                        passwordConfirmation = passwordConfirmationValue,
+                        onNameChanged = {
+                            nameValue = it
+                            nameError = null
+                        },
+                        onEmailChanged = {
+                            emailValue = it
+                            emailError = null
+                        },
+                        onPasswordChanged = {
+                            passwordValue = it
+                            passwordError = null
+                            isPasswordTouched = true // Mark the password field as touched
+                        },
+                        onPasswordConfirmationChanged = {
+                            passwordConfirmationValue = it
+                            passwordConfirmationError = null
+                        },
+                        nameError = nameError,
+                        emailError = emailError,
+                        passwordError = passwordError,
+                        passwordConfirmationError = passwordConfirmationError,
+                        passwordLengthError = passwordLengthError, // Pass the password length error
+                        showPassword = showPassword, // Pass the showPassword state
+                        showPasswordConfirmation = showPasswordConfirmation, // Pass the showPasswordConfirmation state
+                        onShowPasswordChanged = { showPassword = it },
+                        onShowPasswordConfirmationChanged = { showPasswordConfirmation = it }
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    RegisterButton(
+                        navController = navHostController,
+                        onRegister = {
+                            if (validateForm()) {
+                                viewModel.registerUser(
+                                    nameValue,
+                                    emailValue,
+                                    passwordValue,
+                                    passwordConfirmationValue,
+                                    onSuccess = {
+                                        navHostController.navigate(Screen.Login.route) {
+                                            popUpTo(Screen.Register.route) { inclusive = true }
+                                        }
+                                        isSuccess = true
+                                        Toast.makeText(
+                                            context,
+                                            "Daftar berhasil, lets go:>",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    },
+                                    onError = {
+                                        isSuccess = false
+                                        Toast.makeText(
+                                            context,
+                                            "Registrasi Anda gagal. Coba lagi, ya;-;",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
-                                    isSuccess = true
-                                    Toast.makeText(context, "Daftar berhasil, lets go:>", Toast.LENGTH_SHORT).show()
-                                },
-                                onError = {
-                                    isSuccess = false
-                                    Toast.makeText(context, "Registrasi Anda gagal. Coba lagi, ya;-;", Toast.LENGTH_SHORT).show()
-                                }
-                            )
+                                )
+                            }
                         }
-                    }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                LoginRedirectButton(navController = navHostController)
+                    LoginRedirectButton(navController = navHostController)
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun RegisterForm(
@@ -162,7 +197,9 @@ fun RegisterForm(
     passwordConfirmationError: String?,
     passwordLengthError: String?, // Add password length error
     showPassword: Boolean, // Add showPassword state
-    onShowPasswordChanged: (Boolean) -> Unit // Add onShowPasswordChanged callback
+    showPasswordConfirmation: Boolean, // Add showPasswordConfirmation state
+    onShowPasswordChanged: (Boolean) -> Unit, // Add onShowPasswordChanged callback
+    onShowPasswordConfirmationChanged: (Boolean) -> Unit // Add onShowPasswordConfirmationChanged callback
 ) {
     TextFieldForm(
         modifier = Modifier.fillMaxWidth(),
@@ -192,7 +229,8 @@ fun RegisterForm(
         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         isError = passwordError != null || passwordLengthError != null,
-        errorMessage = passwordLengthError ?: passwordError, // Show password length error if available
+        errorMessage = passwordLengthError
+            ?: passwordError, // Show password length error if available
         trailingIcon = {
             IconButton(onClick = { onShowPasswordChanged(!showPassword) }) {
                 Icon(
@@ -208,12 +246,21 @@ fun RegisterForm(
         value = passwordConfirmation,
         onValueChange = onPasswordConfirmationChanged,
         label = "Konfirmasi Password",
-        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (showPasswordConfirmation) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         isError = passwordConfirmationError != null,
-        errorMessage = passwordConfirmationError
+        errorMessage = passwordConfirmationError,
+        trailingIcon = {
+            IconButton(onClick = { onShowPasswordConfirmationChanged(!showPasswordConfirmation) }) {
+                Icon(
+                    painter = painterResource(id = if (showPasswordConfirmation) R.drawable.ic_visibility else R.drawable.ic_visibility_off),
+                    contentDescription = if (showPasswordConfirmation) "Sembunyikan Kata Sandi" else "Tampilkan Kata Sandi"
+                )
+            }
+        }
     )
 }
+
 
 @Composable
 fun RegisterButton(

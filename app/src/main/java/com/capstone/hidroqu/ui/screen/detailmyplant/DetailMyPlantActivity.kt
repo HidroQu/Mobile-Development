@@ -220,9 +220,9 @@ fun NoHistoryList(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.pupuk),
-                contentDescription = "Artikel",
+                contentDescription = "riwayat",
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(80.dp)
                     .align(Alignment.Center)
                     .fillMaxWidth(),
                 contentScale = ContentScale.Crop
