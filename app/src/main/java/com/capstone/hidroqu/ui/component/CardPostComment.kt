@@ -83,9 +83,6 @@ fun CardPostComment(
             ),
             contentDescription = "Profil",
             modifier = Modifier
-                .clickable {
-                    navHostController.navigate(Screen.ProfileOther.createRoute(post?.id ?: 0))
-                }
                 .size(50.dp)
                 .clip(CircleShape)
                 .border(
