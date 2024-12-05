@@ -2,7 +2,7 @@
 
 ## About This Project
 
-*HidroQu* is a technology-based application designed to assist environmentally-conscious individuals, hydroponic farmers, and urban farming communities in monitoring plant health, optimizing nutrients, and increasing harvest productivity. The app emphasizes environmental sustainability and cost-efficiency, while encouraging collaboration among farmers through its interactive community features. With *HidroQu*, users can experience smarter and more sustainable modern farming.
+*HidroQu* is a technology-based program that helps  hydroponic farmers and urban farming groups monitor plant health, optimize nutrients, and maximize harvest production. The application encourages sustainable development and cost-efficiency, while also encouraging farmer collaboration through interactive community components. *HidroQu* allows people to experience better, more sustainable modern farming.
 
 ## Table of Contents
 - [Features](#hidroqu-features)
