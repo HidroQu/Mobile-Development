@@ -5,39 +5,12 @@
 *HidroQu* is a technology-based application designed to assist environmentally-conscious individuals, hydroponic farmers, and urban farming communities in monitoring plant health, optimizing nutrients, and increasing harvest productivity. The app emphasizes environmental sustainability and cost-efficiency, while encouraging collaboration among farmers through its interactive community features. With *HidroQu*, users can experience smarter and more sustainable modern farming.
 
 ## Table of Contents
-- [Getting Started](#getting-started)
-- [Screenshots and Demo](#screenshots-and-demo)
-- [Features](#features)
+- [Features](#hidroqu-features)
 - [Technologies Used](#technologies-used)
+- [Getting Started](#getting-started)
+- [Screenshots and Demo](#application-demonstration)
 - [Contact](#contact)
 - [Acknowledgement](#acknowledgement)
-
-## Getting Started
-
-### Prerequisites
-- Mobile device with Android Operating System
-
-### Installation
-
-1. **Install on your phone**
-   - Go to the release page
-   - Select the latest version
-   - Click on the APK file
-   - The app will be downloaded
-   - Install it on your phone
-
-2. **Android Studio**
-   - Clone the repository:
-     ```bash
-     git clone https://github.com/HidroQu/Mobile-Development
-     ```
-   - Build the app
-   - Run the app or press `Shift + F10`
-
-## Application Demonstration
-Click on the picture below to watch the app demonstration:
-
-[Link to Demo Image]
 
 ## HidroQu Features
 
@@ -73,6 +46,34 @@ Click on the picture below to watch the app demonstration:
 - **CameraX**
 - **DataStore**
 - **Broadcast Receiver**
+
+## Getting Started
+
+### Prerequisites
+- Mobile device with Android Operating System
+
+### Installation
+
+1. **Install on your phone**
+   - Go to the release page
+   - Select the latest version
+   - Click on the APK file
+   - The app will be downloaded
+   - Install it on your phone
+
+2. **Android Studio**
+   - Clone the repository:
+     ```bash
+     git clone https://github.com/HidroQu/Mobile-Development
+     ```
+   - Build the app
+   - Run the app or press `Shift + F10`
+
+## Application Demonstration
+Click on the picture below to watch the app demonstration:
+
+[Link to Demo Image]
+
 
 ## **Contact**
 
