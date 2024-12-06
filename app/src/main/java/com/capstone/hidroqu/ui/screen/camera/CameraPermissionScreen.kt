@@ -2,7 +2,6 @@ package com.capstone.hidroqu.ui.screen.camera
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -11,21 +10,18 @@ import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -35,7 +31,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
@@ -50,10 +45,6 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.capstone.hidroqu.R
-import com.capstone.hidroqu.ui.screen.camera.ResultTesting
-import com.capstone.hidroqu.ui.screen.resultpototanam.ResultPotoTanamActivity
-import com.capstone.hidroqu.ui.screen.resultscantanam.ResultScanTanamActivity
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URLEncoder
@@ -115,7 +106,7 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
     var cameraControl: CameraControl? by remember { mutableStateOf(null) }
     var cameraInfo: CameraInfo? by remember { mutableStateOf(null) }
     var cameraProvider: ProcessCameraProvider? by remember { mutableStateOf(null) }
-    val showTooltip by remember { mutableStateOf(true) } // Tooltip visibilitas
+    val showTooltip by remember { mutableStateOf(true) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -131,8 +122,6 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
         }
     )
 
-
-    // Fungsi untuk mengikat kamera ke lifecycle
     fun bindCameraUseCases() {
         val cameraSelector = if (isFrontCamera) {
             CameraSelector.DEFAULT_FRONT_CAMERA
@@ -159,7 +148,6 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
             cameraControl = camera?.cameraControl
             cameraInfo = camera?.cameraInfo
 
-            // Matikan flash jika kamera depan
             if (isFrontCamera) {
                 cameraControl?.enableTorch(false)
                 flashEnabled = false
@@ -255,7 +243,6 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                     .fillMaxSize()
             )
 
-            // Tooltip Overlay
             if (showTooltip && cameraMode == "Poto Tanam") {
                 Box(
                     modifier = Modifier
@@ -275,7 +262,6 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Gambar dengan border yang halus
                         Image(
                             painter = painterResource(id = R.drawable.poto_tanam),
                             contentDescription = "Leaf Guidance",
@@ -305,7 +291,7 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                     Column(
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f), // Transparansi background
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
                                 shape = MaterialTheme.shapes.medium
                             )
                             .padding(24.dp)
@@ -314,7 +300,6 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Gambar dengan border yang halus
                         Image(
                             painter = painterResource(id = R.drawable.scan_tanam),
                             contentDescription = "Leaf Guidance",
@@ -338,19 +323,15 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
             }
 
             val color = MaterialTheme.colorScheme.onPrimaryContainer
-            // Animasi kotak panduan dengan garis sudut
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val strokeWidth = 5f
                 val baseCornerLength = 60f
                 val cornerLength = baseCornerLength + (animatedProgress * 150f)
-
                 val centerX = size.width / 2
                 val centerY = size.height / 2
-
                 val widthOffset = animatedProgress * (size.width / 3f)
                 val heightOffset = animatedProgress * (size.height / 3f)
 
-                // Gambar sudut atas kiri
                 drawRoundRect(
                     color = color,
                     topLeft = Offset(centerX - widthOffset, centerY - heightOffset),
@@ -363,8 +344,6 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                     size = androidx.compose.ui.geometry.Size(strokeWidth, cornerLength),
                     cornerRadius = CornerRadius(animatedCornerRadius, animatedCornerRadius)
                 )
-
-                // Gambar sudut atas kanan
                 drawRoundRect(
                     color = color,
                     topLeft = Offset(centerX + widthOffset - cornerLength, centerY - heightOffset),
@@ -377,8 +356,6 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                     size = androidx.compose.ui.geometry.Size(strokeWidth, cornerLength),
                     cornerRadius = CornerRadius(animatedCornerRadius, animatedCornerRadius)
                 )
-
-                // Gambar sudut bawah kiri
                 drawRoundRect(
                     color = color,
                     topLeft = Offset(centerX - widthOffset, centerY + heightOffset - strokeWidth),
@@ -391,8 +368,6 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                     size = androidx.compose.ui.geometry.Size(strokeWidth, cornerLength),
                     cornerRadius = CornerRadius(animatedCornerRadius, animatedCornerRadius)
                 )
-
-                // Gambar sudut bawah kanan
                 drawRoundRect(
                     color = color,
                     topLeft = Offset(centerX + widthOffset - cornerLength, centerY + heightOffset - strokeWidth),
@@ -443,13 +418,13 @@ fun BottomBar(
                 modifier = Modifier
                     .size(150.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer) // Background dengan transparansi
-                    .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape) // Border di sekitar ikon
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_camera_click),
                     contentDescription = "Ambil Foto",
-                    modifier = Modifier // Memberikan jarak agar ikon tidak menempel ke border
+                    modifier = Modifier
                         .padding(2.dp)
                         .fillMaxSize(),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
@@ -487,84 +462,59 @@ fun takePhoto(
             override fun onError(exception: ImageCaptureException) {
                 exception.printStackTrace()
             }
-
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                 val savedUri = Uri.fromFile(photoFile)
-
-                // Pastikan navigasi dilakukan di main thread
                 val handler = Handler(Looper.getMainLooper())
                 handler.post {
                     if (cameraMode == "Poto Tanam") {
-                        // Jika menggunakan kamera depan, lakukan mirror pada gambar
                         if (isFrontCamera) {
-                            // Lakukan transformasi gambar untuk efek mirror
                             val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
-                            // Menggunakan ExifInterface untuk memeriksa orientasi dan memperbaiki gambar
                             val exif = ExifInterface(photoFile)
                             val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-
-                            // Memutar gambar sesuai dengan orientasi
                             val rotatedBitmap = when (orientation) {
                                 ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
                                 ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
                                 ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
-                                else -> bitmap // Tidak perlu memutar jika orientasi sudah benar
+                                else -> bitmap
                             }
-                            // Lakukan transformasi mirror pada gambar
                             val mirroredBitmap = Bitmap.createBitmap(
                                 rotatedBitmap, 0, 0, rotatedBitmap.width, rotatedBitmap.height,
                                 Matrix().apply { preScale(-1f, 1f) }, false
                             )
-
-                            // Simpan bitmap hasil mirror ke file
                             val mirroredFile = File(context.externalCacheDir, "${System.currentTimeMillis()}_mirrored.jpg")
                             FileOutputStream(mirroredFile).use { out ->
                                 mirroredBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
                             }
-
-                            // Kirim hasil gambar yang sudah di-mirror ke ResultTesting
                             val mirroredUri = Uri.fromFile(mirroredFile)
                             val encodedUri = URLEncoder.encode(mirroredUri.toString(), "UTF-8")
                             navController.navigate("ResultPotoTanam/$encodedUri")
                         } else {
-                            // Jika kamera belakang, kirim foto tanpa perubahan
                             val encodedUri = URLEncoder.encode(savedUri.toString(), "UTF-8")
                             navController.navigate("ResultPotoTanam/$encodedUri")
                         }
                     } else {
-                        // Jika menggunakan kamera depan, lakukan mirror pada gambar
                         if (isFrontCamera) {
-                            // Lakukan transformasi gambar untuk efek mirror
                             val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
-                            // Menggunakan ExifInterface untuk memeriksa orientasi dan memperbaiki gambar
                             val exif = ExifInterface(photoFile)
                             val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-
-                            // Memutar gambar sesuai dengan orientasi
                             val rotatedBitmap = when (orientation) {
                                 ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(bitmap, 90f)
                                 ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(bitmap, 180f)
                                 ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(bitmap, 270f)
-                                else -> bitmap // Tidak perlu memutar jika orientasi sudah benar
+                                else -> bitmap
                             }
-                            // Lakukan transformasi mirror pada gambar
                             val mirroredBitmap = Bitmap.createBitmap(
                                 rotatedBitmap, 0, 0, rotatedBitmap.width, rotatedBitmap.height,
                                 Matrix().apply { preScale(-1f, 1f) }, false
                             )
-
-                            // Simpan bitmap hasil mirror ke file
                             val mirroredFile = File(context.externalCacheDir, "${System.currentTimeMillis()}_mirrored.jpg")
                             FileOutputStream(mirroredFile).use { out ->
                                 mirroredBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
                             }
-
-                            // Kirim hasil gambar yang sudah di-mirror ke ResultTesting
                             val mirroredUri = Uri.fromFile(mirroredFile)
                             val encodedUri = URLEncoder.encode(mirroredUri.toString(), "UTF-8")
                             navController.navigate("ResultScanTanam/$encodedUri")
                         } else {
-                            // Jika kamera belakang, kirim foto tanpa perubahan
                             val encodedUri = URLEncoder.encode(savedUri.toString(), "UTF-8")
                             navController.navigate("ResultScanTanam/$encodedUri")
                         }
@@ -575,8 +525,6 @@ fun takePhoto(
         }
     )
 }
-
-// Fungsi untuk memutar gambar
 fun rotateImage(source: Bitmap, angle: Float): Bitmap {
     val matrix = Matrix()
     matrix.postRotate(angle)

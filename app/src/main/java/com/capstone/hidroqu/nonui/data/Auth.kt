@@ -62,7 +62,6 @@ data class TestResponse(
     }
 }
 
-
 @Parcelize
 data class ResetPasswordRequest(
     val token: String,

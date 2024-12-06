@@ -1,4 +1,4 @@
-package com.capstone.hidroqu.ui.screen.formaddplantscantanam
+package com.capstone.hidroqu.ui.screen.formaddplant
 
 import android.content.Context
 import android.os.Build
@@ -14,14 +14,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,11 +33,8 @@ import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
-import com.capstone.hidroqu.nonui.data.BasicResponse
 import com.capstone.hidroqu.nonui.data.PlantResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
-import com.capstone.hidroqu.utils.ListMyAddPlant
-import com.capstone.hidroqu.utils.getAddPlantById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -49,7 +44,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun FormAddPlantScanTanam(
+fun FormAddPlantScreen(
     plantId: Int,
     viewModel: MyPlantViewModel = viewModel(),
     context: Context = LocalContext.current,
@@ -103,7 +98,7 @@ fun FormAddPlantScanTanam(
                                 onSuccess = { response ->
                                     navHostController.navigate(Screen.MyPlantRoute.route)
                                     {
-                                        popUpTo(Screen.ScanTanamRoute.route) { inclusive = true }
+                                        popUpTo(Screen.MyPlantRoute.route) { inclusive = true }
                                     }
                                     message = "Tanaman berhasil ditambahkan!"
                                 }
@@ -184,7 +179,6 @@ fun FormAddPlantContent(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Header dengan gambar tanaman dan detailnya
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -240,15 +234,13 @@ fun FormAddPlantContent(
             }
         }
 
-        // Field untuk memilih tanggal tanam
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DatePickerField(
                 plantingDate = plantingDate,
-                onDateSelected = onDateSelected // Callback untuk format tanggal
+                onDateSelected = onDateSelected
             )
         }
 
-        // Field untuk menambahkan catatan
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
                 text = "Tambahkan Catatan",
@@ -276,7 +268,6 @@ fun FormAddPlantContent(
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DatePickerField(
@@ -286,8 +277,6 @@ fun DatePickerField(
     val dateDialogState = rememberMaterialDialogState()
 
     val displayDateText = plantingDate ?: "Pilih Tanggal Tanam"
-
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -356,6 +345,6 @@ fun DatePickerField(
 fun PreviewFormAddPlantActivity() {
     val navHostController = rememberNavController()
     HidroQuTheme {
-        FormAddPlantScanTanam(1, navHostController = navHostController)
+        FormAddPlantScreen(1, navHostController = navHostController)
     }
 }

@@ -45,8 +45,6 @@ import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.nonui.data.PostData
 import com.capstone.hidroqu.ui.screen.detailmyplant.formatDateWithMonthName
-import com.capstone.hidroqu.utils.ListCommunity
-import com.capstone.hidroqu.utils.dummyListCommunity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
 import com.capstone.hidroqu.ui.viewmodel.ProfileViewModel
@@ -84,7 +82,6 @@ fun CardCommunity(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Row untuk informasi pengguna
         Row(
             modifier = modifier
                 .fillMaxWidth(),
@@ -108,12 +105,12 @@ fun CardCommunity(
                     .clickable {
                         navHostController.navigate(Screen.ProfileOther.createRoute(listCommunity.id))
                     }
-                    .size(50.dp) // Ukuran gambar
-                    .clip(CircleShape) // Membuat gambar menjadi bulat
+                    .size(50.dp)
+                    .clip(CircleShape)
                     .border(
-                        width = 2.dp, // Ketebalan border
-                        color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
-                        shape = CircleShape // Bentuk border bulat
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape
                     ),
                 contentScale = ContentScale.Crop,
                 contentDescription = "Gambar Profil"
@@ -139,7 +136,6 @@ fun CardCommunity(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Tampilkan judul dan konten
                     Text(
                         text = listCommunity.title,
                         style = MaterialTheme.typography.bodyMedium,
@@ -164,8 +160,6 @@ fun CardCommunity(
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-
-                    // Periksa apakah gambar tersedia
                     if (!listCommunity.image.isNullOrEmpty()) {
                         val imageLoader = ImageLoader.Builder(LocalContext.current)
                             .components {
@@ -183,7 +177,6 @@ fun CardCommunity(
                                 .fillMaxWidth()
                                 .fillMaxHeight()
                                 .clickable {
-                                    // Toggle the image expanded state when clicked
                                     isImageExpanded.value = !isImageExpanded.value
                                 },
                             contentScale = ContentScale.Crop
@@ -192,8 +185,6 @@ fun CardCommunity(
                 }
             }
         }
-
-        // Bagian untuk komentar
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -214,21 +205,5 @@ fun CardCommunity(
                 color = MaterialTheme.colorScheme.outline
             )
         }
-    }
-}
-
-
-@Preview
-@Composable
-private fun CardCommunityPreview() {
-    HidroQuTheme {
-//        dummyListCommunity.forEach { post ->
-//            CardCommunity (
-//                listCommunity = post,
-//                onClick = {
-//                    // Handle onClick here
-//                }
-//            )
-//        }
     }
 }

@@ -48,11 +48,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         onError: (String) -> Unit
     ) {
         val request = RegisterRequest(name, email, password, passwordConfirmation)
-        _isLoading.value = true  // Tambahkan baris ini untuk mengaktifkan loading
+        _isLoading.value = true
         viewModelScope.launch {
             apiService.register(request).enqueue(object : Callback<AuthResponse> {
                 override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
-                    _isLoading.value = false  // Nonaktifkan loading saat respons diterima
+                    _isLoading.value = false
                     if (response.isSuccessful) {
                         response.body()?.let {
                             onSuccess(it)
@@ -64,7 +64,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
-                    _isLoading.value = false  // Nonaktifkan loading saat terjadi kegagalan
+                    _isLoading.value = false
                     onError("Failure: ${t.message}")
                 }
             })
@@ -87,7 +87,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     if (response.isSuccessful) {
                         val loginResponse = response.body()
                         loginResponse?.let {
-                            // Simpan data pengguna ke DataStore
                             viewModelScope.launch {
                                 userPreferences.saveUserData(
                                     userId = it.data.user.id,
@@ -151,20 +150,19 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         onError: (String) -> Unit
     ) {
         val request = ResetPasswordRequest(token, email, password)
-        _isLoading.value = true  // Tambahkan baris ini
+        _isLoading.value = true
         viewModelScope.launch {
             apiService.resetPassword(request).enqueue(object : Callback<BasicResponse> {
                 override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
-                    _isLoading.value = false  // Tambahkan baris ini
+                    _isLoading.value = false
                     if (response.isSuccessful) {
                         response.body()?.message?.let { onSuccess(it) }
                     } else {
                         onError("Error: ${response.message()}")
                     }
                 }
-
                 override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-                    _isLoading.value = false  // Tambahkan baris ini
+                    _isLoading.value = false
                     onError("Failure: ${t.message}")
                 }
             })

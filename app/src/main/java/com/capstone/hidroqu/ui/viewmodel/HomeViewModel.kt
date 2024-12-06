@@ -21,23 +21,15 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class HomeViewModel(private val userPreferences: UserPreferences) : ViewModel() {
-
-    // StateFlow untuk nama pengguna
     private val _userName = MutableStateFlow<String>("")
     val userName: StateFlow<String> get() = _userName
-
-    // StateFlow untuk loading state
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading.asStateFlow()
-
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
-
     init {
         loadUserData()
     }
-
-    // Memuat data pengguna
     private fun loadUserData() {
         viewModelScope.launch {
             _isLoading.value = true

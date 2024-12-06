@@ -6,13 +6,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.capstone.hidroqu.ui.screen.article.ArticleActivity
 import com.capstone.hidroqu.ui.screen.camera.CameraPermissionScreen
-import com.capstone.hidroqu.ui.screen.chooseplant.ChoosePlantActivity
-import com.capstone.hidroqu.ui.screen.detailarticle.DetailArticleScreen
-import com.capstone.hidroqu.ui.screen.home.HomeActivity
-import com.capstone.hidroqu.ui.screen.resultpototanam.ResultPotoTanamActivity
-import com.capstone.hidroqu.ui.screen.resultscantanam.ResultScanTanamActivity
+import com.capstone.hidroqu.ui.screen.chooseplant.ChoosePlantScreen
+import com.capstone.hidroqu.ui.screen.resultpototanam.ResultPotoTanamScreen
 
 fun NavGraphBuilder.potoTanamGraph(navController: NavHostController) {
     navigation(
@@ -28,7 +24,7 @@ fun NavGraphBuilder.potoTanamGraph(navController: NavHostController) {
             arguments = listOf(navArgument("photoUri") { type = NavType.StringType })
         ) { backStackEntry ->
             val photoUri = backStackEntry.arguments?.getString("photoUri")
-            ResultPotoTanamActivity(photoUri = photoUri, navHostController = navController)
+            ResultPotoTanamScreen(photoUri = photoUri, navHostController = navController)
         }
         composable(
             route = Screen.ChoosePlant.route,
@@ -40,7 +36,7 @@ fun NavGraphBuilder.potoTanamGraph(navController: NavHostController) {
         ) { backStackEntry ->
             val diagnoseId = backStackEntry.arguments?.getInt("diagnoseId")
             val photoUri = backStackEntry.arguments?.getString("photoUri")
-            ChoosePlantActivity(
+            ChoosePlantScreen(
                 diagnoseId = diagnoseId,
                 photoUri = photoUri,
                 navHostController = navController

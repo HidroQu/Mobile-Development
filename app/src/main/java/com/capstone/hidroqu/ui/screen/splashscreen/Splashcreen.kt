@@ -29,12 +29,10 @@ fun SplashScreen(
     viewModel: AuthViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
-    // Observasi nilai LiveData
     val isUserLoggedIn by viewModel.isUserLoggedIn().observeAsState(initial = false)
 
     LaunchedEffect(key1 = true) {
         delay(700L)
-
         if (isUserLoggedIn) {
             navHostController.navigate(Screen.HomeRoute.route) {
                 popUpTo(Screen.Splash.route) { inclusive = true }
@@ -45,7 +43,6 @@ fun SplashScreen(
             }
         }
     }
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier

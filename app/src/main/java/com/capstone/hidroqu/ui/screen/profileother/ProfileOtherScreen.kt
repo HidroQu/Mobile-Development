@@ -1,16 +1,12 @@
 package com.capstone.hidroqu.ui.screen.profileother
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,16 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,26 +45,16 @@ import coil.compose.AsyncImage
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
-import com.capstone.hidroqu.navigation.TopBarDefault
-import com.capstone.hidroqu.navigation.TopBarDefaultAction
-import com.capstone.hidroqu.nonui.data.MyPostData
 import com.capstone.hidroqu.nonui.data.PostData
 import com.capstone.hidroqu.nonui.data.UserPreferences
-import com.capstone.hidroqu.ui.component.CardMyPost
 import com.capstone.hidroqu.ui.component.CardOtherPost
-import com.capstone.hidroqu.ui.screen.profile.MyPostsSection
-import com.capstone.hidroqu.ui.screen.profile.ProfileInfo
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
-import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
-import com.capstone.hidroqu.ui.viewmodel.ProfileViewModel
-import com.capstone.hidroqu.ui.viewmodel.ThemeViewModel
-import com.capstone.hidroqu.utils.dummyListUserData
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun ProfileOtherActivity(
+fun ProfileOtherScreen(
     navHostController: NavHostController,
     idPost: Int,
     viewModel: CommunityViewModel = viewModel(),
@@ -96,9 +77,7 @@ fun ProfileOtherActivity(
             }
         }
     }
-    Log.d("ID", "ID USER${userOtherData?.id} ID USER2 ${userOtherData?.user?.id} ID USER2 ${userOtherData?.user_id}Sorted posts: ${filteredPosts.size}")
     val filteredPostsByUser = filteredPosts.filter { it.user_id == userOtherData?.user?.id }
-    // Dummy data for posts
     var visiblePostsCount by remember { mutableStateOf(5) }
     val displayedPosts = filteredPostsByUser.take(visiblePostsCount)
     val isMoreAvailable = visiblePostsCount < filteredPostsByUser.size
@@ -138,7 +117,6 @@ fun ProfileOtherActivity(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    // Profile Header
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -153,18 +131,14 @@ fun ProfileOtherActivity(
                                 .size(120.dp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.primary),
-                            placeholder = painterResource(id = R.drawable.ic_launcher_foreground), // Placeholder jika gambar belum dimuat
-                            error = painterResource(id = R.drawable.ic_launcher_foreground), // Gambar default jika terjadi kesalahan
-                            contentScale = ContentScale.Crop // Sesuaikan gambar dengan crop
+                            placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
+                            error = painterResource(id = R.drawable.ic_launcher_foreground),
+                            contentScale = ContentScale.Crop
                         )
-
-                        // Profile Name and Description
                         ProfileOtherInfo(
                             name = userOtherData?.user?.name ?: "Nama pengguna",
                             bio = userOtherData?.user?.bio ?: "Bio belum ditambahkan"
                         )
-
-                        // Other Posts Section
                         if (filteredPosts.isEmpty()) {
                             NoOtherPostList(modifier = Modifier)
                         } else {
@@ -307,14 +281,5 @@ fun OtherPostsSection(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewProfileScreen() {
-    HidroQuTheme {
-        val navController = rememberNavController()
-        val userData = dummyListUserData.first()
     }
 }

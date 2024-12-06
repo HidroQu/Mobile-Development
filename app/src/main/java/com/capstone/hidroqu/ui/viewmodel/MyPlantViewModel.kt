@@ -68,7 +68,7 @@ class MyPlantViewModel : ViewModel() {
             _isLoading.value = true
             try {
                 var currentPage = 1
-                val allPlants = mutableListOf<MyPlantResponse>() // Ganti tipe ini dengan tipe data yang sesuai
+                val allPlants = mutableListOf<MyPlantResponse>()
                 do {
                     val response = withContext(Dispatchers.IO) {
                         apiService.getMyPlants("Bearer $token", currentPage).execute()
@@ -93,7 +93,6 @@ class MyPlantViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching plants: ${e.message}"
-                Log.e("MyPlantViewModel", "Error fetching plants", e)
             } finally {
                 _isLoading.value = false
             }
@@ -111,17 +110,14 @@ class MyPlantViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val plantDetail = response.body()?.data
                     _plantDetail.value = plantDetail
-                    Log.d("MyPlantViewModel", "Fetched plant detail: ${response.body()}")
                 } else {
                     _errorMessage.value = "Error fetching plant details: ${response.message()}"
-                    Log.e("MyPlantViewModel", "Error fetching details: ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<MyPlantDetailWrapper>, t: Throwable) {
                 _isLoading.value = false
                 _errorMessage.value = "Error fetching plant details: ${t.message}"
-                Log.e("MyPlantViewModel", "Failure: ${t.message}")
             }
         })
     }
@@ -137,17 +133,14 @@ class MyPlantViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val plantDetail = response.body()?.data
                     _plantDiagnostic.value = plantDetail
-                    Log.d("MyPlantViewModel", "Fetched plant detail: ${response.body()}")
                 } else {
                     _errorMessage.value = "Error fetching plant details: ${response.message()}"
-                    Log.e("MyPlantViewModel", "Error fetching details: ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<DiagnosticHistoryResponseWrapper>, t: Throwable) {
                 _isLoading.value = false
                 _errorMessage.value = "Error fetching plant details: ${t.message}"
-                Log.e("MyPlantViewModel", "Failure: ${t.message}")
             }
         })
     }
@@ -170,19 +163,16 @@ class MyPlantViewModel : ViewModel() {
         apiService.storePlant("Bearer $token", request).enqueue(object : Callback<BasicResponse> {
             override fun onResponse(call: Call<BasicResponse>, response: Response<BasicResponse>) {
                 if (response.isSuccessful) {
-                    Log.d("MyPlantViewModel", "Plant stored successfully: ${response.body()}")
                     val responseBody = response.body()
                     responseBody?.let {
                         onSuccess(it)
                     }
                 } else {
-                    Log.e("MyPlantViewModel", "Failed to store plant: ${response.message()}")
                     _errorMessage.value = "Error storing plant: ${response.message()}"
                 }
             }
 
             override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-                Log.e("MyPlantViewModel", "Network error: ${t.message}")
                 _errorMessage.value = "Network error: ${t.message}"
             }
         })
@@ -190,19 +180,15 @@ class MyPlantViewModel : ViewModel() {
     }
     fun fetchPlants(token: String) {
         _isLoading.value = true
-
-        // Menggunakan PlantResponseWrapper untuk mendapatkan data
         apiService.getPlants("Bearer $token").enqueue(object : Callback<PlantResponseWrapper> {
             override fun onResponse(call: Call<PlantResponseWrapper>, response: Response<PlantResponseWrapper>) {
                 _isLoading.value = false
                 if (response.isSuccessful) {
-                    // Ambil daftar tanaman dari response.body()?.data
                     _plants.value = response.body()?.data ?: emptyList()
                 } else {
                     _errorMessage.value = "Failed to load plants: ${response.message()}"
                 }
             }
-
             override fun onFailure(call: Call<PlantResponseWrapper>, t: Throwable) {
                 _isLoading.value = false
                 _errorMessage.value = "Error: ${t.message}"
@@ -222,34 +208,26 @@ class MyPlantViewModel : ViewModel() {
             try {
                 _isLoading.value = true
 
-                // Mengubah URI ke file sementara
                 var file = withContext(Dispatchers.IO) { uriToFile(imageUri!!, context) }
 
-                // Memastikan ukuran file valid, jika tidak, melakukan kompresi
                 if (!isFileSizeValid(file)) {
                     file = withContext(Dispatchers.IO) { compressImageFile(file, context) }
                 }
 
-                // Jika ukuran file masih lebih besar dari 1 MB setelah kompresi
                 if (!isFileSizeValid(file)) {
                     _isLoading.value = false
                     _errorMessage.value = "File size exceeds 1 MB even after compression."
                     return@launch
                 }
 
-                // Mengonversi file ke RequestBody untuk upload
                 val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 val body =
                     MultipartBody.Part.createFormData("diagnostic_image", file.name, requestFile)
-
-                // Membuat RequestBody untuk parameter lain
                 val userPlantIdBody =
                     myPlantId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
                 val diagnoseIdBody =
                     diagnoseId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
                 val diagnoseDateBody = diagnoseDate.toRequestBody("text/plain".toMediaTypeOrNull())
-
-                // Mengirim request ke API untuk menyimpan diagnosis
                 apiService.StoreDiagnostic(
                     token = "Bearer $token",
                     userPlant = myPlantId,
@@ -262,38 +240,27 @@ class MyPlantViewModel : ViewModel() {
                         call: Call<BasicResponse>,
                         response: Response<BasicResponse>
                     ) {
-                        Log.d("StoreDiagnose", "Response code: ${response.code()}")
                         if (response.isSuccessful) {
                             val responseBody = response.body()
-                            Log.d("StoreDiagnose", "Response body: $responseBody")
-
                             responseBody?.let {
-                                Log.d("StoreDiagnose", "Diagnose stored successfully")
                                 onSuccess(it)
                             }
                         } else {
                             val errorBody = response.errorBody()?.string()
-                            Log.e("StoreDiagnose", "Error storing plant: ${response.message()}")
-                            Log.e("StoreDiagnose", "Error body: $errorBody")
-
                             _errorMessage.value = "Error storing plant: ${response.message()}"
                         }
                     }
 
                     override fun onFailure(call: Call<BasicResponse>, t: Throwable) {
-                        Log.e("StoreDiagnose", "Network error: ${t.message}")
                         _errorMessage.value = "Network error: ${t.message}"
                     }
                 })
-
-                // Menampilkan status success pada UI
                 withContext(Dispatchers.Main) {
                     _isLoading.value = false
                 }
             } catch (e: Exception) {
                 _isLoading.value = false
                 _errorMessage.value = "Error storing diagnose: ${e.message}"
-                Log.e("StoreDiagnose", "Exception: ${e.message}")
             }
         }
 

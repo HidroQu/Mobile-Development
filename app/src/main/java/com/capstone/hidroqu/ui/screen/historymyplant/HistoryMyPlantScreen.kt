@@ -1,7 +1,6 @@
 package com.capstone.hidroqu.ui.screen.historymyplant
 
 import android.content.Context
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,21 +33,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
-import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.nonui.data.DiagnosticHistoryData
 import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.screen.detailmyplant.formatDateWithMonthName
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
-import com.capstone.hidroqu.utils.ListHealthHistory
-import com.capstone.hidroqu.utils.getHealthHistoryByPlantAndHealthId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryMyPlantActivity(
+fun HistoryMyPlantScreen(
     navHostController: NavHostController,
     plantId: Int,
     healthId: Int,
@@ -62,13 +56,11 @@ fun HistoryMyPlantActivity(
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
     val formattedDate = formatDateWithMonthName(plantDiagnostic?.diagnostic_history?.diagnostic_date ?: "00/00/0000")
-    
-    // Fetch plant details once the composable is launched
+
     LaunchedEffect(plantId, healthId) {
         token?.let {
             viewModel.fetchMyPlantDetailDiagnostic(it, plantId, healthId)
         } ?: run {
-            // Handle the case when token is not available
         }
     }
 
@@ -145,10 +137,9 @@ fun DetailHistoryContent(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(25.dp)),
             contentScale = ContentScale.Crop,
-            imageLoader = imageLoader // Gunakan custom ImageLoader untuk mendukung SVG
+            imageLoader = imageLoader
         )
 
-        // Diagnosis Details
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
@@ -167,7 +158,6 @@ fun DetailHistoryContent(
                     text = history?.diagnostic_history?.diagnostic?.disease_name ?: "Disease name",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                // Menampilkan gambar terkait dalam LazyRow
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(
                         history?.diagnostic_history?.diagnostic?.image_disease ?: listOf()
@@ -178,19 +168,17 @@ fun DetailHistoryContent(
                             modifier = Modifier
                                 .widthIn(min = 150.dp)
                                 .height(95.dp)
-                                .clip(RoundedCornerShape(25.dp)) // Gambar dengan sudut membulat
+                                .clip(RoundedCornerShape(25.dp))
                                 .border(
                                     2.dp,
                                     MaterialTheme.colorScheme.outlineVariant,
                                     RoundedCornerShape(25.dp)
                                 ),
-                            contentScale = ContentScale.Crop // Memotong gambar agar sesuai dengan ukuran dan bentuk
+                            contentScale = ContentScale.Crop
                         )
                     }
                 }
             }
-
-            // Symptoms and Cause Details
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -209,7 +197,6 @@ fun DetailHistoryContent(
                         .padding(16.dp)
                 )
             }
-
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -255,6 +242,6 @@ fun DetailHistoryContent(
 private fun HistoryMyPlantActivityPreview() {
     val navHostController = rememberNavController()
     HidroQuTheme {
-        HistoryMyPlantActivity(navHostController, 1, 1)
+        HistoryMyPlantScreen(navHostController, 1, 1)
     }
 }

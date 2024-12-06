@@ -1,6 +1,5 @@
-package com.capstone.hidroqu.ui.screen.forgetpassword
+package com.capstone.hidroqu.ui.screen.forgotpassword
 
-import android.annotation.SuppressLint
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -26,7 +25,7 @@ import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun ForgotPasswordActivity(
+fun ForgotPasswordScreen(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = viewModel()
@@ -34,7 +33,7 @@ fun ForgotPasswordActivity(
     var emailValue by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf<String?>(null) }
     var isSuccess by remember { mutableStateOf(false) }
-    val isLoading by viewModel.isLoading // Observe loading state from ViewModel
+    val isLoading by viewModel.isLoading
     val context = LocalContext.current
 
     fun validateForm(): Boolean {
@@ -63,7 +62,6 @@ fun ForgotPasswordActivity(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                // Konten utama
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -73,7 +71,7 @@ fun ForgotPasswordActivity(
                         email = emailValue,
                         onEmailChanged = {
                             emailValue = it
-                            emailError = null // Reset error saat teks berubah
+                            emailError = null
                         },
                         emailError = emailError,
                     )
@@ -98,8 +96,6 @@ fun ForgotPasswordActivity(
                     )
                     LoginRedirectButton(navController = navHostController)
                 }
-
-                // Indikator loading di tengah layar
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -177,7 +173,7 @@ fun LoginRedirectButton(
 @Composable
 fun ForgetPasswordActivityPreview() {
     HidroQuTheme {
-        ForgotPasswordActivity(
+        ForgotPasswordScreen(
             navHostController = NavHostController(context = LocalContext.current),
         )
     }

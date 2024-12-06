@@ -68,11 +68,9 @@ interface HidroQuApiService {
         @Part("_method") method: RequestBody
     ): Call<BasicResponse>
 
-
-    // New endpoints for "Tanamanku"
     @GET("api/plants")
     fun getPlants(
-        @Header("Authorization") token: String // Menambahkan header Authorization
+        @Header("Authorization") token: String
     ): Call<PlantResponseWrapper>
 
     @POST("api/plants/store")
@@ -112,29 +110,25 @@ interface HidroQuApiService {
         @Path("id_diagnostic") diagnosticId: Int
     ): Call<DiagnosticHistoryResponseWrapper>
 
-    // Mendapatkan daftar komunitas
     @GET("api/communities")
     fun getCommunities(
         @Header("Authorization") token: String,
-        @Query("page") page: Int, // Adding a page query parameter
+        @Query("page") page: Int,
         @Query("search") searchQuery: String? = null
     ): Call<CommunityResponseWrapper>
 
-    // Mendapatkan detail komunitas tertentu berdasarkan ID atau slug
     @GET("api/communities/{community}")
     fun getCommunityDetail(
         @Header("Authorization") token: String,
         @Path("community") communityIdOrSlug: Int
     ): Call<CommunityDetailWrapper>
 
-    // Mendapatkan daftar postingan pengguna dalam komunitas
     @GET("api/communities/my-posts")
     fun getMyPosts(
         @Header("Authorization") token: String,
         @Query("page") page: Int
     ): Call<MyPostResponse>
 
-    //multipart api-store
     @Multipart
     @POST("api/communities/store")
     fun storeCommunityPost(
@@ -154,22 +148,19 @@ interface HidroQuApiService {
         @Part image: MultipartBody.Part? = null
     ): Call<TestResponse>
 
-    // Mendapatkan daftar article
     @GET("api/articles")
     fun getArticles(
         @Header("Authorization") token: String,
-        @Query("page") page: Int, // Existing parameter
-        @Query("search") searchQuery: String? = null // New parameter for search
+        @Query("page") page: Int,
+        @Query("search") searchQuery: String? = null
     ): Call<ArticleResponseWrapper>
 
-    // Mendapatkan daftar komunitas
     @GET("api/articles/{article}")
     fun getArticleDetail(
         @Header("Authorization") token: String,
         @Path("article") articleId: Int
     ): Call<ArticleDetailWrapper>
 
-    // Post Camera
     @Multipart
     @POST("predictNutrient")
     fun predictNutrient(

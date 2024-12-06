@@ -40,17 +40,16 @@ fun CardCamera(
             .background(backgroundColor, shape = MaterialTheme.shapes.medium)
             .border(
                 width = 1.dp,
-                color = borderColor, // Warna outline
-                shape = MaterialTheme.shapes.medium // Bentuk sesuai Card
+                color = borderColor,
+                shape = MaterialTheme.shapes.medium
             )
-            .padding(16.dp), // Padding internal kartu
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Image(
             painter = painterResource(id = imageRes),
             contentDescription = null,
-//            modifier = Modifier.size(48.dp)
         )
         Column (
             verticalArrangement = Arrangement.spacedBy(6.dp)

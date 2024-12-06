@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,7 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -66,24 +64,16 @@ import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
-import com.capstone.hidroqu.navigation.TopBarDefault
 import com.capstone.hidroqu.nonui.data.Comment
 import com.capstone.hidroqu.nonui.data.CommunityDetailResponse
-import com.capstone.hidroqu.nonui.data.DiagnosticHistory
 import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.component.CardPostComment
-import com.capstone.hidroqu.ui.screen.detailmyplant.DetailMyPlantContent
-import com.capstone.hidroqu.utils.ListCommunity
-import com.capstone.hidroqu.utils.ListDetailPostCommunity
-import com.capstone.hidroqu.utils.getDetailPostById
-import com.capstone.hidroqu.utils.getPostById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
-import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 import com.capstone.hidroqu.utils.formatDate
 
 @Composable
-fun DetailPostCommunityActivity(
+fun DetailPostCommunityScreen(
     navHostController: NavHostController,
     idPost: Int,
     viewModel: CommunityViewModel = viewModel(),
@@ -95,11 +85,8 @@ fun DetailPostCommunityActivity(
     val communityDetail by viewModel.communityDetail.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
-
     val currentBackStackEntry by navHostController.currentBackStackEntryAsState()
     val shouldRefresh = currentBackStackEntry?.savedStateHandle?.get<Boolean>("refresh_comments") ?: false
-
-    // State for comment submission status
     val isSubmittingComment = remember { mutableStateOf(false) }
     val commentSubmissionError = remember { mutableStateOf<String?>(null) }
 
@@ -286,7 +273,6 @@ fun DetailPostCommunityContent(
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
-                            // Post Content
                             Text(
                                 text = post?.content ?: "Lorem ipsum",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -304,9 +290,6 @@ fun DetailPostCommunityContent(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
-
-
-                            // Only display the image if it's available
                             if (!post?.image.isNullOrEmpty()) {
                                 Image(
                                     painter = rememberAsyncImagePainter(post?.image),
@@ -314,7 +297,6 @@ fun DetailPostCommunityContent(
                                     modifier = imageModifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            // Toggle the image expanded state when clicked
                                             isImageExpanded.value = !isImageExpanded.value
                                         },
                                     contentScale = ContentScale.Crop
@@ -323,8 +305,6 @@ fun DetailPostCommunityContent(
                         }
                     }
                 }
-
-                // Comments Section
                 Column(
                     modifier = Modifier
                         .padding(20.dp),
@@ -350,7 +330,6 @@ fun DetailPostCommunityContent(
             }
         },
         bottomBar = {
-            // Bottom Comment Section
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -401,12 +380,11 @@ fun DetailPostCommunityContent(
                                 token = token,
                                 communityId = post.id,
                                 content = commentText.value,
-                                imageUri = null, // Tetap null karena gambar tidak dipilih
+                                imageUri = null,
                                 context = context,
                                 onSuccess = { response ->
                                     isSubmittingComment.value = false
                                     commentText.value = ""
-                                    // Refresh the post details to show the new comment
                                     viewModel.fetchCommunityDetail(token, post.id)
                                 },
                                 onError = { error ->
@@ -431,6 +409,6 @@ fun DetailPostCommunityContent(
 private fun DetailPostCommunityPreview() {
     val navHostController = rememberNavController()
     HidroQuTheme {
-        DetailPostCommunityActivity(navHostController , 4)
+        DetailPostCommunityScreen(navHostController , 4)
     }
 }

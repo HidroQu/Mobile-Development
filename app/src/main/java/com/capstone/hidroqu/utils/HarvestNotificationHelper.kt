@@ -10,7 +10,7 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.core.content.getSystemService
-import com.capstone.hidroqu.receiver.HarvestNotificationReceiver
+import com.capstone.hidroqu.nonui.receiver.HarvestNotificationReceiver
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -178,8 +178,6 @@ class HarvestNotificationHelper(private val context: Context) {
             }
         }
     }
-
-
 
     private fun generateNotificationId(harvestDateStr: String, daysBeforeHarvest: Int): Int {
         return (harvestDateStr.hashCode() + daysBeforeHarvest).hashCode()

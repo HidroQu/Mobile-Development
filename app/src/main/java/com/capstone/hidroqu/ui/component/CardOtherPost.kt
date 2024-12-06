@@ -48,13 +48,11 @@ fun CardOtherPost(
 ) {
     val isImageExpanded = remember { mutableStateOf(false) }
     val isContentExpanded = remember { mutableStateOf(false) }
-
     val imageModifier = if (isImageExpanded.value) {
         Modifier.wrapContentHeight()
     } else {
         Modifier.height(190.dp)
     }
-
     Column(
         modifier = modifier
             .clickable(onClick = onClick)
@@ -68,7 +66,6 @@ fun CardOtherPost(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Row untuk informasi pengguna
         Row(
             modifier = modifier
                 .fillMaxWidth(),
@@ -89,12 +86,12 @@ fun CardOtherPost(
                     placeholder = painterResource(id = R.drawable.ic_launcher_foreground)
                 ),
                 modifier = Modifier
-                    .size(50.dp) // Ukuran gambar
-                    .clip(CircleShape) // Membuat gambar menjadi bulat
+                    .size(50.dp)
+                    .clip(CircleShape)
                     .border(
-                        width = 2.dp, // Ketebalan border
-                        color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
-                        shape = CircleShape // Bentuk border bulat
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape
                     ),
                 contentDescription = "Gambar Profil",
                 contentScale = ContentScale.Crop
@@ -119,7 +116,6 @@ fun CardOtherPost(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Tampilkan judul dan konten
                     Text(
                         text = listCommunity.title,
                         style = MaterialTheme.typography.bodyMedium,
@@ -144,8 +140,6 @@ fun CardOtherPost(
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-
-                    // Periksa apakah gambar tersedia
                     if (!listCommunity.image.isNullOrEmpty()) {
                         val imageLoader = ImageLoader.Builder(LocalContext.current)
                             .components {
@@ -163,7 +157,6 @@ fun CardOtherPost(
                                 .fillMaxWidth()
                                 .fillMaxHeight()
                                 .clickable {
-                                    // Toggle the image expanded state when clicked
                                     isImageExpanded.value = !isImageExpanded.value
                                 },
                             contentScale = ContentScale.Crop
@@ -172,10 +165,6 @@ fun CardOtherPost(
                 }
             }
         }
-
-
-
-        // Bagian untuk komentar
         Row(
             modifier = Modifier
                 .fillMaxWidth(),

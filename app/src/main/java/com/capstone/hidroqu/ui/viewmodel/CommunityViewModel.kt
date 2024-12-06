@@ -54,10 +54,8 @@ class CommunityViewModel : ViewModel() {
             override fun onResponse(call: Call<ProfileResponse>, response: Response<ProfileResponse>) {
                 _isLoading.value = false
                 if (response.isSuccessful) {
-                    Log.d("ProfileViewModel", "Response: ${response.body()}")
                     _userData.value = response.body()?.data
                 } else {
-                    Log.e("ProfileViewModel", "Error: ${response.errorBody()?.string()}")
                     _errorMessage.value = "Failed to load profile: ${response.message()}"
                 }
             }
@@ -71,10 +69,6 @@ class CommunityViewModel : ViewModel() {
 
     fun fetchCommunityDetail(token: String, communityId: Int) {
         _isLoading.value = true
-        Log.d(
-            "CommunityViewModel",
-            "Fetching detail komunitas dengan ID=$communityId menggunakan token"
-        )
         apiService.getCommunityDetail("Bearer $token", communityId)
             .enqueue(object : Callback<CommunityDetailWrapper> {
                 override fun onResponse(
@@ -150,8 +144,6 @@ class CommunityViewModel : ViewModel() {
         }
     }
 
-
-
     fun fetchAllCommunityPosts(token: String, searchQuery: String? = null) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -195,7 +187,6 @@ class CommunityViewModel : ViewModel() {
         val contentRequestBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
 
         val imagePart: MultipartBody.Part? = imageUri?.let {
-            // Kompresi gambar sebelum diunggah
             val compressedImageFile = compressImage(context, it)
 
             compressedImageFile?.let { file ->
@@ -205,7 +196,6 @@ class CommunityViewModel : ViewModel() {
         }
 
         if (imagePart == null && imageUri != null) {
-            Log.e("CommunityViewModel", "Gambar tidak dapat diproses menjadi MultipartBody.Part")
         }
 
         apiService.storeCommunityComment(
@@ -225,12 +215,10 @@ class CommunityViewModel : ViewModel() {
                     onError("Error: ${response.message()}")
                 }
             }
-
             override fun onFailure(call: Call<TestResponse>, t: Throwable) {
                 onError("Network error: ${t.message}")
             }
         })
     }
-
 }
 

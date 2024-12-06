@@ -8,15 +8,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.capstone.hidroqu.ui.screen.addplant.AddPlantActivity
-import com.capstone.hidroqu.ui.screen.detailmyplant.DetailMyPlantActivity
-import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
-import com.capstone.hidroqu.ui.screen.formaddplant.FormAddPlantActivity
-import com.capstone.hidroqu.ui.screen.historymyplant.HistoryMyPlantActivity
-import com.capstone.hidroqu.ui.screen.login.LoginActivity
-import com.capstone.hidroqu.ui.screen.myplant.MyPlantActivity
-import com.capstone.hidroqu.ui.screen.register.RegisterActivity
-import com.capstone.hidroqu.ui.screen.resetpassword.ResetPasswordActivity
+import com.capstone.hidroqu.ui.screen.addplant.AddPlantScreen
+import com.capstone.hidroqu.ui.screen.detailmyplant.DetailMyPlantScreen
+import com.capstone.hidroqu.ui.screen.formaddplant.FormAddPlantScreen
+import com.capstone.hidroqu.ui.screen.historymyplant.HistoryMyPlantScreen
+import com.capstone.hidroqu.ui.screen.myplant.MyPlantScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.myPlantGraph(navController: NavHostController){
@@ -27,13 +23,13 @@ fun NavGraphBuilder.myPlantGraph(navController: NavHostController){
         //tanamanku
         composable(Screen.MyPlant.route) {
             // Panggil MyPlantActivity di sini
-            MyPlantActivity(
+            MyPlantScreen(
                 navHostController = navController
             )
         }
         ////add plant
         composable(Screen.AddPlant.route) {
-            AddPlantActivity(
+            AddPlantScreen(
                 navHostController = navController,
             )
         }
@@ -43,7 +39,7 @@ fun NavGraphBuilder.myPlantGraph(navController: NavHostController){
             arguments = listOf(navArgument("plantId") { type = NavType.IntType })
         ) { backStackEntry ->
             val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
-            FormAddPlantActivity(plantId =  plantId, navHostController = navController)
+            FormAddPlantScreen(plantId =  plantId, navHostController = navController)
         }
         /////detailmyplant
         composable(
@@ -51,12 +47,11 @@ fun NavGraphBuilder.myPlantGraph(navController: NavHostController){
             arguments = listOf(navArgument("plantId") { type = NavType.IntType })
         ) { backStackEntry ->
             val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
-            DetailMyPlantActivity(
+            DetailMyPlantScreen(
                 plantId = plantId,
                 navHostController = navController
             )
         }
-
         ////history riwayat sakit
         composable(
             route = Screen.HistoryMyPlant.route,
@@ -65,10 +60,10 @@ fun NavGraphBuilder.myPlantGraph(navController: NavHostController){
                 navArgument("healthId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
-            val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0  // Default to 0 if null
-            val healthId = backStackEntry.arguments?.getInt("healthId") ?: 0  // Default to 0 if null
+            val plantId = backStackEntry.arguments?.getInt("plantId") ?: 0
+            val healthId = backStackEntry.arguments?.getInt("healthId") ?: 0
 
-            HistoryMyPlantActivity(navHostController = navController, plantId = plantId, healthId = healthId)
+            HistoryMyPlantScreen(navHostController = navController, plantId = plantId, healthId = healthId)
         }
     }
 }

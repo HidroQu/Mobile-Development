@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,7 +38,7 @@ import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormAddComment(
+fun FormAddCommentScreen(
     navHostController: NavHostController,
     postId: Int,
     viewModel: CommunityViewModel = viewModel(),
@@ -50,7 +49,7 @@ fun FormAddComment(
     var commentText by remember { mutableStateOf("") }
     var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
     var errorMessage by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) } // Add loading state
+    var isLoading by remember { mutableStateOf(false) }
 
     val pickImages = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
         if (uris.size > 1) {
@@ -69,7 +68,7 @@ fun FormAddComment(
                 onActionClick = {
                     if (commentText.isNotBlank()) {
                         if (token != null) {
-                            isLoading = true // Show loading
+                            isLoading = true
                             viewModel.storeComment(
                                 token = token!!,
                                 communityId = postId,
@@ -78,15 +77,14 @@ fun FormAddComment(
                                 context = context,
                                 onSuccess = {
                                     Log.d("FormAddComment", "Comment berhasil ditambahkan")
-                                    isLoading = false // Hide loading
-                                    // Navigate back and refresh the comments
+                                    isLoading = false
                                     navHostController.previousBackStackEntry
                                         ?.savedStateHandle
                                         ?.set("refresh_comments", true)
                                     navHostController.popBackStack()
                                 },
                                 onError = { error ->
-                                    isLoading = false // Hide loading
+                                    isLoading = false
                                     errorMessage = error
                                     Log.e("FormAddComment", "Gagal menambahkan komentar: $error")
                                 }
@@ -218,6 +216,6 @@ fun FormAddComment(
 private fun FormAddCommentPreview() {
     HidroQuTheme {
         val navHostController = rememberNavController()
-        FormAddComment(navHostController = navHostController, postId = 1)
+        FormAddCommentScreen(navHostController = navHostController, postId = 1)
     }
 }

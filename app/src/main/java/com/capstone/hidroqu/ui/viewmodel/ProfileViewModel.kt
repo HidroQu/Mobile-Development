@@ -118,7 +118,6 @@ class ProfileViewModel: ViewModel() {
         }
     }
 
-
     fun updateProfile(
         token: String,
         name: String,
@@ -158,7 +157,6 @@ class ProfileViewModel: ViewModel() {
                         }
                         file = compressedFile
                     }
-
                     val requestFile = file.asRequestBody(mimeType.toMediaTypeOrNull())
                     MultipartBody.Part.createFormData("photo", file.name, requestFile)
                 } else {
@@ -201,7 +199,7 @@ class ProfileViewModel: ViewModel() {
                 })
             } catch (e: Exception) {
                 _isLoading.value = false
-                onComplete(false, "Error updating profile: ${e.message}")
+                onComplete(false, "Format file tidak diketahui ${e.message}")
             }
         }
     }

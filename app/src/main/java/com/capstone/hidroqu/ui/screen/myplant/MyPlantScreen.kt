@@ -41,7 +41,7 @@ import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
 
 @Composable
-fun MyPlantActivity(
+fun MyPlantScreen(
     navHostController: NavHostController,
     viewModel: MyPlantViewModel = viewModel(),
     context: Context = LocalContext.current
@@ -113,7 +113,7 @@ fun MyPlantActivity(
 @Composable
 fun AddButton(onClick: () -> Unit) {
     FloatingActionButton(
-        onClick = onClick, // Navigasi dipicu dari parameter onClick
+        onClick = onClick,
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         shape = CircleShape,
@@ -186,16 +186,12 @@ fun MyPlantList(
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun MyPlantActivityPreview() {
     HidroQuTheme {
         val navHostController = rememberNavController()
-
-        // Menampilkan MyPlantActivity dengan dummy data
-        MyPlantActivity(navHostController, context = LocalContext.current)
+        MyPlantScreen(navHostController, context = LocalContext.current)
     }
 }
 

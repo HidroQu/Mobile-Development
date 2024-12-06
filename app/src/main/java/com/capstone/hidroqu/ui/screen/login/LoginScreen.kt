@@ -33,7 +33,7 @@ import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun LoginActivity(
+fun LoginScreen(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = viewModel()
@@ -53,8 +53,8 @@ fun LoginActivity(
         return emailError == null && passwordError == null
     }
 
-    val context = LocalContext.current // <-- Use it here inside @Composable function
-    val isLoading by viewModel.isLoading // Observe the loading state
+    val context = LocalContext.current
+    val isLoading by viewModel.isLoading
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -81,7 +81,6 @@ fun LoginActivity(
                         .fillMaxSize()
                         .padding(20.dp)
                 ) {
-                    // Title
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = "Masuk dulu, yuk!",
@@ -92,17 +91,16 @@ fun LoginActivity(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Login Form
-                    LoginForm(  // Pass emailValue and passwordValue here
+                    LoginForm(
                         email = emailValue,
                         password = passwordValue,
                         onEmailChanged = {
                             emailValue = it
-                            emailError = null // Reset error saat input berubah
+                            emailError = null
                         },
                         onPasswordChanged = {
                             passwordValue = it
-                            passwordError = null // Reset error saat input berubah
+                            passwordError = null
                         },
                         emailError = emailError,
                         passwordError = passwordError
@@ -111,8 +109,6 @@ fun LoginActivity(
                     ForgotPasswordButton(navHostController = navHostController)
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Loading Indicator
-                        // Login Button
                     LoginButton(
                         navHostController = navHostController,
                         onLogin = {
@@ -140,10 +136,8 @@ fun LoginActivity(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Google Login Button
                     GoogleButton(navHostController = navHostController)
 
-                    // Register Button
                     RegisterButton(navHostController = navHostController)
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -199,7 +193,6 @@ fun LoginForm(
         isError = passwordError != null || (isTyping && passwordLengthError != null),
         errorMessage = passwordError ?: passwordLengthError,
         trailingIcon = {
-            // Menambahkan ikon mata untuk toggle password visibility
             IconButton(onClick = { showPassword = !showPassword }) {
                 Icon(
                     painter = painterResource(id = if (showPassword) R.drawable.ic_visibility else R.drawable.ic_visibility_off),
@@ -324,7 +317,7 @@ fun GoogleButton(
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    LoginActivity(
+    LoginScreen(
         navHostController = NavHostController(context = LocalContext.current),
     )
 }

@@ -33,7 +33,7 @@ import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.ScanPlantViewModel
 
 @Composable
-fun ResultScanTanamActivity(
+fun ResultScanTanamScreen(
     photoUri: String?,
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
@@ -281,6 +281,6 @@ fun ResultScanTanamActivity(
 @Composable
 private fun ResultScanTanamActivityPreview() {
     HidroQuTheme {
-        ResultScanTanamActivity("Poto Tanam", navHostController = rememberNavController())
+        ResultScanTanamScreen("Poto Tanam", navHostController = rememberNavController())
     }
 }

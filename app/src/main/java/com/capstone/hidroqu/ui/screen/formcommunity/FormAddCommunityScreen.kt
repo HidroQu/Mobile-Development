@@ -34,27 +34,19 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
-import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.TopBarButtonAction
-import com.capstone.hidroqu.nonui.data.PostData
-import com.capstone.hidroqu.nonui.data.UserData
 import com.capstone.hidroqu.nonui.data.UserPreferences
-import com.capstone.hidroqu.ui.screen.profile.ProfileInfo
-import com.capstone.hidroqu.utils.ListUserData
-import com.capstone.hidroqu.utils.dummyListUserData
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
 import com.capstone.hidroqu.ui.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormAddCommunityActivity(
+fun FormAddCommunityScreen(
     navHostController: NavHostController,
     context: Context = LocalContext.current,
     profileViewModel: ProfileViewModel = viewModel(),
@@ -346,18 +338,11 @@ fun FormAddCommunityActivity(
     }
 }
 
-@Composable
-fun UserItem(
-    name: String
-) {
-
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun FormAddCommunityActivityPreview() {
     HidroQuTheme {
         val navHostController = rememberNavController()
-        FormAddCommunityActivity(navHostController = navHostController)
+        FormAddCommunityScreen(navHostController = navHostController)
     }
 }

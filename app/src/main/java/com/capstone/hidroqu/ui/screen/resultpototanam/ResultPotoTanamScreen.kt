@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -20,24 +19,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.capstone.hidroqu.ui.screen.myplant.NoPlantList
 import com.capstone.hidroqu.ui.viewmodel.ScanPlantViewModel
 import java.net.URLEncoder
 
 @Composable
-fun ResultPotoTanamActivity(
+fun ResultPotoTanamScreen(
     photoUri: String?,
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
@@ -297,6 +293,6 @@ fun ResultPotoTanamActivityContent(
 @Composable
 private fun ResultPotoTanamActivityPreview() {
     HidroQuTheme {
-        ResultPotoTanamActivity("Poto Tanam", navHostController = rememberNavController())
+        ResultPotoTanamScreen("Poto Tanam", navHostController = rememberNavController())
     }
 }

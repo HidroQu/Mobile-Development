@@ -1,7 +1,6 @@
 package com.capstone.hidroqu.ui.screen.profile
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,7 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,34 +19,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
-import com.capstone.hidroqu.navigation.TopBarAction
 import com.capstone.hidroqu.navigation.TopBarDefaultAction
 import com.capstone.hidroqu.nonui.data.MyPostData
-import com.capstone.hidroqu.nonui.data.PostData
 import com.capstone.hidroqu.nonui.data.UserPreferences
-import com.capstone.hidroqu.ui.component.CardCommunity
 import com.capstone.hidroqu.ui.component.CardMyPost
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 import com.capstone.hidroqu.ui.viewmodel.ProfileViewModel
 import com.capstone.hidroqu.ui.viewmodel.ThemeViewModel
-import com.capstone.hidroqu.utils.dummyListUserData
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun ProfileActivity(
+fun ProfileScreen(
     navHostController: NavHostController,
     themeViewModel: ThemeViewModel,
     profileViewModel: ProfileViewModel = viewModel(),
@@ -63,21 +55,17 @@ fun ProfileActivity(
     val isLoading by profileViewModel.isLoading.collectAsState()
     val errorMessage by profileViewModel.errorMessage.collectAsState()
 
-    // Fetch user profile data
     LaunchedEffect(token) {
         token?.let {
             profileViewModel.fetchUserProfile(it)
-            profileViewModel.getMyPost(it) // Fetch user's posts
+            profileViewModel.getMyPost(it)
         } ?: run {
-            // If token is null, navigate to login screen
             navHostController.navigate(Screen.AuthRoute.route) {
                 popUpTo(Screen.ProfileRoute.route) { inclusive = true }
             }
         }
     }
     val myPosts by profileViewModel.myPost.collectAsState()
-
-    // Dummy data for posts
     var visiblePostsCount by remember { mutableStateOf(5) }
     val displayedPosts = myPosts.take(visiblePostsCount)
     val isMoreAvailable = visiblePostsCount < myPosts.size
@@ -86,7 +74,6 @@ fun ProfileActivity(
         token?.let {
             profileViewModel.fetchUserProfile(it)
         }?: run {
-            // Tangani kasus ketika token null, misalnya arahkan ke halaman login
             navHostController.navigate(Screen.Login.route) {
                 popUpTo(Screen.Profile.route) { inclusive = true }
             }
@@ -99,9 +86,9 @@ fun ProfileActivity(
                 title = "Profil anda",
                 navHostController = navHostController,
                 onActionClick = {
-                    authViewModel.logoutUser() // Panggil fungsi logout
-                    navHostController.navigate(Screen.AuthRoute.route) { // Arahkan ke halaman login
-                        popUpTo(Screen.ProfileRoute.route) { inclusive = true } // Bersihkan stack
+                    authViewModel.logoutUser()
+                    navHostController.navigate(Screen.AuthRoute.route) {
+                        popUpTo(Screen.ProfileRoute.route) { inclusive = true }
                     }
                 },
                 actionIcon = Icons.Default.ExitToApp )
@@ -134,7 +121,6 @@ fun ProfileActivity(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    // Profile Header
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -149,18 +135,14 @@ fun ProfileActivity(
                                 .size(120.dp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.primary),
-                            placeholder = painterResource(id = R.drawable.ic_launcher_foreground), // Placeholder jika gambar belum dimuat
-                            error = painterResource(id = R.drawable.ic_launcher_foreground), // Gambar default jika terjadi kesalahan
-                            contentScale = ContentScale.Crop // Sesuaikan gambar dengan crop
+                            placeholder = painterResource(id = R.drawable.ic_launcher_foreground),
+                            error = painterResource(id = R.drawable.ic_launcher_foreground),
+                            contentScale = ContentScale.Crop
                         )
-
-                        // Profile Name and Description
                         ProfileInfo(
                             name = userData?.name ?: "Nama pengguna",
                             bio = userData?.bio ?: "Bio belum ditambahkan"
                         )
-
-                        // Edit Profile Button (Outlined)
                         OutlinedButton(
                             onClick = { navHostController.navigate(Screen.EditProfile.route) },
                             modifier = Modifier.fillMaxWidth(),
@@ -173,13 +155,10 @@ fun ProfileActivity(
                             )
                         }
 
-                        // Appearance Settings (Theme change)
                         AppearanceSettings(
                             selectedMode = themeMode,
                             onModeChange = { newMode -> themeViewModel.setTheme(newMode.lowercase()) }
                         )
-
-                        // My Posts Section
                         if (myPosts.isEmpty()) {
                             NoPostList(modifier = Modifier)
                         } else {
@@ -286,7 +265,7 @@ fun AppearanceSettings(
         Text(
             "Appearance",
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground // Appearance label color set to onBackground
+            color = MaterialTheme.colorScheme.onBackground
         )
         AppearanceOption("System", selected = selectedMode == "system", onClick = { onModeChange("system") })
         AppearanceOption("Light", selected = selectedMode == "light", onClick = { onModeChange("light") })
@@ -365,14 +344,5 @@ fun MyPostsSection(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewProfileScreen() {
-    HidroQuTheme {
-        val navController = rememberNavController()
-        val userData = dummyListUserData.first()
     }
 }

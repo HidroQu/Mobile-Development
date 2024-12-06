@@ -42,75 +42,67 @@ fun CardHealthHistory(
     modifier: Modifier = Modifier
 ) {
     val formattedDate = formatDateWithMonthName(listHealthHistory.diagnostic_date)
+    Row(
+        modifier = Modifier
+            .clickable { onClick() }
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = MaterialTheme.shapes.medium
+            )
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Row(
-            modifier = Modifier
-                .clickable { onClick() }
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.onPrimary, shape = MaterialTheme.shapes.medium)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                    shape = MaterialTheme.shapes.medium
-                )
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                val imageLoader = ImageLoader.Builder(LocalContext.current)
-                    .components {
-                        add(SvgDecoder.Factory())
-                    }
-                    .build()
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = listHealthHistory.diagnostic_image,
-                        imageLoader = imageLoader
-
-                    ),
-                    contentDescription = "Plant Image",
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant,
-                            shape = CircleShape
-                        ),
-                    contentScale = ContentScale.Crop
-                )
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Text(
-                        text = listHealthHistory.diagnostic.disease_name,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        text = formattedDate,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+        ){
+            val imageLoader = ImageLoader.Builder(LocalContext.current)
+                .components {
+                    add(SvgDecoder.Factory())
                 }
-            }
-            IconButton(onClick = { onClick() }) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = "See Health Details",
-                    tint = MaterialTheme.colorScheme.outline
+                .build()
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = listHealthHistory.diagnostic_image,
+                    imageLoader = imageLoader
+
+                ),
+                contentDescription = "Plant Image",
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape
+                    ),
+                contentScale = ContentScale.Crop
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = listHealthHistory.diagnostic.disease_name,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = formattedDate,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
-    }
-
-    @Preview(showBackground = false)
-    @Composable
-    private fun CardHealthHistoryPreview() {
-        HidroQuTheme {
-            val navController = rememberNavController()
+        IconButton(onClick = { onClick() }) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "See Health Details",
+                tint = MaterialTheme.colorScheme.outline
+            )
         }
     }
+}

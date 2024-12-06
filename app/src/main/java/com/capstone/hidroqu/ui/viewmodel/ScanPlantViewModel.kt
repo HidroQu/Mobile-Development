@@ -39,7 +39,6 @@ class ScanPlantViewModel: ViewModel(){
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
 
-    // Function to make plant prediction
     fun predictPlant(
         token: String,
         imageUri: Uri?,
@@ -86,8 +85,6 @@ class ScanPlantViewModel: ViewModel(){
                 })
         }
     }
-
-    // Function to make nutrient prediction
     fun predictNutrient(
         token: String,
         imageUri: Uri?,
@@ -95,39 +92,30 @@ class ScanPlantViewModel: ViewModel(){
         onSuccess: (NutrientPredictionResponse) -> Unit
     ) {
         _isLoading.value = true
-        Log.d("ScanPlantViewModel", "Start nutrient prediction...")
-
         val imagePart: MultipartBody.Part? = imageUri?.let {
             val inputStream = context.contentResolver.openInputStream(it)
             val byteArray = inputStream?.readBytes()
-            Log.d("ScanPlantViewModel", "Image size: ${byteArray?.size} bytes")
             val requestFile = byteArray?.toRequestBody("image/jpeg".toMediaTypeOrNull())
             requestFile?.let { file ->
                 MultipartBody.Part.createFormData("nutrient_img", "filename.jpg", file)
             }
         }
 
-        Log.d("ScanPlantViewModel", "Image part created: $imagePart")
-
         apiService.predictNutrient("Bearer $token", imagePart).enqueue(object : Callback<NutrientPredictionResponse> {
             override fun onResponse(call: Call<NutrientPredictionResponse>, response: Response<NutrientPredictionResponse>) {
                 _isLoading.value = false
                 if (response.isSuccessful) {
-                    Log.d("ScanPlantViewModel", "Nutrient prediction success: ${response.body()}")
                     response.body()?.let {
                         _nutrientPrediction.value = it
-                        onSuccess(it) // Kirim ke UI untuk ditampilkan
+                        onSuccess(it)
                     }
                 } else {
-                    Log.e("ScanPlantViewModel", "Failed to make nutrient prediction: ${response.message()}")
-                    Log.e("ScanPlantViewModel", "Response Body: ${response.errorBody()?.string()}")
                     _errorMessage.value = "Failed to make nutrient prediction: ${response.message()}"
                 }
             }
 
             override fun onFailure(call: Call<NutrientPredictionResponse>, t: Throwable) {
                 _isLoading.value = false
-                Log.e("ScanPlantViewModel", "Network error: ${t.message}")
                 _errorMessage.value = "Network error: ${t.message}"
             }
         })

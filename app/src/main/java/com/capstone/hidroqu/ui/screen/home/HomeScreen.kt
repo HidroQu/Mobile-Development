@@ -21,17 +21,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,9 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import coil.ImageLoader
-import coil.compose.rememberAsyncImagePainter
-import coil.decode.SvgDecoder
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.component.CardAlarm
 import com.capstone.hidroqu.ui.component.CardArticle
@@ -51,14 +45,13 @@ import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.nonui.data.ArticleDetailResponse
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
-import com.capstone.hidroqu.ui.component.CardMyPlant
 import com.capstone.hidroqu.ui.viewmodel.ArticleViewModel
 import com.capstone.hidroqu.ui.viewmodel.HomeViewModel
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
 
 
 @Composable
-fun HomeActivity(
+fun HomeScreen(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
     myPlantViewModel: MyPlantViewModel = viewModel(),
@@ -178,7 +171,7 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(0.dp), // Padding sudah diatur di root
+            .padding(0.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -192,7 +185,6 @@ fun CameraSection(navController: NavHostController, modifier: Modifier = Modifie
             borderColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f),
             colorText = MaterialTheme.colorScheme.onTertiaryContainer,
             onClick = {
-                // Buka CameraPotoTanamActivity
                 navController.navigate(Screen.PotoTanamRoute.route)
             }
         )
@@ -297,8 +289,6 @@ fun AlarmSection(
                     .collectAsState(initial = false)
                 isNotificationEnabled
             }
-
-            // Menampilkan CardAlarm untuk setiap tanaman yang memiliki notifikasi yang aktif
             if (plantsWithNotification.isNotEmpty()) {
                 plantsWithNotification.forEach { plant ->
                     CardAlarm(
@@ -349,7 +339,7 @@ fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifi
             )
         }
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp) // Jarak antar artikel
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             articles.take(5).forEach { article ->
                 CardArticle(

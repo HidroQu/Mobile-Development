@@ -2,7 +2,6 @@ package com.capstone.hidroqu.ui.screen.resetpassword
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Patterns
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,7 +13,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,7 +20,6 @@ import androidx.navigation.NavHostController
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.ui.component.TextFieldForm
-import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.AuthViewModel
 
@@ -32,7 +29,7 @@ import androidx.compose.ui.Alignment
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun ResetPasswordActivity(
+fun ResetPasswordScreen(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = viewModel()
@@ -200,7 +197,7 @@ fun ResetPasswordForm(
 @Composable
 fun ResetPasswordActivityPreview() {
     HidroQuTheme {
-        ResetPasswordActivity(
+        ResetPasswordScreen(
             navHostController = NavHostController(context = LocalContext.current),
         )
     }

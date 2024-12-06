@@ -68,7 +68,6 @@ fun CardMyPost(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Row untuk informasi pengguna
         Row(
             modifier = modifier
                 .fillMaxWidth(),
@@ -89,12 +88,12 @@ fun CardMyPost(
                     placeholder = painterResource(id = R.drawable.ic_launcher_foreground)
                 ),
                 modifier = Modifier
-                    .size(50.dp) // Ukuran gambar
-                    .clip(CircleShape) // Membuat gambar menjadi bulat
+                    .size(50.dp)
+                    .clip(CircleShape)
                     .border(
-                        width = 2.dp, // Ketebalan border
-                        color = MaterialTheme.colorScheme.outlineVariant, // Warna outline
-                        shape = CircleShape // Bentuk border bulat
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        shape = CircleShape
                     ),
                 contentDescription = "Gambar Profil",
                 contentScale = ContentScale.Crop
@@ -119,7 +118,6 @@ fun CardMyPost(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Tampilkan judul dan konten
                     Text(
                         text = listCommunity.title,
                         style = MaterialTheme.typography.bodyMedium,
@@ -146,7 +144,6 @@ fun CardMyPost(
                         )
                     }
 
-                    // Periksa apakah gambar tersedia
                     if (!listCommunity.image.isNullOrEmpty()) {
                         val imageLoader = ImageLoader.Builder(LocalContext.current)
                             .components {
@@ -164,7 +161,6 @@ fun CardMyPost(
                                 .fillMaxWidth()
                                 .fillMaxHeight()
                                 .clickable {
-                                    // Toggle the image expanded state when clicked
                                     isImageExpanded.value = !isImageExpanded.value
                                 },
                             contentScale = ContentScale.Crop
@@ -174,9 +170,6 @@ fun CardMyPost(
             }
         }
 
-
-
-        // Bagian untuk komentar
         Row(
             modifier = Modifier
                 .fillMaxWidth(),

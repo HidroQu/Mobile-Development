@@ -1,16 +1,11 @@
 package com.capstone.hidroqu.ui.screen.editprofile
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,35 +18,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
 import com.capstone.hidroqu.R
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.TopBarAction
 import com.capstone.hidroqu.nonui.data.UserPreferences
 import com.capstone.hidroqu.ui.component.TextFieldForm
 import com.capstone.hidroqu.ui.screen.myplant.NoPlantList
-import com.capstone.hidroqu.utils.ListUserData
-import com.capstone.hidroqu.utils.dummyListUserData
-import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.ProfileViewModel
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 
 @Composable
-fun EditProfileActivity(
+fun EditProfileScreen(
     navHostController: NavHostController,
     profileViewModel: ProfileViewModel = viewModel(),
     context: Context = LocalContext.current,
@@ -61,19 +46,16 @@ fun EditProfileActivity(
     val userData by profileViewModel.userData.collectAsState()
     val isLoading by profileViewModel.isLoading.collectAsState()
     val errorMessage by profileViewModel.errorMessage.collectAsState()
-
     var nameValue by remember { mutableStateOf("") }
     var emailValue by remember { mutableStateOf("") }
     var bioValue by remember { mutableStateOf("") }
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
 
-// Update nilai default saat userData berubah
     LaunchedEffect(userData) {
         userData?.let {
             nameValue = it.name ?: ""
             emailValue = it.email ?: ""
             bioValue = it.bio ?: ""
-            // Jika ada URL gambar profil, inisialisasi Uri
             if (!it.photo.isNullOrEmpty()) {
                 profileImageUri = Uri.parse(it.photo)
             }
@@ -90,14 +72,13 @@ fun EditProfileActivity(
         }
     }
 
-    // State for editable fields
     var passwordValue by remember { mutableStateOf("") }
     var confirmPasswordValue by remember { mutableStateOf("") }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        profileImageUri = uri // Simpan URI yang dipilih
+        profileImageUri = uri
     }
 
     val isPasswordValid = passwordValue.isEmpty() || (passwordValue == confirmPasswordValue)
@@ -110,7 +91,6 @@ fun EditProfileActivity(
 
     Scaffold(
         topBar = {
-            // TopBar can be customized if needed
             TopBarAction(
                 title = "Edit Profil",
                 navHostController = navHostController,
@@ -128,12 +108,12 @@ fun EditProfileActivity(
                                 bio = bioValue,
                                 password = if (passwordValue.isNotEmpty()) passwordValue else null,
                                 confirmPassword = if (passwordValue.isNotEmpty()) passwordValue else null,
-                                photoUri = profileImageUri, // Kirim Uri langsung,
+                                photoUri = profileImageUri,
                                 context = context,
                                 onComplete = { success, message ->
                                     if (success) {
                                         Toast.makeText(context, "Profil berhasil diperbarui", Toast.LENGTH_SHORT).show()
-                                        navHostController.popBackStack() // Kembali ke halaman sebelumnya
+                                        navHostController.popBackStack()
                                     } else {
                                         Toast.makeText(context, "Gagal memperbarui profil: $message", Toast.LENGTH_SHORT).show()
                                     }
@@ -161,9 +141,9 @@ fun EditProfileActivity(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentAlignment = Alignment.Center // Atur konten ke tengah
+                    contentAlignment = Alignment.Center
                 ) {
-                    NoPlantList() // Panggil fungsi NoPlantList
+                    NoPlantList()
                 }
             } else {
                 Column(
@@ -182,7 +162,7 @@ fun EditProfileActivity(
                         confirmPassword = confirmPasswordValue,
                         profileImageUri = profileImageUri,
                         onProfileImageClicked = {
-                            launcher.launch("image/*") // Filter hanya untuk gambar
+                            launcher.launch("image/*")
                         },
                         onNameChanged = { nameValue = it },
                         onBioChanged = { bioValue = it },
@@ -225,8 +205,6 @@ fun EditProfileActivity(
         }
     )
 }
-
-
 @Composable
 fun EditForm(
     name: String,
@@ -241,20 +219,18 @@ fun EditForm(
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onConfirmPasswordChanged: (String) -> Unit,
-
     emailError: String?,
     passwordError: String?,
     confirmPasswordError: String?,
     nameError: String?,
     bioError: String?
 ){
-// Profile Header
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        // Profile Picture Section
         Box(
             modifier = Modifier
                 .size(120.dp)
@@ -264,7 +240,7 @@ fun EditForm(
         ) {
             profileImageUri?.let {
                 AsyncImage(
-                    model = it, // Gunakan URI untuk memuat gambar
+                    model = it,
                     contentDescription = "Profile Picture",
                     modifier = Modifier
                         .size(120.dp)
@@ -282,7 +258,6 @@ fun EditForm(
             )
         }
 
-        // TextField for Name
         TextFieldForm(
             modifier = Modifier.fillMaxWidth(),
             value = name,
@@ -292,13 +267,12 @@ fun EditForm(
             errorMessage = nameError,
         )
 
-        // TextField for Bio
         TextFieldForm(
             modifier = Modifier.fillMaxWidth(),
             value = bio,
             onValueChange = onBioChanged,
             label = "Bio",
-            singleLine = false,  // Multiline untuk Bio
+            singleLine = false,
             maxLines = 5,
             isError = bioError != null,
             errorMessage = bioError,

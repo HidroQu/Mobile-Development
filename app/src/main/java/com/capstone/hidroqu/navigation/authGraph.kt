@@ -4,10 +4,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
-import com.capstone.hidroqu.ui.screen.login.LoginActivity
-import com.capstone.hidroqu.ui.screen.register.RegisterActivity
-import com.capstone.hidroqu.ui.screen.resetpassword.ResetPasswordActivity
+import com.capstone.hidroqu.ui.screen.forgotpassword.ForgotPasswordScreen
+import com.capstone.hidroqu.ui.screen.login.LoginScreen
+import com.capstone.hidroqu.ui.screen.register.RegisterScreen
+import com.capstone.hidroqu.ui.screen.resetpassword.ResetPasswordScreen
 
 fun NavGraphBuilder.authGraph(navController: NavHostController){
     navigation(
@@ -15,16 +15,16 @@ fun NavGraphBuilder.authGraph(navController: NavHostController){
         route = Screen.AuthRoute.route
     ){
         composable(Screen.Login.route) {
-            LoginActivity(navHostController = navController)
+            LoginScreen(navHostController = navController)
         }
         composable(Screen.Register.route) {
-            RegisterActivity(navHostController = navController)
+            RegisterScreen(navHostController = navController)
         }
         composable(Screen.ForgotPassword.route) {
-            ForgotPasswordActivity(navHostController = navController)
+            ForgotPasswordScreen(navHostController = navController)
         }
         composable(Screen.ResetPassword.route) {
-            ResetPasswordActivity(navHostController = navController)
+            ResetPasswordScreen(navHostController = navController)
         }
     }
 }

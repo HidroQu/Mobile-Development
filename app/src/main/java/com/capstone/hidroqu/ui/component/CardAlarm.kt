@@ -35,25 +35,17 @@ fun CardAlarm(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    // Parse the planting date
     val plantingDate = LocalDate.parse(
         listAlarmHome.planting_date.split(" ")[0],
         DateTimeFormatter.ISO_DATE
     )
-
-    // Calculate harvest date
     val harvestDate = plantingDate.plusDays(listAlarmHome.plant.duration_plant.toLong())
-
-    // Calculate remaining days
     val remainingDays = ChronoUnit.DAYS.between(LocalDate.now(), harvestDate)
-
-    // Prepare remaining days text
     val remainingDaysText = when {
         remainingDays > 0 -> "Akan dipanen dalam ${remainingDays} hari"
         remainingDays == 0L -> "Hari ini panen"
         else -> "Sudah melewati masa panen"
     }
-
     Row(
         modifier = modifier
             .clickable(onClick = onClick)

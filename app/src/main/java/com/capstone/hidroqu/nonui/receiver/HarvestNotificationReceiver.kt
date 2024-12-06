@@ -1,4 +1,4 @@
-package com.capstone.hidroqu.receiver
+package com.capstone.hidroqu.nonui.receiver
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver

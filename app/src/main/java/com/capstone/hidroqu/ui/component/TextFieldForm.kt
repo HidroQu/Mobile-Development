@@ -23,7 +23,7 @@ fun TextFieldForm(
     isError: Boolean = false,
     errorMessage: String? = null,
     labelTextStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
-    singleLine: Boolean = true,  // Tambahkan parameter untuk singleLine
+    singleLine: Boolean = true,
     maxLines: Int = 1,
     trailingIcon: @Composable (() -> Unit)? = null
 ) {
@@ -32,7 +32,7 @@ fun TextFieldForm(
             value = value,
             onValueChange = onValueChange,
             label = {
-                Text(label, style = labelTextStyle) // Gunakan gaya label yang dapat disesuaikan
+                Text(label, style = labelTextStyle)
             },
             modifier = modifier,
             singleLine = singleLine,
@@ -58,7 +58,6 @@ fun TextFieldForm(
         )
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

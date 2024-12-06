@@ -3,13 +3,11 @@ package com.capstone.hidroqu.ui.screen.detailarticle
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,15 +39,11 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
-import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
 import com.capstone.hidroqu.nonui.data.ArticleDetailResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
-import com.capstone.hidroqu.ui.screen.home.ListArticleHome
-import com.capstone.hidroqu.ui.screen.home.getArticleById
 import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.ui.viewmodel.ArticleViewModel
-import com.capstone.hidroqu.ui.viewmodel.CommunityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -67,7 +61,8 @@ fun DetailArticleScreen(
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState("")
     val currentBackStackEntry by navHostController.currentBackStackEntryAsState()
-    val shouldRefresh = currentBackStackEntry?.savedStateHandle?.get<Boolean>("refresh_comments") ?: false
+    val shouldRefresh =
+        currentBackStackEntry?.savedStateHandle?.get<Boolean>("refresh_comments") ?: false
 
     LaunchedEffect(articleId, shouldRefresh) {
         if (shouldRefresh) {
@@ -80,10 +75,8 @@ fun DetailArticleScreen(
 
     LaunchedEffect(articleId) {
         token?.let {
-            Log.d("DetailPostCommunity", "Token ditemukan, memulai fetch detail komunitas")
             viewModel.fetchArticleDetail(it, articleId)
         } ?: run {
-            Log.e("DetailPostCommunity", "Token tidak ditemukan. Tidak dapat memuat detail komunitas.")
         }
     }
 
@@ -91,16 +84,16 @@ fun DetailArticleScreen(
         Scaffold(
             topBar = {
                 SimpleLightTopAppBar(
-                    title = articleDetail?.title?: "Judul", // Menampilkan judul artikel
+                    title = articleDetail?.title ?: "Judul",
                     navHostController = navHostController
                 )
             },
             content = { paddingValues ->
 
-                    DetailArticleContent(
-                        article = articleDetail,
-                        modifier = Modifier.padding(paddingValues) // Gunakan paddingValues di sini
-                    )
+                DetailArticleContent(
+                    article = articleDetail,
+                    modifier = Modifier.padding(paddingValues)
+                )
 
             }
         )
@@ -112,8 +105,9 @@ fun DetailArticleScreen(
 @Composable
 fun DetailArticleContent(
     article: ArticleDetailResponse?,
-    modifier: Modifier = Modifier) {
-    Column{
+    modifier: Modifier = Modifier
+) {
+    Column {
         val imageLoader = ImageLoader.Builder(LocalContext.current)
             .components {
                 add(SvgDecoder.Factory())
@@ -146,24 +140,24 @@ fun DetailArticleContent(
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text (
-                    text = article?.title?: "Judul",
+                Text(
+                    text = article?.title ?: "Judul",
                     style = MaterialTheme.typography.titleLarge
                 )
-                Row (
+                Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
-                ){
+                ) {
                     Text(
-                        text = article?.user?.name?: "Penulis",
+                        text = article?.user?.name ?: "Penulis",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = article?.createdAt?: "00/00/0000",
+                        text = article?.createdAt ?: "00/00/0000",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.wrapContentWidth(Alignment.End)
@@ -172,19 +166,18 @@ fun DetailArticleContent(
             }
 
             Text(
-                text = article?.content?: "Lorem ipsum",
+                text = article?.content ?: "Lorem ipsum",
                 style = MaterialTheme.typography.bodyLarge
             )
         }
     }
 }
 
-
 @Preview(device = Devices.DEFAULT, showBackground = true)
 @Composable
 fun DetailArticleActivityPreview() {
     HidroQuTheme {
-        val navHostController = rememberNavController() // Create a NavHostController
-        DetailArticleScreen(navHostController = navHostController, articleId = 1) // Pass navController to the screen
+        val navHostController = rememberNavController()
+        DetailArticleScreen(navHostController = navHostController, articleId = 1)
     }
 }

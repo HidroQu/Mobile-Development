@@ -1,6 +1,5 @@
 package com.capstone.hidroqu.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capstone.hidroqu.navigation.Screen
@@ -49,7 +48,6 @@ class ArticleViewModel : ViewModel() {
                     }
                     if (response.isSuccessful) {
                         response.body()?.data?.let { wrapper ->
-                            // Sort the articles on this page by ID in descending order
                             val sortedPageArticles = wrapper.data.sortedByDescending { it.id }
                             allArticles.addAll(sortedPageArticles)
                             currentPage = wrapper.currentPage + 1
@@ -59,8 +57,6 @@ class ArticleViewModel : ViewModel() {
                         break
                     }
                 } while (response.body()?.data?.nextPageUrl != null)
-
-                // Final sort to ensure the most recent articles are at the top
                 _articles.value = allArticles.sortedByDescending { it.id }
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching articles: ${e.message}"
@@ -72,10 +68,6 @@ class ArticleViewModel : ViewModel() {
 
     fun fetchArticleDetail(token: String, articleId: Int) {
         _isLoading.value = true
-        Log.d(
-            "CommunityViewModel",
-            "Fetching detail komunitas dengan ID=$articleId menggunakan token"
-        )
         apiService.getArticleDetail("Bearer $token", articleId)
             .enqueue(object : Callback<ArticleDetailWrapper> {
                 override fun onResponse(
@@ -83,35 +75,22 @@ class ArticleViewModel : ViewModel() {
                     response: Response<ArticleDetailWrapper>
                 ) {
                     _isLoading.value = false
-                    Log.d("CommunityViewModel", "Response diterima untuk fetchCommunityDetail")
                     if (response.isSuccessful) {
                         val detailData = response.body()?.data
                         if (detailData != null) {
                             _articlesdetail.value = detailData
-                            Log.d(
-                                "CommunityViewModel",
-                                "Detail komunitas berhasil dimuat: $detailData"
-                            )
                         } else {
                             _errorMessage.value = "Data detail komunitas null"
-                            Log.e("CommunityViewModel", "Detail komunitas null")
                         }
                     } else {
                         _errorMessage.value = "Gagal memuat detail komunitas: ${response.message()}"
-                        Log.e(
-                            "CommunityViewModel",
-                            "Response error: ${response.code()} - ${response.message()}"
-                        )
                     }
                 }
 
                 override fun onFailure(call: Call<ArticleDetailWrapper>, t: Throwable) {
                     _isLoading.value = false
                     _errorMessage.value = "Gagal memuat detail komunitas: ${t.message}"
-                    Log.e("CommunityViewModel", "Koneksi gagal: ${t.message}", t)
                 }
             })
     }
-
-
 }

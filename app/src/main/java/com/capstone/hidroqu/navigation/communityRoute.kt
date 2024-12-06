@@ -6,15 +6,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.capstone.hidroqu.ui.screen.community.CommunityActivity
-import com.capstone.hidroqu.ui.screen.detailcommunity.DetailPostCommunityActivity
-import com.capstone.hidroqu.ui.screen.forgetpassword.ForgotPasswordActivity
-import com.capstone.hidroqu.ui.screen.formaddcomment.FormAddComment
-import com.capstone.hidroqu.ui.screen.formcommunity.FormAddCommunityActivity
-import com.capstone.hidroqu.ui.screen.login.LoginActivity
-import com.capstone.hidroqu.ui.screen.profileother.ProfileOtherActivity
-import com.capstone.hidroqu.ui.screen.register.RegisterActivity
-import com.capstone.hidroqu.ui.screen.resetpassword.ResetPasswordActivity
+import com.capstone.hidroqu.ui.screen.community.CommunityScreen
+import com.capstone.hidroqu.ui.screen.detailcommunity.DetailPostCommunityScreen
+import com.capstone.hidroqu.ui.screen.formaddcomment.FormAddCommentScreen
+import com.capstone.hidroqu.ui.screen.formcommunity.FormAddCommunityScreen
+import com.capstone.hidroqu.ui.screen.profileother.ProfileOtherScreen
 
 fun NavGraphBuilder.communityGraph(navController: NavHostController){
     navigation(
@@ -23,7 +19,7 @@ fun NavGraphBuilder.communityGraph(navController: NavHostController){
     ){
         //komunitas
         composable(Screen.Community.route) {
-            CommunityActivity(
+            CommunityScreen(
                 navHostController = navController,
                 onAddClicked = {
                     navController.navigate(Screen.AddPostCommunity.route)
@@ -32,39 +28,35 @@ fun NavGraphBuilder.communityGraph(navController: NavHostController){
         }
         ////add post komunitas
         composable(Screen.AddPostCommunity.route) {
-            FormAddCommunityActivity(navHostController = navController)
+            FormAddCommunityScreen(navHostController = navController)
         }
-
         ////detail komunitas
         composable(
             route = Screen.DetailCommunity.route,
             arguments = listOf(navArgument("idPost") { type = NavType.IntType })
         ) { backStackEntry ->
             val idPost = backStackEntry.arguments?.getInt("idPost") ?: 0
-            DetailPostCommunityActivity(
+            DetailPostCommunityScreen(
                 navHostController = navController,
                 idPost = idPost
             )
         }
-
         composable(
             route = Screen.ProfileOther.route,
             arguments = listOf(navArgument("idPost") { type = NavType.IntType })
         ) { backStackEntry ->
             val idPost = backStackEntry.arguments?.getInt("idPost") ?: 0
-            ProfileOtherActivity(
+            ProfileOtherScreen(
                 navHostController = navController,
                 idPost = idPost
             )
         }
-
-
         composable(
             route = Screen.AddPostComment.route,
             arguments = listOf(navArgument("postId") { type = NavType.IntType })
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            FormAddComment(
+            FormAddCommentScreen(
                 navHostController = navController,
                 postId = postId
             )

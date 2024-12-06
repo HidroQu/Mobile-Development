@@ -73,7 +73,6 @@ class UserPreferences(context: Context) {
             preferences[getNotificationKey(plantId)] ?: false
         }
 
-    // Fungsi untuk menyimpan status notifikasi untuk tanaman tertentu
     suspend fun savePlantNotificationEnabled(plantId: Int, enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[getNotificationKey(plantId)] = enabled

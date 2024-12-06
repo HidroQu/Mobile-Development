@@ -1,8 +1,5 @@
 package com.capstone.hidroqu.ui.component
 
-import com.capstone.hidroqu.utils.ListDetailPostCommunity
-import com.capstone.hidroqu.utils.dummyListDetailPostCommunity
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,20 +26,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.SvgDecoder
 import com.capstone.hidroqu.R
-import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.nonui.data.Comment
 import com.capstone.hidroqu.nonui.data.CommunityDetailResponse
-import com.capstone.hidroqu.ui.theme.HidroQuTheme
 import com.capstone.hidroqu.utils.formatDate
 
 @Composable
@@ -176,19 +168,6 @@ fun CardPostComment(
                     )
                 }
             }
-        }
-    }
-}
-
-
-@Preview
-@Composable
-private fun CardPostCommentPreview() {
-    HidroQuTheme {
-        dummyListDetailPostCommunity.forEach { comment ->
-//            CardPostComment (
-//                listComment = comment
-//            )
         }
     }
 }

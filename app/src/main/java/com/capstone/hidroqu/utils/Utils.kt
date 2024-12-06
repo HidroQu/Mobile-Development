@@ -44,16 +44,13 @@ fun compressImageFile(file: File, context: Context): File {
     bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
     outputStream.close()
 
-    Log.d("FileUtils", "Compression completed, File size after compression: ${compressedFile.length() / 1024} KB")
     while (compressedFile.length() > 1_024_000 && quality > 10) {
         quality -= 10
         compressedFile = File(context.cacheDir, "compressed_${file.name}")
         outputStream = FileOutputStream(compressedFile)
         bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
         outputStream.close()
-        Log.d("FileUtils", "Compression iteration with quality $quality, File size: ${compressedFile.length() / 1024} KB")
     }
-    Log.d("FileUtils", "Final compressed file size: ${compressedFile.length() / 1024} KB")
     return compressedFile
 }
 

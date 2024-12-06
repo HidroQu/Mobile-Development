@@ -1,14 +1,12 @@
-package com.capstone.hidroqu.ui.screen.addplant
+package com.capstone.hidroqu.ui.screen.chooseplant
 
-import android.app.Application
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,7 +15,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,34 +25,41 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.capstone.hidroqu.navigation.Screen
 import com.capstone.hidroqu.navigation.SimpleLightTopAppBar
-import com.capstone.hidroqu.nonui.data.PlantResponse
+import com.capstone.hidroqu.nonui.data.MyPlantResponse
 import com.capstone.hidroqu.nonui.data.UserPreferences
-import com.capstone.hidroqu.ui.component.CardAddPlant
+import com.capstone.hidroqu.ui.component.CardChoosePlant
+import com.capstone.hidroqu.ui.screen.addplant.AddPlantScreen
 import com.capstone.hidroqu.ui.viewmodel.MyPlantViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
-fun AddPlantActivity(
+fun ChoosePlantScreen(
+    diagnoseId: Int?,
+    photoUri: String?,
     viewModel: MyPlantViewModel = viewModel(),
     context: Context = LocalContext.current,
     navHostController: NavHostController
 ) {
-
-    // Menangani state tanaman yang dipilih secara internal
-    var selectedPlant by remember { mutableStateOf<PlantResponse?>(null) }
+    val imageUri = Uri.parse(photoUri)
+    var selectedPlant by remember { mutableStateOf<MyPlantResponse?>(null) }
 
     val userPreferences = UserPreferences(context)
     val token by userPreferences.token.collectAsState(initial = null)
-    val plants by viewModel.plants.collectAsState(emptyList()) // Mengobservasi data tanaman
+    val myPlant by viewModel.myPlants.collectAsState(emptyList())
     val isLoading by viewModel.isLoading.collectAsState(false)
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(Unit) {
         token?.let {
-            viewModel.fetchPlants(it) // Memuat data saat komponen diluncurkan
+            viewModel.fetchMyPlants(it)
         } ?: run {
-            // Handle the case when token is not availabl
         }
+    }
+    LaunchedEffect(myPlant) {
+        Log.d("ChoosePlantActivity", "Data tanaman: $myPlant")
     }
     Scaffold(
         topBar = {
@@ -71,8 +75,26 @@ fun AddPlantActivity(
                 Button(
                     onClick = {
                         selectedPlant?.let { plant ->
-                            navHostController.navigate(
-                                Screen.FormAddPlant.createRoute(plantId = plant.id)
+                            val currentDate = Date()
+                            Log.d("Current Date", currentDate.toString())
+                            val todayWithTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale("id", "ID")).format(currentDate)
+                            Log.d("Formatted Date", todayWithTime)
+                            Log.d(
+                                "ChoosePlantActivity",
+                                "Token: $token, PlantId: ${plant.id}, Diagnose ID: $diagnoseId, Date: $todayWithTime"
+                            )
+                            viewModel.storeDiagnose(
+                                token = token!!,
+                                myPlantId = plant.id,
+                                diagnoseId = diagnoseId!!,
+                                diagnoseDate = todayWithTime,
+                                imageUri = imageUri,
+                                context = context,
+                                onSuccess = {
+                                    navHostController.navigate(Screen.DetailMyPlant.createRoute(plant.id)) {
+                                        popUpTo(Screen.PotoTanamRoute.route) {inclusive = true}
+                                    }
+                                },
                             )
                         }
                     },
@@ -125,16 +147,16 @@ fun AddPlantActivity(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(3), // Menetapkan 2 kolom
+                    columns = GridCells.Fixed(3),
                     modifier = Modifier
                         .fillMaxSize(),
                     contentPadding = PaddingValues(0.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    items(plants) { plant ->
+                    items(myPlant) { plant ->
                         val isSelected = selectedPlant == plant
-                        CardAddPlant(
+                        CardChoosePlant(
                             ListPlant = plant,
                             isSelected = isSelected,
                             onClick = {
@@ -151,7 +173,6 @@ fun AddPlantActivity(
 @Preview(showBackground = true)
 @Composable
 fun AddPlantActivityPreview() {
-    // Preview dengan data dummy
     val navController = rememberNavController()
-    AddPlantActivity(navHostController = navController)
+    AddPlantScreen(navHostController = navController)
 }

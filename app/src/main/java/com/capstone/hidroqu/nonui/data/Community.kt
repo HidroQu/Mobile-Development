@@ -104,7 +104,7 @@ data class Comment(
     val comment_id: Int?,
     val user_id: Int,
     val content: String,
-    val image: String?, // Menggunakan `image` bukan `images`
+    val image: String?,
     val created_at: String,
     val updated_at: String?,
     val user: UserData,
@@ -112,13 +112,13 @@ data class Comment(
 ) : Parcelable
 
 @Parcelize
-data class Reply( // Renamed from Replies to Reply
+data class Reply(
     val id: Int,
     val community_id: Int,
     val comment_id: Int?,
     val user_id: Int,
     val content: String,
-    val images: String, // Changed from List<String> to String to match JSON
+    val images: String,
     val created_at: String,
     val updated_at: String?,
     val user: UserData
