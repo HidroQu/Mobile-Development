@@ -315,7 +315,9 @@ fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifi
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = "Artikel",
                     style = MaterialTheme.typography.titleLarge,
@@ -333,9 +335,11 @@ fun ArticleSection(navController: NavHostController, modifier: Modifier = Modifi
                     fontSize = 12.sp
                 ),
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.clickable {
-                    navController.navigate(Screen.Article.route)
-                }
+                modifier = Modifier
+                    .clickable {
+                        navController.navigate(Screen.Article.route)
+                    }
+                    .wrapContentWidth(Alignment.End)
             )
         }
         Column(

@@ -22,10 +22,12 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,14 +35,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -106,7 +112,7 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
     var cameraControl: CameraControl? by remember { mutableStateOf(null) }
     var cameraInfo: CameraInfo? by remember { mutableStateOf(null) }
     var cameraProvider: ProcessCameraProvider? by remember { mutableStateOf(null) }
-    val showTooltip by remember { mutableStateOf(true) }
+    var showTooltipOverlay by remember { mutableStateOf(false) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -242,88 +248,101 @@ fun CameraScreen(cameraMode: String, navHostController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
             )
-
-            if (showTooltip && cameraMode == "Poto Tanam") {
+            IconButton(
+                onClick = { showTooltipOverlay = !showTooltipOverlay },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "Show Tooltip",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(24.dp)
+                )
+            }
+            if (showTooltipOverlay) {
                 Box(
                     modifier = Modifier
+                        .zIndex(1f)
                         .fillMaxSize()
-                        .padding(28.dp),
+                        .background(Color.Black.copy(alpha = 0.7f))
+                        .pointerInput(Unit) {
+                            detectTapGestures {
+                                // Block any interaction with underlying elements
+                            }
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 shape = MaterialTheme.shapes.medium
                             )
-                            .padding(24.dp)
-                            .widthIn(max = 250.dp)
-                            .heightIn(max = 250.dp),
-                        verticalArrangement = Arrangement.Center,
+                            .padding(30.dp)
+                            .widthIn(max = 260.dp),
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.poto_tanam),
-                            contentDescription = "Leaf Guidance",
-                            modifier = Modifier
-                                .size(100.dp)
-                                .graphicsLayer(alpha = 0.7f)
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "Arahkan kamera ke dekat daun yang bermasalah",
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
+                            text = "Panduan diagnosis",
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .graphicsLayer(alpha = 0.7f)
-                        )
-                    }
-                }
-            } else if (showTooltip && cameraMode == "Scan Tanam") {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(28.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
-                                shape = MaterialTheme.shapes.medium
-                            )
-                            .padding(24.dp)
-                            .widthIn(max = 250.dp)
-                            .heightIn(max = 250.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.scan_tanam),
-                            contentDescription = "Leaf Guidance",
-                            modifier = Modifier
-                                .size(100.dp)
-                                .graphicsLayer(alpha = 0.7f)
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = "Arahkan kamera ke tanaman anda",
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .graphicsLayer(alpha = 0.7f)
-                        )
+                        val steps = if (cameraMode == "Poto Tanam") {
+                            listOf(
+                                "Dekatkan Kamera ke Tanaman: Pastikan tanaman yang ingin kamu cek kondisi nutrisinya masuk dalam bingkai layar dengan jelas.",
+                                "Fokuskan Kamera pada Daun: Arahkan fokus kamera tepat pada daun tanaman untuk mendapatkan hasil terbaik.",
+                                "Cahaya yang Tepat: Pastikan cahaya cukup agar tanaman terlihat jelas, tidak terlalu terang atau gelap.",
+                            )
+                        } else {
+                            listOf(
+                                "Arahkan Kamera ke Tanaman: Pastikan tanaman yang ingin dikenali jenisnya berada dalam bingkai layar.",
+                                "Fokus pada Tanaman Utama: Pastikan tanaman yang akan dikenali terlihat jelas.",
+                                "Pencahayaan yang Pas: Gunakan pencahayaan yang cukup agar detail tanaman terlihat jelas, tanpa bayangan atau silau."
+                            )
+                        }
+                        steps.forEachIndexed { index, step ->
+                            Row(
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                Text(
+                                    text = String.format("%-4s", "${index + 1}."),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                                Text(
+                                    text = step,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                            }
+                        }
+                        Button(
+                            onClick = { showTooltipOverlay = !showTooltipOverlay },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text(
+                                text = "Tutup Panduan",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
                     }
                 }
             }
 
             val color = MaterialTheme.colorScheme.onPrimaryContainer
-            Canvas(modifier = Modifier.fillMaxSize()) {
+            Canvas(modifier = Modifier
+                .fillMaxSize()
+                .zIndex(0f)
+            ) {
                 val strokeWidth = 5f
                 val baseCornerLength = 60f
                 val cornerLength = baseCornerLength + (animatedProgress * 150f)
