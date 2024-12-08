@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.capstone.hidroqu.nonui.data.MyPlantResponse
-import com.capstone.hidroqu.ui.screen.home.ListAlarmHome
 
 class HarvestNotificationViewModel : ViewModel() {
     private val _listAlarmHome = MutableLiveData<List<MyPlantResponse>>()

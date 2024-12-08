@@ -63,12 +63,12 @@ fun CardCamera(
                 Icon(
                     painterResource(icon),
                     contentDescription = "Camera",
-                    modifier = Modifier.width(14.dp)
+                    modifier = Modifier.width(13.dp)
                 )
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleLarge.copy(
-                        fontSize = 13.sp
+                        fontSize = 12.sp
                     ),
                     color = colorText
                 )
