@@ -1,6 +1,8 @@
 package com.capstone.hidroqu.ui.screen.login
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -136,8 +138,6 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    GoogleButton(navHostController = navHostController)
-
                     RegisterButton(navHostController = navHostController)
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -255,6 +255,9 @@ fun RegisterButton(
 fun ForgotPasswordButton(
     navHostController: NavHostController
 ) {
+    val context = LocalContext.current
+    val forgotPasswordUrl = "http://168.138.164.252/reset-password"
+
     Row (
         modifier = Modifier
             .fillMaxWidth(),
@@ -268,49 +271,11 @@ fun ForgotPasswordButton(
             ),
             modifier = Modifier
                 .clickable {
-                    navHostController.navigate(Screen.ForgotPassword.route)
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(forgotPasswordUrl))
+                    context.startActivity(intent)
                 }
                 .padding(vertical = 8.dp, horizontal = 8.dp)
         )
-    }
-}
-
-
-@Composable
-fun GoogleButton(
-    navHostController: NavHostController,
-) {
-    TextButton(
-        onClick = {
-//            navHostController.navigate(Screen.HomeRoute.route) {
-//                popUpTo(Screen.Login.route) { inclusive = true }
-//            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .border(
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                shape = RoundedCornerShape(100.dp)
-            ),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.google),
-                contentDescription = "Google Logo",
-                modifier = Modifier.size(16.dp),
-                contentScale = ContentScale.Fit
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Masuk dengan Google",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
     }
 }
 

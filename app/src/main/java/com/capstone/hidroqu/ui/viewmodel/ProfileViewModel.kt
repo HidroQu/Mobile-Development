@@ -61,7 +61,7 @@ class ProfileViewModel: ViewModel() {
                     _userData.value = response.body()?.data
                 } else {
                     Log.e("ProfileViewModel", "Error: ${response.errorBody()?.string()}")
-                    _errorMessage.value = "Failed to load profile: ${response.message()}"
+                    _errorMessage.value = "Gagal memuat profilmu:( Keluar lalu login lagi, ya!: ${response.message()}"
                 }
             }
 
