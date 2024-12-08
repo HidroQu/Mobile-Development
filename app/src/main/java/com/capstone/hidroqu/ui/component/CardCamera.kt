@@ -36,7 +36,7 @@ fun CardCamera(
     Row(
         modifier = modifier
             .clickable { onClick() }
-            .height(95.dp)
+            .height(100.dp)
             .background(backgroundColor, shape = MaterialTheme.shapes.medium)
             .border(
                 width = 1.dp,
@@ -49,7 +49,9 @@ fun CardCamera(
     ) {
         Image(
             painter = painterResource(id = imageRes),
-            contentDescription = null,
+            contentDescription = "Icon",
+            modifier = Modifier
+                .width(30.dp)
         )
         Column (
             verticalArrangement = Arrangement.spacedBy(6.dp)
