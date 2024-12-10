@@ -256,7 +256,7 @@ fun ForgotPasswordButton(
     navHostController: NavHostController
 ) {
     val context = LocalContext.current
-    val forgotPasswordUrl = "http://168.138.164.252/reset-password"
+    val forgotPasswordUrl = "https://hidroqu-api-1031788214835.asia-southeast2.run.app/reset-password"
 
     Row (
         modifier = Modifier
