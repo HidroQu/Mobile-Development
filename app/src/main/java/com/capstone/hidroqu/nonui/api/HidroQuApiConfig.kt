@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class HidroQuApiConfig {
     companion object {
-        private const val BASE_URL = "https://hidroqu-api-1031788214835.asia-southeast2.run.app/"
+        private const val BASE_URL = "http://localhost:3000/"
 
         private val retrofit: Retrofit by lazy {
             val loggingInterceptor =
