@@ -1,8 +1,6 @@
 package com.capstone.hidroqu.ui.screen.login
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -255,9 +253,6 @@ fun RegisterButton(
 fun ForgotPasswordButton(
     navHostController: NavHostController
 ) {
-    val context = LocalContext.current
-    val forgotPasswordUrl = "https://hidroqu-api-1031788214835.asia-southeast2.run.app/reset-password"
-
     Row (
         modifier = Modifier
             .fillMaxWidth(),
@@ -271,8 +266,7 @@ fun ForgotPasswordButton(
             ),
             modifier = Modifier
                 .clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(forgotPasswordUrl))
-                    context.startActivity(intent)
+                    navHostController.navigate(Screen.ForgotPassword.route)
                 }
                 .padding(vertical = 8.dp, horizontal = 8.dp)
         )
