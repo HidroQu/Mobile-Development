@@ -68,6 +68,12 @@
      ```
    - Build the app
    - Run the app or press `Shift + F10`
+3. **Linux CLI**
+   - Clone the repository
+   - Run `./setup-linux`
+   - Check the grandle `./gradlew`
+   - Build debug app `./gradlew assembleDebug`
+   - Build release app `./gradlew assembleRelease`
 
 ## Application Demonstration
 Click on the picture below to watch the app demonstration:

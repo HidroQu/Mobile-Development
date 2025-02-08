@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Define SDK paths
+SDK_DIR="$HOME/Android/Sdk"
+CMDLINE_TOOLS_DIR="$SDK_DIR/cmdline-tools"
+CMDLINE_BIN="$CMDLINE_TOOLS_DIR/tools/bin"
+PLATFORM_TOOLS_DIR="$SDK_DIR/platform-tools"
+
+# Detect shell and determine config file
+if [[ $SHELL == */zsh ]]; then
+    SHELL_CONFIG="$HOME/.zshrc"
+elif [[ $SHELL == */bash ]]; then
+    SHELL_CONFIG="$HOME/.bashrc"
+else
+    SHELL_CONFIG="$HOME/.bashrc"  # Default to bashrc if unknown shell
+fi
+
+# Function to display a progress bar
+progress_bar() {
+    local pid=$1
+    local delay=0.1
+    local spin='-\|/'
+
+    echo -n "Installing..."
+    while ps -p $pid > /dev/null; do
+        for i in {0..3}; do
+            echo -ne "\rInstalling... ${spin:$i:1}"
+            sleep $delay
+        done
+    done
+    echo -ne "\rInstallation completed! ✅\n"
+}
+
+# Function to install SDK if not found
+install_sdk() {
+    echo "Android SDK not found. Installing..."
+
+    mkdir -p "$SDK_DIR"
+    cd "$SDK_DIR" || exit 1
+
+    # Download Android command-line tools with progress bar
+    echo "Downloading Android SDK..."
+    wget --show-progress -q https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip &
+    progress_bar $!
+
+    # Extract files
+    echo "Extracting SDK files..."
+    unzip -q cmdline-tools.zip -d cmdline-tools &
+    progress_bar $!
+    mv cmdline-tools/cmdline-tools cmdline-tools/tools
+    rm cmdline-tools.zip
+
+    # Set environment variables
+    echo "Setting up environment variables in $SHELL_CONFIG..."
+    export ANDROID_HOME=$SDK_DIR
+    export PATH=$CMDLINE_BIN:$PLATFORM_TOOLS_DIR:$PATH
+
+    # Add to shell config if not already present
+    if ! grep -q 'ANDROID_HOME' "$SHELL_CONFIG"; then
+        echo 'export ANDROID_HOME=$HOME/Android/Sdk' >> "$SHELL_CONFIG"
+        echo 'export PATH=$ANDROID_HOME/cmdline-tools/tools/bin:$ANDROID_HOME/platform-tools:$PATH' >> "$SHELL_CONFIG"
+    fi
+
+    # Install SDK components with progress
+    echo "Accepting licenses..."
+    yes | sdkmanager --licenses &> /dev/null &
+    progress_bar $!
+
+    echo "Installing required SDK components..."
+    sdkmanager --install "platforms;android-34" "build-tools;34.0.0" "platform-tools" &
+    progress_bar $!
+
+    echo "Android SDK installation completed successfully! 🎉"
+}
+
+# Check if SDK is installed
+if [ -d "$CMDLINE_BIN" ] && [ -d "$PLATFORM_TOOLS_DIR" ]; then
+    echo "✅ Android SDK is already installed."
+else
+    install_sdk
+
+    echo "Reloading shell configuration..."
+    echo "✅ Android SDK setup is complete. Restart your terminal to apply changes!"
+fi
