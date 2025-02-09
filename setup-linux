@@ -67,7 +67,7 @@ install_sdk() {
     progress_bar $!
 
     echo "Installing required SDK components..."
-    sdkmanager --install "platforms;android-34" "build-tools;34.0.0" "platform-tools" &
+    sdkmanager --install "platforms;android-35" "build-tools;34.0.0" "platform-tools" &
     progress_bar $!
 
     echo "Android SDK installation completed successfully! 🎉"
@@ -79,6 +79,5 @@ if [ -d "$CMDLINE_BIN" ] && [ -d "$PLATFORM_TOOLS_DIR" ]; then
 else
     install_sdk
 
-    echo "Reloading shell configuration..."
     echo "✅ Android SDK setup is complete. Restart your terminal to apply changes!"
 fi

@@ -70,6 +70,7 @@
    - Run the app or press `Shift + F10`
 3. **Linux CLI**
    - Clone the repository
+   - Ensure java has installed
    - Run `./setup-linux`
    - Check the grandle `./gradlew`
    - Build debug app `./gradlew assembleDebug`
