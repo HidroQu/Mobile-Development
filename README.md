@@ -58,6 +58,9 @@ _HidroQu_ is built with:
 ### Prerequisites
 
 - Mobile device with Android Operating System
+- Setup the `BASE_URL` for the API on
+  `app/src/main/java/com/capstone/hidroqu/nonui/api/HidroQuApiConfig.kt` for [HidroQu-API](https://github.com/HidroQu/HidroQu-API)
+  `app/src/main/java/com/capstone/hidroqu/nonui/api/HidroQuApiPredictConfig.kt` for [HidroQu-ML](https://github.com/HidroQu/Mobile-Development)
 
 ### Installation
 
